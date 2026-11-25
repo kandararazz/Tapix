@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>NEON CORE // Cyber-Mining Empire</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Tapix — Cyber-Mining Clicker</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2322d3ee'/%3E%3Cstop offset='100%25' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%23070b14'/%3E%3Cpolygon points='32,6 56,20 56,44 32,58 8,44 8,20' fill='url(%23g)' fill-opacity='0.22' stroke='url(%23g)' stroke-width='3'/%3E%3Cpath d='M20 22h24v6h-9v20h-6V28h-9z' fill='%23ffffff'/%3E%3Ccircle cx='46' cy='44' r='4' fill='%2322d3ee'/%3E%3C/svg%3E" />
   <style>
     /* ==========================================================================
        1. DESIGN TOKENS & RESET
@@ -100,17 +101,21 @@
     }
 
     .brand-badge {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, rgba(34, 211, 238, 0.16), rgba(168, 85, 247, 0.22));
+      border: 1px solid rgba(34, 211, 238, 0.45);
       display: grid;
       place-items: center;
-      font-weight: 800;
-      font-size: 16px;
-      color: #04070f;
-      box-shadow: 0 0 16px var(--cyan-glow);
+      box-shadow: 0 0 18px rgba(34, 211, 238, 0.28);
       flex-shrink: 0;
+    }
+
+    .brand-badge svg {
+      width: 28px;
+      height: 28px;
+      display: block;
     }
 
     .brand-title {
@@ -532,6 +537,11 @@
     }
 
     .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 40px;
       padding: 9px 12px;
       border-radius: var(--radius-sm);
       font-size: 0.85rem;
@@ -540,6 +550,32 @@
       background: transparent;
       border: 1px solid transparent;
       transition: all 0.15s ease;
+    }
+
+    .tab-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 800;
+      background: rgba(52, 211, 153, 0.18);
+      color: var(--green);
+      border: 1px solid rgba(52, 211, 153, 0.4);
+    }
+
+    .tab-badge.hidden {
+      display: none;
+    }
+
+    .tab-badge.prestige-ready {
+      background: rgba(168, 85, 247, 0.28);
+      color: #e9d5ff;
+      border-color: rgba(192, 132, 252, 0.65);
     }
 
     .tab-btn.active {
@@ -626,12 +662,17 @@
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       text-align: left;
-      transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+      transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .upgrade-card:not(:disabled) {
+      border-color: rgba(52, 211, 153, 0.38);
+      box-shadow: inset 0 0 12px rgba(52, 211, 153, 0.06);
     }
 
     .upgrade-card:hover:not(:disabled) {
       background: var(--bg-card-hover);
-      border-color: var(--border-glow);
+      border-color: var(--green);
       transform: translateY(-1px);
     }
 
@@ -941,24 +982,80 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    .guide-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .guide-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .guide-step strong {
+      color: var(--cyan);
+      flex-shrink: 0;
+    }
+
     /* ==========================================================================
-       6. MOBILE & TABLET RESPONSIVE LAYOUT
+       6. LAPTOP, TABLET & MOBILE RESPONSIVE LAYOUT
        ========================================================================== */
-    @media (max-width: 900px) {
+    /* Tablet Landscape / Small Laptop */
+    @media (max-width: 1100px) {
+      .main-grid {
+        grid-template-columns: 1fr 360px;
+      }
+
+      .top-bar {
+        padding: 10px 14px;
+        gap: 10px;
+      }
+
+      .stat-pill {
+        min-width: 102px;
+        padding: 5px 10px;
+      }
+
+      .stat-pill.primary {
+        min-width: 136px;
+      }
+
+      .core-wrapper {
+        width: 210px;
+        height: 210px;
+      }
+
+      .core-button {
+        width: 180px;
+        height: 180px;
+      }
+    }
+
+    /* Tablet Portrait & Mobile */
+    @media (max-width: 819px) {
       .app-shell {
         height: auto;
         min-height: 100dvh;
         overflow-y: auto;
+        overflow-x: hidden;
       }
 
       .top-bar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
         flex-wrap: wrap;
         padding: 10px 12px;
         gap: 8px;
-      }
-
-      .brand-title span {
-        display: none;
       }
 
       .stats-cluster {
@@ -978,6 +1075,11 @@
       .stat-value,
       .stat-pill.primary .stat-value {
         font-size: 0.96rem;
+      }
+
+      .icon-btn {
+        min-height: 40px;
+        padding: 8px 11px;
       }
 
       .main-grid {
@@ -1013,11 +1115,48 @@
 
       .shop-scroll {
         overflow-y: visible;
-        padding-bottom: 32px;
+        padding-bottom: max(32px, env(safe-area-inset-bottom));
       }
 
       .upgrade-card {
+        min-height: 64px;
         padding: 12px;
+      }
+
+      .buy-mode-btn {
+        min-height: 32px;
+        padding: 4px 10px;
+      }
+    }
+
+    /* Small Phones */
+    @media (max-width: 480px) {
+      .brand-title span {
+        display: none;
+      }
+
+      .icon-btn .btn-label {
+        display: none;
+      }
+
+      .click-arena {
+        min-height: 320px;
+        padding: 16px 12px;
+      }
+
+      .core-wrapper {
+        width: 176px;
+        height: 176px;
+      }
+
+      .core-button {
+        width: 152px;
+        height: 152px;
+      }
+
+      .core-svg {
+        width: 78px;
+        height: 78px;
       }
     }
   </style>
@@ -1027,9 +1166,21 @@
     <!-- ==================== TOP HUD BAR ==================== -->
     <header class="top-bar">
       <div class="brand">
-        <div class="brand-badge">N</div>
+        <div class="brand-badge" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="tapixGrad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#22d3ee" />
+                <stop offset="100%" stop-color="#a855f7" />
+              </linearGradient>
+            </defs>
+            <polygon points="32,5 56,19 56,45 32,59 8,45 8,19" fill="url(#tapixGrad)" fill-opacity="0.2" stroke="url(#tapixGrad)" stroke-width="3.2" />
+            <path d="M19 21H45V27.5H35.5V47H28.5V27.5H19V21Z" fill="#F8FAFC" />
+            <circle cx="45" cy="43" r="4.2" fill="#22D3EE" />
+          </svg>
+        </div>
         <div class="brand-title">
-          <strong>Neon Core</strong>
+          <strong>Tapix</strong>
           <span>Cyber-Mining Empire</span>
         </div>
       </div>
@@ -1054,13 +1205,17 @@
       </div>
 
       <div class="header-actions">
-        <button class="icon-btn active" id="btn-sound" title="Toggle Sound Effects">
-          <span id="sound-icon">🔊</span>
-          <span>SFX</span>
+        <button class="icon-btn" id="btn-help" title="How to Play" aria-label="How to Play">
+          <span>❓</span>
+          <span class="btn-label">Guide</span>
         </button>
-        <button class="icon-btn" id="btn-save-menu" title="Save, Export & Import">
+        <button class="icon-btn active" id="btn-sound" title="Toggle Sound Effects" aria-label="Toggle Sound Effects">
+          <span id="sound-icon">🔊</span>
+          <span class="btn-label">SFX</span>
+        </button>
+        <button class="icon-btn" id="btn-save-menu" title="Save, Export & Import" aria-label="Save, Export and Import">
           <span>💾</span>
-          <span>Save</span>
+          <span class="btn-label">Save</span>
         </button>
       </div>
     </header>
@@ -1087,28 +1242,34 @@
           <button
             class="core-button"
             id="core-button"
-            aria-label="Mine Cyber Core"
+            aria-label="Mine Tapix Core"
             type="button"
           >
-            <!-- Vector Cyber Core Crystal -->
+            <!-- Vector Tapix Core Crystal -->
             <svg class="core-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
               <polygon points="50,6 88,28 88,72 50,94 12,72 12,28" stroke="#e0f2fe" stroke-width="3" fill="rgba(255,255,255,0.12)" />
               <polygon points="50,18 76,34 76,66 50,82 24,66 24,34" stroke="#67e8f9" stroke-width="2.5" fill="rgba(34,211,238,0.22)" />
-              <polygon points="50,30 64,50 50,70 36,50" fill="#ffffff" />
-              <circle cx="50" cy="50" r="6" fill="#22d3ee" />
+              <path d="M33 36H67V44H54.5V69H45.5V44H33V36Z" fill="#ffffff" />
+              <circle cx="66" cy="63" r="5" fill="#22d3ee" />
             </svg>
           </button>
         </div>
 
-        <p class="arena-hint">Tap the Neon Core (or press Space) to extract Cyber Credits. Watch for Golden Packets!</p>
+        <p class="arena-hint">Tap the Tapix Core (or press Space) to mine Cyber Credits. Catch Golden Stars for bonuses!</p>
         <p class="creator-credit">Created by Raza</p>
       </section>
 
       <!-- RIGHT: UPGRADE SHOP & PRESTIGE SIDEBAR -->
       <aside class="shop-sidebar">
         <div class="shop-tabs">
-          <button class="tab-btn active" id="tab-shop" type="button">Upgrade Shop</button>
-          <button class="tab-btn prestige-tab" id="tab-prestige" type="button">Prestige Core</button>
+          <button class="tab-btn active" id="tab-shop" type="button">
+            <span>Upgrade Shop</span>
+            <span class="tab-badge hidden" id="shop-buyable-badge">0</span>
+          </button>
+          <button class="tab-btn prestige-tab" id="tab-prestige" type="button">
+            <span>Prestige Core</span>
+            <span class="tab-badge prestige-ready hidden" id="prestige-ready-badge">READY</span>
+          </button>
         </div>
 
         <div class="shop-scroll" id="panel-shop">
@@ -1213,6 +1374,34 @@
     </div>
   </div>
 
+  <!-- How to Play Modal -->
+  <div class="modal-backdrop" id="help-modal">
+    <div class="modal-card">
+      <h2>How to Play Tapix</h2>
+      <div class="guide-steps">
+        <div class="guide-step">
+          <strong>1. Tap:</strong>
+          <span>Tap the glowing Tapix Core (or press Space on a laptop) to mine Cyber Credits.</span>
+        </div>
+        <div class="guide-step">
+          <strong>2. Upgrade:</strong>
+          <span>Cards with a green glow are ready to buy. Get Click Multipliers for stronger taps and Miners for automatic CPS.</span>
+        </div>
+        <div class="guide-step">
+          <strong>3. Catch Stars:</strong>
+          <span>Golden Stars appear occasionally for 10 seconds — tap them for an instant jackpot or 2x Overclock!</span>
+        </div>
+        <div class="guide-step">
+          <strong>4. Rebirth:</strong>
+          <span>Reach 100,000 run credits to Rebirth for permanent Prestige Gems (+25% all earnings each).</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="btn-close-help" type="button">Got It</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Rebirth Confirmation Modal -->
   <div class="modal-backdrop" id="rebirth-modal">
     <div class="modal-card">
@@ -1234,7 +1423,8 @@
       /* ========================================================================
          1. GAME CONFIGURATION & CATALOGS
          ======================================================================== */
-      const SAVE_KEY = 'neon_core_cyber_miner_v1';
+      const SAVE_KEY = 'tapix_cyber_miner_v1';
+      const LEGACY_SAVE_KEY = 'neon_core_cyber_miner_v1';
       const PRESTIGE_MILESTONE = 100_000;
       const GEM_BONUS_PER_GEM = 0.25; // +25% permanent multiplier per Prestige Gem
       const OFFLINE_CAP_SECONDS = 86_400; // Max 24 hours of offline mining
@@ -1647,6 +1837,8 @@
         buildingList: document.getElementById('building-list'),
         tabShop: document.getElementById('tab-shop'),
         tabPrestige: document.getElementById('tab-prestige'),
+        shopBuyableBadge: document.getElementById('shop-buyable-badge'),
+        prestigeReadyBadge: document.getElementById('prestige-ready-badge'),
         panelShop: document.getElementById('panel-shop'),
         panelPrestige: document.getElementById('panel-prestige'),
         prestigeClaimable: document.getElementById('prestige-claimable'),
@@ -1661,6 +1853,7 @@
         statRebirths: document.getElementById('stat-rebirths'),
         btnSound: document.getElementById('btn-sound'),
         soundIcon: document.getElementById('sound-icon'),
+        helpModal: document.getElementById('help-modal'),
         saveModal: document.getElementById('save-modal'),
         saveTextarea: document.getElementById('save-textarea'),
         offlineModal: document.getElementById('offline-modal'),
@@ -1932,7 +2125,7 @@
 
       function loadFromStorage() {
         try {
-          const raw = localStorage.getItem(SAVE_KEY);
+          const raw = localStorage.getItem(SAVE_KEY) || localStorage.getItem(LEGACY_SAVE_KEY);
           if (!raw) return;
           const parsed = JSON.parse(raw);
           const merged = createDefaultState();
@@ -1987,6 +2180,7 @@
         }
 
         // Click-Power Multipliers
+        let buyableCount = 0;
         for (const m of CLICK_MULTIPLIERS) {
           const node = multiplierNodes[m.id];
           const isOwned = !!state.multipliers[m.id];
@@ -1996,8 +2190,10 @@
             node.badge.textContent = 'ACTIVE';
             node.cost.textContent = 'OWNED';
           } else {
+            const canBuy = state.credits >= m.baseCost;
+            if (canBuy) buyableCount++;
             node.btn.classList.remove('owned-max');
-            node.btn.disabled = state.credits < m.baseCost;
+            node.btn.disabled = !canBuy;
             node.badge.textContent = `x${m.mult}`;
             node.cost.textContent = `${formatNum(m.baseCost)} Credits`;
           }
@@ -2008,13 +2204,19 @@
           const node = buildingNodes[b.id];
           const owned = state.buildings[b.id] || 0;
           const quote = getBuildingBulkQuote(b, buyMode);
+          const canBuy = quote.affordable !== false && state.credits >= quote.cost;
+          if (canBuy) buyableCount++;
           node.owned.textContent = owned;
-          node.btn.disabled = quote.affordable === false || state.credits < quote.cost;
+          node.btn.disabled = !canBuy;
           node.cost.textContent = `${formatNum(quote.cost)} Credits${quote.qty > 1 ? ` (x${quote.qty})` : ''}`;
         }
 
+        els.shopBuyableBadge.textContent = String(buyableCount);
+        els.shopBuyableBadge.classList.toggle('hidden', buyableCount === 0);
+
         // Prestige Tab
         const claimable = getClaimableGems();
+        els.prestigeReadyBadge.classList.toggle('hidden', claimable <= 0);
         els.prestigeClaimable.textContent = `+${claimable} Gem${claimable === 1 ? '' : 's'}`;
         els.btnRebirth.disabled = claimable <= 0;
 
@@ -2134,6 +2336,15 @@
         document.getElementById('btn-confirm-rebirth').addEventListener('click', () => {
           els.rebirthModal.classList.remove('open');
           performRebirth();
+        });
+
+        // How to Play Guide Modal
+        document.getElementById('btn-help').addEventListener('click', () => {
+          els.helpModal.classList.add('open');
+        });
+
+        document.getElementById('btn-close-help').addEventListener('click', () => {
+          els.helpModal.classList.remove('open');
         });
 
         // Save / Export / Import Modal
