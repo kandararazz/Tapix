@@ -4,34 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Tapix — Coin Clicker</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2322d3ee'/%3E%3Cstop offset='100%25' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%23060913'/%3E%3Cpolygon points='32,6 56,20 56,44 32,58 8,44 8,20' fill='url(%23g)' fill-opacity='0.22' stroke='url(%23g)' stroke-width='3'/%3E%3Cpath d='M20 22h24v6h-9v20h-6V28h-9z' fill='%23ffffff'/%3E%3Ccircle cx='46' cy='44' r='4' fill='%2322d3ee'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23fbbf24'/%3E%3Cstop offset='100%25' stop-color='%23f43f5e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%230b0912'/%3E%3Cpolygon points='32,6 56,20 56,44 32,58 8,44 8,20' fill='url(%23g)' fill-opacity='0.24' stroke='url(%23g)' stroke-width='3'/%3E%3Cpath d='M20 22h24v6h-9v20h-6V28h-9z' fill='%23ffffff'/%3E%3Ccircle cx='46' cy='44' r='4' fill='%23fbbf24'/%3E%3C/svg%3E" />
   <!-- Supabase JS SDK v2 (graceful fallback to localStorage if offline/unconfigured) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* ==========================================================================
-       1. DESIGN TOKENS & RESET
+       1. DESIGN TOKENS & RESET (Solar Gold & Obsidian Vault Theme)
        ========================================================================== */
     :root {
-      --bg-base: #060913;
-      --bg-elevated: rgba(13, 19, 34, 0.86);
-      --bg-card: rgba(20, 29, 51, 0.78);
-      --bg-card-hover: rgba(28, 40, 68, 0.92);
-      --border-subtle: rgba(148, 163, 184, 0.14);
-      --border-cyan: rgba(34, 211, 238, 0.42);
-      --border-green: rgba(16, 185, 129, 0.55);
+      --bg-base: #0b0912;
+      --bg-elevated: rgba(20, 16, 32, 0.9);
+      --bg-card: rgba(31, 24, 48, 0.84);
+      --bg-card-hover: rgba(42, 33, 66, 0.96);
+      --border-subtle: rgba(251, 191, 36, 0.14);
+      --border-cyan: rgba(251, 191, 36, 0.48);
+      --border-green: rgba(16, 185, 129, 0.62);
 
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      --text-main: #fefce8;
+      --text-muted: #c4b5a0;
+      --text-dim: #8b7e96;
 
-      --cyan: #22d3ee;
-      --cyan-soft: rgba(34, 211, 238, 0.14);
-      --violet: #8b5cf6;
-      --violet-soft: rgba(139, 92, 246, 0.16);
+      --cyan: #fbbf24;
+      --cyan-soft: rgba(251, 191, 36, 0.15);
+      --violet: #f43f5e;
+      --violet-soft: rgba(244, 63, 94, 0.16);
       --emerald: #10b981;
-      --emerald-soft: rgba(16, 185, 129, 0.14);
+      --emerald-soft: rgba(16, 185, 129, 0.16);
       --amber: #f59e0b;
-      --amber-soft: rgba(245, 158, 11, 0.18);
+      --amber-soft: rgba(245, 158, 11, 0.2);
       --rose: #fb7185;
 
       --radius-sm: 10px;
@@ -78,8 +78,8 @@
       min-height: 100dvh;
       overflow: hidden;
       background:
-        radial-gradient(ellipse 65% 55% at 22% 20%, rgba(34, 211, 238, 0.09), transparent),
-        radial-gradient(ellipse 55% 50% at 85% 85%, rgba(139, 92, 246, 0.09), transparent),
+        radial-gradient(ellipse 65% 55% at 22% 20%, rgba(251, 191, 36, 0.11), transparent),
+        radial-gradient(ellipse 55% 50% at 85% 85%, rgba(244, 63, 94, 0.1), transparent),
         var(--bg-base);
     }
 
@@ -108,11 +108,11 @@
       width: 40px;
       height: 40px;
       border-radius: 12px;
-      background: linear-gradient(145deg, rgba(34, 211, 238, 0.16), rgba(139, 92, 246, 0.22));
-      border: 1px solid rgba(34, 211, 238, 0.42);
+      background: linear-gradient(145deg, rgba(251, 191, 36, 0.2), rgba(244, 63, 94, 0.22));
+      border: 1px solid rgba(251, 191, 36, 0.48);
       display: grid;
       place-items: center;
-      box-shadow: 0 0 20px rgba(34, 211, 238, 0.22);
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.24);
     }
 
     .brand-logo svg {
@@ -179,12 +179,12 @@
 
     .stat-chip.primary {
       border-color: var(--border-cyan);
-      background: linear-gradient(90deg, rgba(34, 211, 238, 0.12), rgba(20, 29, 51, 0.9));
+      background: linear-gradient(90deg, rgba(251, 191, 36, 0.16), rgba(31, 24, 48, 0.9));
     }
 
     .stat-chip.gems {
-      border-color: rgba(139, 92, 246, 0.38);
-      background: linear-gradient(90deg, rgba(139, 92, 246, 0.12), rgba(20, 29, 51, 0.9));
+      border-color: rgba(244, 63, 94, 0.42);
+      background: linear-gradient(90deg, rgba(244, 63, 94, 0.15), rgba(31, 24, 48, 0.9));
     }
 
     .stat-chip-label {
@@ -208,7 +208,7 @@
     }
 
     .stat-chip.gems .stat-chip-val {
-      color: #c4b5fd;
+      color: #fda4af;
     }
 
     .header-actions {
@@ -284,9 +284,9 @@
       position: absolute;
       inset: 0;
       background-image:
-        radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.08) 0%, transparent 56%),
-        linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
+        radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.1) 0%, transparent 56%),
+        linear-gradient(rgba(251, 191, 36, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(251, 191, 36, 0.04) 1px, transparent 1px);
       background-size: 100% 100%, 44px 44px, 44px 44px;
       mask-image: radial-gradient(circle at center, black 40%, transparent 82%);
       pointer-events: none;
@@ -343,10 +343,10 @@
       font-size: clamp(2.1rem, 4.4vw, 3.4rem);
       font-weight: 800;
       letter-spacing: -0.03em;
-      background: linear-gradient(180deg, #ffffff 25%, #67e8f9 100%);
+      background: linear-gradient(180deg, #fffbeb 20%, #fbbf24 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 22px rgba(34, 211, 238, 0.3));
+      filter: drop-shadow(0 0 22px rgba(251, 191, 36, 0.34));
     }
 
     .arena-sub {
@@ -374,13 +374,13 @@
 
     .core-orbit.outer {
       inset: -14px;
-      border: 1.5px dashed rgba(34, 211, 238, 0.26);
+      border: 1.5px dashed rgba(251, 191, 36, 0.32);
       animation: spinCW 26s linear infinite;
     }
 
     .core-orbit.inner {
       inset: 6px;
-      border: 1px solid rgba(139, 92, 246, 0.34);
+      border: 1px solid rgba(244, 63, 94, 0.38);
       animation: spinCCW 18s linear infinite;
     }
 
@@ -393,12 +393,12 @@
       height: 206px;
       border-radius: 50%;
       background:
-        radial-gradient(circle at 32% 28%, #a5f3fc 0%, #0891b2 36%, #1e1b4b 78%, #070b16 100%);
-      border: 2.5px solid rgba(103, 232, 249, 0.72);
+        radial-gradient(circle at 32% 28%, #fef3c7 0%, #f59e0b 36%, #9f1239 78%, #160c1f 100%);
+      border: 2.5px solid rgba(253, 224, 71, 0.8);
       box-shadow:
-        0 0 42px rgba(34, 211, 238, 0.35),
-        inset 0 0 32px rgba(103, 232, 249, 0.4),
-        inset 0 -20px 34px rgba(91, 33, 182, 0.55);
+        0 0 46px rgba(245, 158, 11, 0.4),
+        inset 0 0 32px rgba(254, 240, 138, 0.45),
+        inset 0 -20px 34px rgba(159, 18, 57, 0.6);
       display: grid;
       place-items: center;
       transition: transform 0.08s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.15s ease;
@@ -408,16 +408,16 @@
     .core-button:hover {
       transform: scale(1.03);
       box-shadow:
-        0 0 54px rgba(34, 211, 238, 0.55),
-        inset 0 0 38px rgba(103, 232, 249, 0.55);
+        0 0 58px rgba(251, 191, 36, 0.6),
+        inset 0 0 38px rgba(254, 240, 138, 0.6);
     }
 
     .core-button:active,
     .core-button.is-pressed {
       transform: scale(0.92);
       box-shadow:
-        0 0 64px rgba(34, 211, 238, 0.78),
-        inset 0 0 44px rgba(255, 255, 255, 0.55);
+        0 0 68px rgba(251, 191, 36, 0.82),
+        inset 0 0 44px rgba(255, 255, 255, 0.6);
     }
 
     .core-svg {
@@ -465,8 +465,8 @@
       font-family: var(--font-mono);
       font-weight: 800;
       font-size: 1.15rem;
-      color: #67e8f9;
-      text-shadow: 0 0 10px rgba(34, 211, 238, 0.8), 0 2px 4px rgba(0, 0, 0, 0.85);
+      color: #fde68a;
+      text-shadow: 0 0 12px rgba(251, 191, 36, 0.85), 0 2px 4px rgba(0, 0, 0, 0.85);
       pointer-events: none;
       z-index: 40;
       transform: translate(-50%, -50%);
@@ -547,9 +547,9 @@
 
     .shop-tabs {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 6px;
-      padding: 12px 16px;
+      padding: 12px 14px;
       border-bottom: 1px solid var(--border-subtle);
       flex-shrink: 0;
     }
@@ -558,14 +558,14 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       min-height: 42px;
-      padding: 8px 12px;
+      padding: 8px 8px;
       border-radius: var(--radius-sm);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
       color: var(--text-muted);
-      background: rgba(15, 23, 42, 0.55);
+      background: rgba(14, 11, 22, 0.65);
       border: 1px solid transparent;
       transition: all 0.15s ease;
     }
@@ -577,8 +577,13 @@
     }
 
     .tab-btn.prestige-tab.active {
-      color: #c4b5fd;
-      border-color: rgba(139, 92, 246, 0.5);
+      color: #fda4af;
+      border-color: rgba(244, 63, 94, 0.52);
+    }
+
+    .tab-btn.leaderboard-tab.active {
+      color: #fde68a;
+      border-color: rgba(251, 191, 36, 0.55);
     }
 
     .tab-badge {
@@ -864,14 +869,14 @@
     .prestige-hero {
       padding: 18px;
       border-radius: var(--radius-lg);
-      background: linear-gradient(145deg, rgba(139, 92, 246, 0.22), rgba(15, 23, 42, 0.85));
-      border: 1px solid rgba(139, 92, 246, 0.4);
+      background: linear-gradient(145deg, rgba(244, 63, 94, 0.2), rgba(31, 24, 48, 0.9));
+      border: 1px solid rgba(244, 63, 94, 0.42);
       text-align: center;
     }
 
     .prestige-hero h3 {
       font-size: 1.05rem;
-      color: #ede9fe;
+      color: #ffe4e6;
       margin-bottom: 6px;
     }
 
@@ -886,15 +891,15 @@
       font-family: var(--font-mono);
       font-size: 2rem;
       font-weight: 800;
-      color: #c4b5fd;
+      color: #fda4af;
     }
 
     .progress-track {
       width: 100%;
       height: 10px;
       border-radius: 999px;
-      background: rgba(6, 9, 19, 0.85);
-      border: 1px solid rgba(139, 92, 246, 0.3);
+      background: rgba(11, 9, 18, 0.85);
+      border: 1px solid rgba(244, 63, 94, 0.32);
       overflow: hidden;
       margin: 12px 0 4px;
     }
@@ -911,12 +916,82 @@
       min-height: 46px;
       padding: 12px 16px;
       border-radius: var(--radius-md);
-      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+      background: linear-gradient(135deg, #f43f5e, #f59e0b);
       color: #ffffff;
       font-weight: 800;
       font-size: 0.92rem;
-      box-shadow: 0 0 24px rgba(139, 92, 246, 0.38);
+      box-shadow: 0 0 24px rgba(244, 63, 94, 0.36);
       transition: transform 0.12s ease, opacity 0.15s ease;
+    }
+
+    /* Leaderboard Coming Soon Panel */
+    .leaderboard-hero {
+      padding: 22px 18px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(145deg, rgba(251, 191, 36, 0.16), rgba(31, 24, 48, 0.92));
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      text-align: center;
+    }
+
+    .coming-soon-pill {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(251, 191, 36, 0.2);
+      border: 1px solid rgba(251, 191, 36, 0.55);
+      color: #fde68a;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .leaderboard-hero h3 {
+      font-size: 1.1rem;
+      color: #fefce8;
+      margin-bottom: 6px;
+    }
+
+    .leaderboard-hero p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .leaderboard-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .lb-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.84rem;
+    }
+
+    .lb-rank {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      color: var(--cyan);
+      margin-right: 10px;
+    }
+
+    .lb-name {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .lb-score {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-dim);
     }
 
     .prestige-btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.08); }
@@ -1194,13 +1269,13 @@
           <svg viewBox="0 0 64 64" fill="none">
             <defs>
               <linearGradient id="tapixLogoGrad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#22d3ee" />
-                <stop offset="100%" stop-color="#8b5cf6" />
+                <stop offset="0%" stop-color="#fbbf24" />
+                <stop offset="100%" stop-color="#f43f5e" />
               </linearGradient>
             </defs>
-            <polygon points="32,5 56,19 56,45 32,59 8,45 8,19" fill="url(#tapixLogoGrad)" fill-opacity="0.2" stroke="url(#tapixLogoGrad)" stroke-width="3.2" />
-            <path d="M19 21H45V27.5H35.5V47H28.5V27.5H19V21Z" fill="#F8FAFC" />
-            <circle cx="45" cy="43" r="4.2" fill="#22D3EE" />
+            <polygon points="32,5 56,19 56,45 32,59 8,45 8,19" fill="url(#tapixLogoGrad)" fill-opacity="0.22" stroke="url(#tapixLogoGrad)" stroke-width="3.2" />
+            <path d="M19 21H45V27.5H35.5V47H28.5V27.5H19V21Z" fill="#FEFCE8" />
+            <circle cx="45" cy="43" r="4.2" fill="#FBBF24" />
           </svg>
         </div>
         <div class="brand-text">
@@ -1277,10 +1352,10 @@
           <div class="core-orbit inner"></div>
           <button class="core-button" id="core-button" aria-label="Tap to earn Coins" type="button">
             <svg class="core-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-              <polygon points="50,6 88,28 88,72 50,94 12,72 12,28" stroke="#e0f2fe" stroke-width="3" fill="rgba(255,255,255,0.1)" />
-              <polygon points="50,18 76,34 76,66 50,82 24,66 24,34" stroke="#67e8f9" stroke-width="2.2" fill="rgba(34,211,238,0.2)" />
+              <polygon points="50,6 88,28 88,72 50,94 12,72 12,28" stroke="#fef3c7" stroke-width="3" fill="rgba(255,255,255,0.12)" />
+              <polygon points="50,18 76,34 76,66 50,82 24,66 24,34" stroke="#fde047" stroke-width="2.2" fill="rgba(251,191,36,0.22)" />
               <path d="M33 36H67V44H54.5V69H45.5V44H33V36Z" fill="#ffffff" />
-              <circle cx="66" cy="63" r="5" fill="#22d3ee" />
+              <circle cx="66" cy="63" r="5" fill="#fbbf24" />
             </svg>
           </button>
         </div>
@@ -1301,6 +1376,9 @@
             <span>Rebirth</span>
             <span class="tab-badge prestige-ready hidden" id="prestige-ready-badge">READY</span>
           </button>
+          <button class="tab-btn leaderboard-tab" id="tab-leaderboard" type="button">
+            <span>Ranks</span>
+          </button>
         </div>
 
         <div class="shop-scroll" id="panel-shop">
@@ -1310,7 +1388,7 @@
               <span>Recommended Next Buy</span>
               <strong id="quick-buy-name">Power Tap (+9/tap)</strong>
             </div>
-            <button class="quick-buy-btn" id="quick-buy-btn" type="button">Buy 25</button>
+            <button class="quick-buy-btn" id="quick-buy-btn" type="button">Buy 100</button>
           </div>
 
           <!-- Tap Power Upgrades -->
@@ -1341,8 +1419,8 @@
             <div class="prestige-hero">
               <h3>Quantum Rebirth</h3>
               <p>
-                Reset your Coins, Auto-Miners, and Tap Upgrades to claim permanent
-                <strong>Prestige Gems</strong>. Each Gem permanently boosts <strong>all coins earned by +25%</strong>.
+                Every Rebirth permanently gives <strong>+50% More Coins per Click</strong>,
+                <strong>+50% Faster Coins/Sec</strong>, plus permanent <strong>Prestige Gems (+25% each)</strong>!
               </p>
               <div class="prestige-gems-big" id="prestige-claimable">+0 Gems</div>
               <p id="prestige-milestone-text">Reach 100,000 run coins to unlock Rebirth</p>
@@ -1352,13 +1430,17 @@
             </div>
 
             <button class="prestige-btn" id="btn-rebirth" type="button" disabled>
-              Rebirth &amp; Claim Gems
+              Rebirth &amp; Claim Boost
             </button>
 
             <div class="stats-box">
               <div class="stats-row">
-                <span>Prestige Multiplier</span>
+                <span>Click Power Boost</span>
                 <strong id="stat-prestige-mult">x1.00</strong>
+              </div>
+              <div class="stats-row">
+                <span>Auto-Miner Speed Boost</span>
+                <strong id="stat-cps-mult">x1.00</strong>
               </div>
               <div class="stats-row">
                 <span>Run Coins</span>
@@ -1379,6 +1461,45 @@
               <div class="stats-row">
                 <span>Total Rebirths</span>
                 <strong id="stat-rebirths">0</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaderboard Coming Soon Tab -->
+        <div class="shop-scroll" id="panel-leaderboard" style="display: none;">
+          <div class="prestige-panel">
+            <div class="leaderboard-hero">
+              <span class="coming-soon-pill">Coming Soon</span>
+              <h3>Global Leaderboard</h3>
+              <p>
+                Compete with players worldwide for Top Coins Mined, Highest Rebirths, and Fastest Coins/Sec via Supabase!
+              </p>
+            </div>
+
+            <div class="leaderboard-preview">
+              <div class="lb-row">
+                <div><span class="lb-rank">#1</span><span class="lb-name">Top Miner</span></div>
+                <span class="lb-score">Coming Soon</span>
+              </div>
+              <div class="lb-row">
+                <div><span class="lb-rank">#2</span><span class="lb-name">Vault Legend</span></div>
+                <span class="lb-score">Coming Soon</span>
+              </div>
+              <div class="lb-row">
+                <div><span class="lb-rank">#3</span><span class="lb-name">Rebirth Master</span></div>
+                <span class="lb-score">Coming Soon</span>
+              </div>
+            </div>
+
+            <div class="stats-box">
+              <div class="stats-row">
+                <span>Your Current Lifetime Coins</span>
+                <strong id="lb-your-coins">0</strong>
+              </div>
+              <div class="stats-row">
+                <span>Your Rebirths</span>
+                <strong id="lb-your-rebirths">0</strong>
               </div>
             </div>
           </div>
@@ -1505,22 +1626,22 @@
 
       const COIN_SVG = '<svg class="coin-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f59e0b" stroke="#fde68a" stroke-width="1.8"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#fef3c7" stroke-width="1.2" opacity="0.7"/><text x="12" y="15.5" text-anchor="middle" font-size="10" font-weight="800" fill="#451a03" font-family="sans-serif">$</text></svg>';
 
-      // Repeatable Per-Tap Upgrades (Start at 1 coin/tap; first Power Tap makes it 10/tap, each tier different!)
+      // Repeatable Per-Tap Upgrades (1 -> 10 on first buy at 100 coins, 300 coins for second, each different!)
       const TAP_UPGRADES = [
-        { id: 'tap_power', name: 'Power Tap', icon: ICONS.bolt, bonus: 9, baseCost: 25, desc: '+9 Coins per tap (1 → 10)' },
-        { id: 'tap_turbo', name: 'Turbo Tap', icon: ICONS.flame, bonus: 50, baseCost: 350, desc: '+50 Coins per tap' },
-        { id: 'tap_hyper', name: 'Hyper Tap', icon: ICONS.gem, bonus: 250, baseCost: 3_200, desc: '+250 Coins per tap' },
-        { id: 'tap_quantum', name: 'Quantum Tap', icon: ICONS.cpu, bonus: 1_500, baseCost: 28_000, desc: '+1,500 Coins per tap' }
+        { id: 'tap_power', name: 'Power Tap', icon: ICONS.bolt, bonus: 9, baseCost: 100, desc: '+9 Coins per tap (1 → 10)' },
+        { id: 'tap_turbo', name: 'Turbo Tap', icon: ICONS.flame, bonus: 35, baseCost: 300, desc: '+35 Coins per tap' },
+        { id: 'tap_hyper', name: 'Hyper Tap', icon: ICONS.gem, bonus: 150, baseCost: 1_200, desc: '+150 Coins per tap' },
+        { id: 'tap_quantum', name: 'Quantum Tap', icon: ICONS.cpu, bonus: 800, baseCost: 6_500, desc: '+800 Coins per tap' }
       ];
 
       const BUILDINGS = [
-        { id: 'cursor', name: 'Auto-Cursor', icon: ICONS.cursor, baseCost: 15, cps: 1, desc: '+1 Coin/s each' },
-        { id: 'drone', name: 'Scrap Drone', icon: ICONS.drone, baseCost: 100, cps: 5, desc: '+5 Coins/s each' },
-        { id: 'worker', name: 'Cyber Worker', icon: ICONS.bot, baseCost: 850, cps: 28, desc: '+28 Coins/s each' },
-        { id: 'drill', name: 'Plasma Drill', icon: ICONS.drill, baseCost: 6_500, cps: 140, desc: '+140 Coins/s each' },
-        { id: 'factory', name: 'Nano Factory', icon: ICONS.factory, baseCost: 48_000, cps: 720, desc: '+720 Coins/s each' },
-        { id: 'orbital', name: 'Orbital Rig', icon: ICONS.orbit, baseCost: 380_000, cps: 3_800, desc: '+3.8K Coins/s each' },
-        { id: 'aibot', name: 'Singularity AI', icon: ICONS.cpu, baseCost: 3_200_000, cps: 21_000, desc: '+21K Coins/s each' }
+        { id: 'cursor', name: 'Coin Collector', icon: ICONS.cursor, baseCost: 100, cps: 1, desc: '+1 Coin/s each' },
+        { id: 'drone', name: 'Gold Drone', icon: ICONS.drone, baseCost: 300, cps: 4, desc: '+4 Coins/s each' },
+        { id: 'worker', name: 'Vault Worker', icon: ICONS.bot, baseCost: 1_100, cps: 18, desc: '+18 Coins/s each' },
+        { id: 'drill', name: 'Laser Drill', icon: ICONS.drill, baseCost: 5_500, cps: 75, desc: '+75 Coins/s each' },
+        { id: 'factory', name: 'Mint Factory', icon: ICONS.factory, baseCost: 28_000, cps: 380, desc: '+380 Coins/s each' },
+        { id: 'orbital', name: 'Orbital Mint', icon: ICONS.orbit, baseCost: 160_000, cps: 1_900, desc: '+1.9K Coins/s each' },
+        { id: 'aibot', name: 'Quantum Vault', icon: ICONS.cpu, baseCost: 950_000, cps: 10_000, desc: '+10K Coins/s each' }
       ];
 
       /* ========================================================================
@@ -1620,7 +1741,7 @@
       /* ========================================================================
          4. ECONOMY & FORMATTING
          ======================================================================== */
-      const getPrestigeMultiplier = () => 1 + state.prestigeGems * GEM_BONUS_PER_GEM;
+      const getPrestigeMultiplier = () => 1 + state.rebirths * 0.5 + state.prestigeGems * GEM_BONUS_PER_GEM;
       const getOverclockMultiplier = () => (Date.now() < state.overclockUntil ? 2 : 1);
       const getGlobalMultiplier = () => getPrestigeMultiplier() * getOverclockMultiplier();
 
@@ -1910,20 +2031,25 @@
         buildingList: document.getElementById('building-list'),
         tabShop: document.getElementById('tab-shop'),
         tabPrestige: document.getElementById('tab-prestige'),
+        tabLeaderboard: document.getElementById('tab-leaderboard'),
         shopBuyableBadge: document.getElementById('shop-buyable-badge'),
         prestigeReadyBadge: document.getElementById('prestige-ready-badge'),
         panelShop: document.getElementById('panel-shop'),
         panelPrestige: document.getElementById('panel-prestige'),
+        panelLeaderboard: document.getElementById('panel-leaderboard'),
         prestigeClaimable: document.getElementById('prestige-claimable'),
         prestigeMilestoneText: document.getElementById('prestige-milestone-text'),
         prestigeProgress: document.getElementById('prestige-progress'),
         btnRebirth: document.getElementById('btn-rebirth'),
         statPrestigeMult: document.getElementById('stat-prestige-mult'),
+        statCpsMult: document.getElementById('stat-cps-mult'),
         statRunCredits: document.getElementById('stat-run-credits'),
         statTotalCredits: document.getElementById('stat-total-credits'),
         statTotalClicks: document.getElementById('stat-total-clicks'),
         statGoldenCaught: document.getElementById('stat-golden-caught'),
         statRebirths: document.getElementById('stat-rebirths'),
+        lbYourCoins: document.getElementById('lb-your-coins'),
+        lbYourRebirths: document.getElementById('lb-your-rebirths'),
         cloudModal: document.getElementById('cloud-modal'),
         helpModal: document.getElementById('help-modal'),
         offlineModal: document.getElementById('offline-modal'),
@@ -2007,7 +2133,7 @@
           clientX,
           clientY,
           getOverclockMultiplier() > 1 ? 14 : 9,
-          getOverclockMultiplier() > 1 ? '#f59e0b' : '#22d3ee'
+          getOverclockMultiplier() > 1 ? '#fde047' : '#fbbf24'
         );
         els.coreButton.classList.add('is-pressed');
         setTimeout(() => els.coreButton.classList.remove('is-pressed'), 75);
@@ -2214,11 +2340,14 @@
             : `Next Gem at ${formatNum(nextThreshold)} run coins`;
 
         els.statPrestigeMult.textContent = `x${prestigeMult.toFixed(2)}`;
+        els.statCpsMult.textContent = `x${prestigeMult.toFixed(2)}`;
         els.statRunCredits.textContent = formatNum(state.runCredits);
         els.statTotalCredits.textContent = formatNum(state.totalCredits);
         els.statTotalClicks.textContent = formatNum(state.totalClicks);
         els.statGoldenCaught.textContent = formatNum(state.goldenCaught);
         els.statRebirths.textContent = formatNum(state.rebirths);
+        els.lbYourCoins.textContent = formatNum(state.totalCredits);
+        els.lbYourRebirths.textContent = formatNum(state.rebirths);
       }
 
       let uiRefreshAcc = 0;
@@ -2262,19 +2391,18 @@
           else buyBuilding(quickBuyTarget.id, true);
         });
 
-        els.tabShop.addEventListener('click', () => {
-          els.tabShop.classList.add('active');
-          els.tabPrestige.classList.remove('active');
-          els.panelShop.style.display = 'flex';
-          els.panelPrestige.style.display = 'none';
-        });
+        function switchTab(activeName) {
+          els.tabShop.classList.toggle('active', activeName === 'shop');
+          els.tabPrestige.classList.toggle('active', activeName === 'prestige');
+          els.tabLeaderboard.classList.toggle('active', activeName === 'leaderboard');
+          els.panelShop.style.display = activeName === 'shop' ? 'flex' : 'none';
+          els.panelPrestige.style.display = activeName === 'prestige' ? 'flex' : 'none';
+          els.panelLeaderboard.style.display = activeName === 'leaderboard' ? 'flex' : 'none';
+        }
 
-        els.tabPrestige.addEventListener('click', () => {
-          els.tabPrestige.classList.add('active');
-          els.tabShop.classList.remove('active');
-          els.panelPrestige.style.display = 'flex';
-          els.panelShop.style.display = 'none';
-        });
+        els.tabShop.addEventListener('click', () => switchTab('shop'));
+        els.tabPrestige.addEventListener('click', () => switchTab('prestige'));
+        els.tabLeaderboard.addEventListener('click', () => switchTab('leaderboard'));
 
         document.querySelectorAll('.buy-mode-btn').forEach((btn) => {
           btn.addEventListener('click', () => {
@@ -2319,9 +2447,11 @@
         els.btnRebirth.addEventListener('click', () => {
           const claimable = getClaimableGems();
           if (claimable <= 0) return;
+          const nextMult = 1 + (state.rebirths + 1) * 0.5 + (state.prestigeGems + claimable) * GEM_BONUS_PER_GEM;
           els.rebirthConfirmText.innerHTML =
-            `You will reset your Coins, Auto-Miners, and Tap Upgrades to gain <strong>+${claimable} Prestige Gem${claimable > 1 ? 's' : ''}</strong> ` +
-            `(new multiplier: <strong>x${(1 + (state.prestigeGems + claimable) * GEM_BONUS_PER_GEM).toFixed(2)}</strong>).`;
+            `You will reset your Coins, Auto-Miners, and Tap Upgrades to gain <strong>+50% Click Power</strong>, ` +
+            `<strong>+50% Faster Coins/Sec</strong>, and <strong>+${claimable} Prestige Gem${claimable > 1 ? 's' : ''}</strong> ` +
+            `(new boost: <strong>x${nextMult.toFixed(2)}</strong>).`;
           els.rebirthModal.classList.add('open');
         });
 
