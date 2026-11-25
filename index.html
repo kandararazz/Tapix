@@ -4,37 +4,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Tapix — Cyber-Mining Clicker</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2322d3ee'/%3E%3Cstop offset='100%25' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%23070b14'/%3E%3Cpolygon points='32,6 56,20 56,44 32,58 8,44 8,20' fill='url(%23g)' fill-opacity='0.22' stroke='url(%23g)' stroke-width='3'/%3E%3Cpath d='M20 22h24v6h-9v20h-6V28h-9z' fill='%23ffffff'/%3E%3Ccircle cx='46' cy='44' r='4' fill='%2322d3ee'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2322d3ee'/%3E%3Cstop offset='100%25' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%23060913'/%3E%3Cpolygon points='32,6 56,20 56,44 32,58 8,44 8,20' fill='url(%23g)' fill-opacity='0.22' stroke='url(%23g)' stroke-width='3'/%3E%3Cpath d='M20 22h24v6h-9v20h-6V28h-9z' fill='%23ffffff'/%3E%3Ccircle cx='46' cy='44' r='4' fill='%2322d3ee'/%3E%3C/svg%3E" />
+  <!-- Supabase JS SDK v2 (graceful fallback to localStorage if offline/unconfigured) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* ==========================================================================
        1. DESIGN TOKENS & RESET
        ========================================================================== */
     :root {
-      --bg-base: #070b14;
-      --bg-panel: #0d1424;
-      --bg-card: #121c33;
-      --bg-card-hover: #182542;
-      --border-subtle: rgba(56, 189, 248, 0.16);
-      --border-glow: rgba(56, 189, 248, 0.48);
+      --bg-base: #060913;
+      --bg-elevated: rgba(13, 19, 34, 0.86);
+      --bg-card: rgba(20, 29, 51, 0.78);
+      --bg-card-hover: rgba(28, 40, 68, 0.92);
+      --border-subtle: rgba(148, 163, 184, 0.14);
+      --border-cyan: rgba(34, 211, 238, 0.42);
+      --border-green: rgba(16, 185, 129, 0.55);
 
-      --text-main: #f1f5f9;
+      --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
 
       --cyan: #22d3ee;
-      --cyan-glow: rgba(34, 211, 238, 0.45);
-      --purple: #a855f7;
-      --purple-glow: rgba(168, 85, 247, 0.45);
-      --gold: #fbbf24;
-      --gold-glow: rgba(251, 191, 36, 0.55);
-      --green: #34d399;
-      --red: #fb7185;
+      --cyan-soft: rgba(34, 211, 238, 0.14);
+      --violet: #8b5cf6;
+      --violet-soft: rgba(139, 92, 246, 0.16);
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.14);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.18);
+      --rose: #fb7185;
 
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 18px;
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, monospace;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     }
 
     *, *::before, *::after {
@@ -45,10 +49,9 @@
 
     html, body {
       height: 100%;
-      background-color: var(--bg-base);
+      background: var(--bg-base);
       color: var(--text-main);
       font-family: var(--font-sans);
-      /* Disable double-tap zoom for rapid tapping on mobile */
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       overscroll-behavior: none;
@@ -66,127 +69,125 @@
     }
 
     /* ==========================================================================
-       2. APP SHELL & RESPONSIVE GRID (Desktop Left/Right, Mobile Stacked)
+       2. APP SHELL & HEADER
        ========================================================================== */
     .app-shell {
       display: flex;
       flex-direction: column;
-      min-height: 100dvh;
       height: 100dvh;
+      min-height: 100dvh;
       overflow: hidden;
       background:
-        radial-gradient(circle at 25% 25%, rgba(34, 211, 238, 0.08), transparent 45%),
-        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08), transparent 45%),
+        radial-gradient(ellipse 65% 55% at 22% 20%, rgba(34, 211, 238, 0.09), transparent),
+        radial-gradient(ellipse 55% 50% at 85% 85%, rgba(139, 92, 246, 0.09), transparent),
         var(--bg-base);
     }
 
-    /* Top Stats Header */
     .top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      padding: 12px 20px;
-      background: rgba(13, 20, 36, 0.92);
+      gap: 16px;
+      padding: 12px 22px;
+      background: var(--bg-elevated);
       border-bottom: 1px solid var(--border-subtle);
-      backdrop-filter: blur(12px);
-      z-index: 20;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 30;
       flex-shrink: 0;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
-    }
-
-    .brand-badge {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: linear-gradient(145deg, rgba(34, 211, 238, 0.16), rgba(168, 85, 247, 0.22));
-      border: 1px solid rgba(34, 211, 238, 0.45);
-      display: grid;
-      place-items: center;
-      box-shadow: 0 0 18px rgba(34, 211, 238, 0.28);
+      gap: 11px;
       flex-shrink: 0;
     }
 
-    .brand-badge svg {
-      width: 28px;
-      height: 28px;
-      display: block;
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, rgba(34, 211, 238, 0.16), rgba(139, 92, 246, 0.22));
+      border: 1px solid rgba(34, 211, 238, 0.42);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.22);
     }
 
-    .brand-title {
+    .brand-logo svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .brand-text {
       display: flex;
       flex-direction: column;
       line-height: 1.15;
     }
 
-    .brand-title strong {
-      font-size: 0.95rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-main);
-    }
-
-    .brand-title span {
-      font-size: 0.72rem;
-      color: var(--cyan);
+    .brand-text strong {
+      font-size: 1.05rem;
+      font-weight: 800;
       letter-spacing: 0.04em;
     }
 
-    .stats-cluster {
+    .brand-text span {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* Unified Live Stats Strip */
+    .stats-strip {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       flex-wrap: wrap;
       justify-content: center;
     }
 
-    .stat-pill {
+    .stat-chip {
       display: flex;
-      flex-direction: column;
-      padding: 6px 14px;
-      border-radius: var(--radius-md);
+      align-items: center;
+      gap: 8px;
+      padding: 7px 13px;
+      border-radius: 999px;
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
-      min-width: 120px;
     }
 
-    .stat-pill.primary {
-      border-color: rgba(34, 211, 238, 0.35);
-      box-shadow: inset 0 0 14px rgba(34, 211, 238, 0.08);
-      min-width: 165px;
+    .stat-chip.primary {
+      border-color: var(--border-cyan);
+      background: linear-gradient(90deg, rgba(34, 211, 238, 0.12), rgba(20, 29, 51, 0.9));
     }
 
-    .stat-pill.prestige {
-      border-color: rgba(168, 85, 247, 0.35);
-      box-shadow: inset 0 0 14px rgba(168, 85, 247, 0.08);
+    .stat-chip.gems {
+      border-color: rgba(139, 92, 246, 0.38);
+      background: linear-gradient(90deg, rgba(139, 92, 246, 0.12), rgba(20, 29, 51, 0.9));
     }
 
-    .stat-label {
-      font-size: 0.68rem;
+    .stat-chip-label {
+      font-size: 0.7rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       color: var(--text-muted);
     }
 
-    .stat-value {
+    .stat-chip-val {
       font-family: var(--font-mono);
-      font-size: 1.08rem;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.95rem;
       font-weight: 700;
       color: var(--text-main);
     }
 
-    .stat-pill.primary .stat-value {
+    .stat-chip.primary .stat-chip-val {
       color: var(--cyan);
-      font-size: 1.22rem;
     }
 
-    .stat-pill.prestige .stat-value {
-      color: #d8b4fe;
+    .stat-chip.gems .stat-chip-val {
+      color: #c4b5fd;
     }
 
     .header-actions {
@@ -196,12 +197,13 @@
       flex-shrink: 0;
     }
 
-    .icon-btn {
+    .pill-btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
+      gap: 7px;
+      min-height: 38px;
+      padding: 7px 13px;
+      border-radius: 999px;
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       font-size: 0.8rem;
@@ -210,28 +212,39 @@
       transition: all 0.15s ease;
     }
 
-    .icon-btn:hover {
+    .pill-btn:hover {
       background: var(--bg-card-hover);
       color: var(--text-main);
-      border-color: var(--border-glow);
+      border-color: var(--border-cyan);
     }
 
-    .icon-btn.active {
-      color: var(--cyan);
-      border-color: var(--cyan);
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 8px var(--amber);
+      flex-shrink: 0;
     }
 
-    /* Main Workspace Split */
+    .status-dot.online {
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+
+    /* ==========================================================================
+       3. MAIN WORKSPACE SPLIT (Laptop/Tablet/Mobile)
+       ========================================================================== */
     .main-grid {
       display: grid;
-      grid-template-columns: 1fr 420px;
+      grid-template-columns: 1fr 440px;
       flex: 1;
       min-height: 0;
       overflow: hidden;
     }
 
     /* ==========================================================================
-       3. LEFT: CLICKER ARENA
+       4. CLICK ARENA
        ========================================================================== */
     .click-arena {
       position: relative;
@@ -243,20 +256,18 @@
       overflow: hidden;
       user-select: none;
       -webkit-user-select: none;
-      background:
-        radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.09) 0%, transparent 58%);
     }
 
-    /* Subtle cyber grid background */
     .click-arena::before {
       content: "";
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
-      background-size: 40px 40px;
-      mask-image: radial-gradient(circle at center, black 35%, transparent 80%);
+        radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.08) 0%, transparent 56%),
+        linear-gradient(rgba(148, 163, 184, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
+      background-size: 100% 100%, 44px 44px, 44px 44px;
+      mask-image: radial-gradient(circle at center, black 40%, transparent 82%);
       pointer-events: none;
     }
 
@@ -269,28 +280,28 @@
       z-index: 15;
     }
 
-    /* Active 2x Overclock Banner */
     .overclock-banner {
       position: absolute;
-      top: 16px;
+      top: 18px;
       left: 50%;
-      transform: translateX(-50%) translateY(-16px);
+      transform: translateX(-50%) translateY(-14px);
       opacity: 0;
       pointer-events: none;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 18px;
+      gap: 8px;
+      padding: 7px 16px;
       border-radius: 999px;
-      background: linear-gradient(90deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.35));
-      border: 1px solid var(--gold);
-      box-shadow: 0 0 24px var(--gold-glow);
-      color: #fef08a;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid var(--amber);
+      box-shadow: 0 0 24px rgba(245, 158, 11, 0.35);
+      color: #fde68a;
+      font-size: 0.82rem;
       font-weight: 700;
-      font-size: 0.85rem;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
       z-index: 25;
       transition: opacity 0.25s ease, transform 0.25s ease;
+      white-space: nowrap;
     }
 
     .overclock-banner.visible {
@@ -298,78 +309,75 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    .arena-score-readout {
+    .arena-readout {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 26px;
       z-index: 5;
       pointer-events: none;
     }
 
     .arena-credits {
       font-family: var(--font-mono);
-      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(2.1rem, 4.4vw, 3.4rem);
       font-weight: 800;
-      letter-spacing: -0.02em;
-      background: linear-gradient(180deg, #ffffff 20%, #67e8f9 100%);
+      letter-spacing: -0.03em;
+      background: linear-gradient(180deg, #ffffff 25%, #67e8f9 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.35));
+      filter: drop-shadow(0 0 22px rgba(34, 211, 238, 0.3));
     }
 
     .arena-sub {
-      margin-top: 4px;
-      font-size: 0.88rem;
-      color: var(--text-muted);
+      margin-top: 6px;
       font-family: var(--font-mono);
+      font-size: 0.86rem;
+      color: var(--text-muted);
     }
 
-    /* Central Click Core */
+    /* Central Core */
     .core-wrapper {
       position: relative;
-      width: 240px;
-      height: 240px;
+      width: 244px;
+      height: 244px;
       display: grid;
       place-items: center;
       z-index: 10;
     }
 
-    .core-ring {
+    .core-orbit {
       position: absolute;
       border-radius: 50%;
       pointer-events: none;
     }
 
-    .core-ring.outer {
+    .core-orbit.outer {
       inset: -14px;
-      border: 2px dashed rgba(34, 211, 238, 0.28);
-      animation: spinSlow 24s linear infinite;
+      border: 1.5px dashed rgba(34, 211, 238, 0.26);
+      animation: spinCW 26s linear infinite;
     }
 
-    .core-ring.inner {
+    .core-orbit.inner {
       inset: 6px;
-      border: 1px solid rgba(168, 85, 247, 0.35);
-      animation: spinReverse 16s linear infinite;
+      border: 1px solid rgba(139, 92, 246, 0.34);
+      animation: spinCCW 18s linear infinite;
     }
 
-    @keyframes spinSlow {
-      to { transform: rotate(360deg); }
-    }
-    @keyframes spinReverse {
-      to { transform: rotate(-360deg); }
-    }
+    @keyframes spinCW { to { transform: rotate(360deg); } }
+    @keyframes spinCCW { to { transform: rotate(-360deg); } }
 
     .core-button {
       position: relative;
-      width: 204px;
-      height: 204px;
+      width: 206px;
+      height: 206px;
       border-radius: 50%;
       background:
-        radial-gradient(circle at 35% 30%, #67e8f9 0%, #0891b2 38%, #1e1b4b 78%, #090d1a 100%);
-      border: 3px solid rgba(103, 232, 249, 0.7);
+        radial-gradient(circle at 32% 28%, #a5f3fc 0%, #0891b2 36%, #1e1b4b 78%, #070b16 100%);
+      border: 2.5px solid rgba(103, 232, 249, 0.72);
       box-shadow:
-        0 0 38px rgba(34, 211, 238, 0.4),
-        inset 0 0 32px rgba(103, 232, 249, 0.45),
-        inset 0 -18px 30px rgba(88, 28, 135, 0.6);
+        0 0 42px rgba(34, 211, 238, 0.35),
+        inset 0 0 32px rgba(103, 232, 249, 0.4),
+        inset 0 -20px 34px rgba(91, 33, 182, 0.55);
       display: grid;
       place-items: center;
       transition: transform 0.08s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.15s ease;
@@ -379,95 +387,84 @@
     .core-button:hover {
       transform: scale(1.03);
       box-shadow:
-        0 0 50px rgba(34, 211, 238, 0.6),
-        inset 0 0 36px rgba(103, 232, 249, 0.6);
+        0 0 54px rgba(34, 211, 238, 0.55),
+        inset 0 0 38px rgba(103, 232, 249, 0.55);
     }
 
     .core-button:active,
     .core-button.is-pressed {
       transform: scale(0.92);
       box-shadow:
-        0 0 60px rgba(34, 211, 238, 0.8),
+        0 0 64px rgba(34, 211, 238, 0.78),
         inset 0 0 44px rgba(255, 255, 255, 0.55);
     }
 
-    .core-button:focus-visible {
-      box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.5), 0 0 45px var(--cyan-glow);
-    }
-
     .core-svg {
-      width: 108px;
-      height: 108px;
-      filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.6));
+      width: 106px;
+      height: 106px;
+      filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.45));
       pointer-events: none;
-      transition: transform 0.1s ease;
+      transition: transform 0.08s ease;
     }
 
     .core-button.is-pressed .core-svg {
-      transform: scale(0.94) rotate(4deg);
+      transform: scale(0.94);
     }
 
-    .arena-hint {
+    .arena-footer {
       margin-top: 24px;
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      letter-spacing: 0.04em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
       z-index: 5;
       text-align: center;
     }
 
-    .creator-credit {
-      margin-top: 10px;
+    .arena-hint {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+
+    .creator-badge {
       padding: 4px 12px;
       border-radius: 999px;
-      background: rgba(34, 211, 238, 0.08);
-      border: 1px solid rgba(34, 211, 238, 0.24);
-      font-size: 0.74rem;
+      background: var(--cyan-soft);
+      border: 1px solid rgba(34, 211, 238, 0.25);
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--cyan);
-      z-index: 5;
-      text-align: center;
     }
 
-    /* Floating '+X' text numbers */
+    /* Floating numbers */
     .floating-num {
       position: fixed;
       font-family: var(--font-mono);
       font-weight: 800;
       font-size: 1.15rem;
       color: #67e8f9;
-      text-shadow: 0 0 10px rgba(34, 211, 238, 0.85), 0 2px 4px rgba(0, 0, 0, 0.8);
+      text-shadow: 0 0 10px rgba(34, 211, 238, 0.8), 0 2px 4px rgba(0, 0, 0, 0.85);
       pointer-events: none;
       z-index: 40;
       transform: translate(-50%, -50%);
-      animation: floatUpFade 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      will-change: transform, opacity;
+      animation: floatUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     .floating-num.golden {
       color: #fde047;
       font-size: 1.45rem;
-      text-shadow: 0 0 14px var(--gold-glow), 0 2px 6px rgba(0, 0, 0, 0.9);
+      text-shadow: 0 0 14px rgba(245, 158, 11, 0.85), 0 2px 6px rgba(0, 0, 0, 0.9);
     }
 
     @keyframes floatUpFade {
-      0% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(0.85);
-      }
-      25% {
-        opacity: 1;
-        transform: translate(-50%, -78%) scale(1.12);
-      }
-      100% {
-        opacity: 0;
-        transform: translate(-50%, -175%) scale(0.95);
-      }
+      0% { opacity: 1; transform: translate(-50%, -50%) scale(0.85); }
+      25% { opacity: 1; transform: translate(-50%, -82%) scale(1.1); }
+      100% { opacity: 0; transform: translate(-50%, -175%) scale(0.95); }
     }
 
-    /* Random Golden Target */
+    /* Golden Star Target */
     .golden-target {
       position: absolute;
       width: 68px;
@@ -475,18 +472,17 @@
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #fef08a, #f59e0b 65%, #b45309 100%);
       border: 2px solid #fef9c3;
-      box-shadow: 0 0 28px var(--gold-glow), 0 0 54px rgba(251, 191, 36, 0.35);
+      box-shadow: 0 0 28px rgba(245, 158, 11, 0.75);
       display: grid;
       place-items: center;
       z-index: 50;
-      cursor: pointer;
-      animation: goldenPulse 0.9s ease-in-out infinite alternate;
+      animation: goldenPulse 0.85s ease-in-out infinite alternate;
       transform: translate(-50%, -50%);
     }
 
-    .golden-target svg {
-      width: 30px;
-      height: 30px;
+    .golden-target svg.star-icon {
+      width: 28px;
+      height: 28px;
       color: #451a03;
       pointer-events: none;
     }
@@ -510,18 +506,20 @@
     }
 
     @keyframes goldenPulse {
-      from { transform: translate(-50%, -50%) scale(0.95); }
+      from { transform: translate(-50%, -50%) scale(0.94); }
       to { transform: translate(-50%, -50%) scale(1.08); }
     }
 
     /* ==========================================================================
-       4. RIGHT: UPGRADE SHOP & PRESTIGE SIDEBAR
+       5. CLEAN SIDEBAR SHOP & PRESTIGE
        ========================================================================== */
     .shop-sidebar {
       display: flex;
       flex-direction: column;
-      background: var(--bg-panel);
+      background: var(--bg-elevated);
       border-left: 1px solid var(--border-subtle);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       min-height: 0;
       overflow: hidden;
     }
@@ -530,9 +528,8 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 6px;
-      padding: 12px 14px;
+      padding: 12px 16px;
       border-bottom: 1px solid var(--border-subtle);
-      background: rgba(7, 11, 20, 0.5);
       flex-shrink: 0;
     }
 
@@ -540,16 +537,27 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      min-height: 40px;
-      padding: 9px 12px;
+      gap: 8px;
+      min-height: 42px;
+      padding: 8px 12px;
       border-radius: var(--radius-sm);
       font-size: 0.85rem;
       font-weight: 700;
       color: var(--text-muted);
-      background: transparent;
+      background: rgba(15, 23, 42, 0.55);
       border: 1px solid transparent;
       transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--bg-card-hover);
+      color: var(--cyan);
+      border-color: var(--border-cyan);
+    }
+
+    .tab-btn.prestige-tab.active {
+      color: #c4b5fd;
+      border-color: rgba(139, 92, 246, 0.5);
     }
 
     .tab-badge {
@@ -563,87 +571,126 @@
       font-family: var(--font-mono);
       font-size: 0.7rem;
       font-weight: 800;
-      background: rgba(52, 211, 153, 0.18);
-      color: var(--green);
-      border: 1px solid rgba(52, 211, 153, 0.4);
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+    }
+
+    .tab-badge.prestige-ready {
+      background: var(--violet-soft);
+      color: #ddd6fe;
+      border-color: rgba(139, 92, 246, 0.55);
     }
 
     .tab-badge.hidden {
       display: none;
     }
 
-    .tab-badge.prestige-ready {
-      background: rgba(168, 85, 247, 0.28);
-      color: #e9d5ff;
-      border-color: rgba(192, 132, 252, 0.65);
-    }
-
-    .tab-btn.active {
-      background: var(--bg-card);
-      color: var(--cyan);
-      border-color: var(--border-glow);
-      box-shadow: 0 0 14px rgba(34, 211, 238, 0.12);
-    }
-
-    .tab-btn.prestige-tab.active {
-      color: #d8b4fe;
-      border-color: rgba(168, 85, 247, 0.5);
-      box-shadow: 0 0 14px rgba(168, 85, 247, 0.18);
-    }
-
     .shop-scroll {
       flex: 1;
       overflow-y: auto;
-      padding: 14px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
     }
 
-    .shop-scroll::-webkit-scrollbar {
-      width: 6px;
-    }
+    .shop-scroll::-webkit-scrollbar { width: 6px; }
     .shop-scroll::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.25);
+      background: rgba(148, 163, 184, 0.22);
       border-radius: 999px;
     }
+
+    /* Quick Next Upgrade Banner */
+    .quick-buy-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.12), rgba(34, 211, 238, 0.08));
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .quick-buy-bar.hidden {
+      display: none;
+    }
+
+    .quick-buy-meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .quick-buy-meta span {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--emerald);
+      font-weight: 700;
+    }
+
+    .quick-buy-meta strong {
+      font-size: 0.86rem;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .quick-buy-btn {
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--emerald);
+      color: #03150e;
+      font-size: 0.78rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      transition: transform 0.1s ease, filter 0.15s ease;
+    }
+
+    .quick-buy-btn:hover { filter: brightness(1.1); }
+    .quick-buy-btn:active { transform: scale(0.95); }
 
     .section-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .section-title {
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.09em;
       color: var(--text-muted);
     }
 
     .buy-mode-group {
       display: inline-flex;
-      background: var(--bg-base);
+      background: rgba(6, 9, 19, 0.7);
       border: 1px solid var(--border-subtle);
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 2px;
       gap: 2px;
     }
 
     .buy-mode-btn {
-      padding: 3px 8px;
+      min-height: 28px;
+      padding: 3px 10px;
       font-size: 0.72rem;
       font-weight: 700;
-      border-radius: 4px;
+      border-radius: 6px;
       color: var(--text-dim);
+      transition: all 0.12s ease;
     }
 
     .buy-mode-btn.active {
       background: var(--cyan);
-      color: #04070f;
+      color: #041019;
     }
 
     .upgrade-list {
@@ -652,27 +699,28 @@
       gap: 8px;
     }
 
+    /* Modern Horizontal Upgrade Card */
     .upgrade-card {
       width: 100%;
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 11px 12px;
+      padding: 11px 13px;
       border-radius: var(--radius-md);
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       text-align: left;
-      transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+      transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
     }
 
     .upgrade-card:not(:disabled) {
-      border-color: rgba(52, 211, 153, 0.38);
-      box-shadow: inset 0 0 12px rgba(52, 211, 153, 0.06);
+      border-color: var(--border-green);
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.08), rgba(20, 29, 51, 0.85));
     }
 
     .upgrade-card:hover:not(:disabled) {
       background: var(--bg-card-hover);
-      border-color: var(--green);
+      border-color: var(--emerald);
       transform: translateY(-1px);
     }
 
@@ -681,43 +729,42 @@
     }
 
     .upgrade-card:disabled {
-      opacity: 0.48;
+      opacity: 0.5;
       cursor: not-allowed;
     }
 
     .upgrade-card.owned-max {
-      opacity: 0.75;
-      border-color: rgba(52, 211, 153, 0.35);
-      background: rgba(16, 185, 129, 0.08);
+      opacity: 0.72;
+      border-color: rgba(16, 185, 129, 0.35);
+      background: rgba(16, 185, 129, 0.07);
     }
 
     .upgrade-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      background: rgba(34, 211, 238, 0.1);
-      border: 1px solid rgba(34, 211, 238, 0.22);
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: var(--cyan-soft);
+      border: 1px solid rgba(34, 211, 238, 0.25);
+      color: var(--cyan);
       display: grid;
       place-items: center;
-      font-size: 1.25rem;
       flex-shrink: 0;
     }
 
-    .upgrade-card.multiplier-card .upgrade-icon {
-      background: rgba(251, 191, 36, 0.12);
-      border-color: rgba(251, 191, 36, 0.3);
+    .upgrade-icon svg {
+      width: 20px;
+      height: 20px;
     }
 
-    .upgrade-info {
+    .upgrade-card.multiplier-card .upgrade-icon {
+      background: var(--amber-soft);
+      border-color: rgba(245, 158, 11, 0.32);
+      color: var(--amber);
+    }
+
+    .upgrade-main {
       flex: 1;
       min-width: 0;
-    }
-
-    .upgrade-name-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
     }
 
     .upgrade-name {
@@ -729,37 +776,49 @@
       text-overflow: ellipsis;
     }
 
-    .upgrade-owned {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.85);
-      color: var(--cyan);
-      flex-shrink: 0;
-    }
-
-    .upgrade-desc {
+    .upgrade-effect {
       margin-top: 2px;
       font-size: 0.75rem;
       color: var(--text-muted);
     }
 
-    .upgrade-cost {
-      margin-top: 4px;
+    .upgrade-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .upgrade-cost-pill {
       font-family: var(--font-mono);
-      font-size: 0.8rem;
+      font-variant-numeric: tabular-nums;
+      font-size: 0.76rem;
       font-weight: 700;
-      color: var(--green);
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.35);
     }
 
-    .upgrade-card:disabled .upgrade-cost {
-      color: var(--red);
+    .upgrade-card:disabled .upgrade-cost-pill {
+      background: rgba(251, 113, 133, 0.12);
+      color: var(--rose);
+      border-color: rgba(251, 113, 133, 0.28);
     }
 
-    .upgrade-card.owned-max .upgrade-cost {
-      color: var(--green);
+    .upgrade-card.owned-max .upgrade-cost-pill {
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+
+    .upgrade-owned {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-dim);
     }
 
     /* Prestige Panel */
@@ -772,14 +831,14 @@
     .prestige-hero {
       padding: 18px;
       border-radius: var(--radius-lg);
-      background: linear-gradient(145deg, rgba(88, 28, 135, 0.32), rgba(15, 23, 42, 0.9));
-      border: 1px solid rgba(168, 85, 247, 0.4);
+      background: linear-gradient(145deg, rgba(139, 92, 246, 0.22), rgba(15, 23, 42, 0.85));
+      border: 1px solid rgba(139, 92, 246, 0.4);
       text-align: center;
     }
 
     .prestige-hero h3 {
       font-size: 1.05rem;
-      color: #e9d5ff;
+      color: #ede9fe;
       margin-bottom: 6px;
     }
 
@@ -794,50 +853,41 @@
       font-family: var(--font-mono);
       font-size: 2rem;
       font-weight: 800;
-      color: #d8b4fe;
-      text-shadow: 0 0 18px var(--purple-glow);
+      color: #c4b5fd;
     }
 
     .progress-track {
       width: 100%;
       height: 10px;
       border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(168, 85, 247, 0.3);
+      background: rgba(6, 9, 19, 0.85);
+      border: 1px solid rgba(139, 92, 246, 0.3);
       overflow: hidden;
-      margin: 12px 0 6px;
+      margin: 12px 0 4px;
     }
 
     .progress-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, var(--purple), var(--cyan));
+      background: linear-gradient(90deg, var(--violet), var(--cyan));
       transition: width 0.25s ease;
     }
 
     .prestige-btn {
       width: 100%;
-      padding: 13px 16px;
+      min-height: 46px;
+      padding: 12px 16px;
       border-radius: var(--radius-md);
-      background: linear-gradient(135deg, #9333ea, #6366f1);
+      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
       color: #ffffff;
       font-weight: 800;
       font-size: 0.92rem;
-      letter-spacing: 0.04em;
-      box-shadow: 0 0 22px rgba(147, 51, 234, 0.45);
+      box-shadow: 0 0 24px rgba(139, 92, 246, 0.38);
       transition: transform 0.12s ease, opacity 0.15s ease;
     }
 
-    .prestige-btn:hover:not(:disabled) {
-      transform: translateY(-1px);
-      filter: brightness(1.1);
-    }
-
-    .prestige-btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
+    .prestige-btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.08); }
+    .prestige-btn:disabled { opacity: 0.42; cursor: not-allowed; box-shadow: none; }
 
     .stats-box {
       padding: 14px;
@@ -846,7 +896,7 @@
       border: 1px solid var(--border-subtle);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 9px;
       font-size: 0.82rem;
     }
 
@@ -862,59 +912,94 @@
     }
 
     /* ==========================================================================
-       5. MODALS & TOASTS
+       6. MODALS & TOASTS
        ========================================================================== */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(3, 7, 18, 0.78);
-      backdrop-filter: blur(6px);
+      background: rgba(3, 6, 16, 0.78);
+      backdrop-filter: blur(8px);
       display: none;
       place-items: center;
       padding: 16px;
       z-index: 100;
     }
 
-    .modal-backdrop.open {
-      display: grid;
-    }
+    .modal-backdrop.open { display: grid; }
 
     .modal-card {
       width: 100%;
       max-width: 460px;
-      background: var(--bg-panel);
-      border: 1px solid var(--border-glow);
+      background: #0d1425;
+      border: 1px solid var(--border-cyan);
       border-radius: var(--radius-lg);
       padding: 22px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65);
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
 
     .modal-card h2 {
-      font-size: 1.15rem;
+      font-size: 1.12rem;
       color: var(--cyan);
     }
 
     .modal-card p {
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       color: var(--text-muted);
       line-height: 1.5;
     }
 
-    .modal-textarea {
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-group label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+
+    .field-input {
       width: 100%;
-      min-height: 100px;
-      padding: 10px;
+      padding: 10px 12px;
       border-radius: var(--radius-sm);
       background: var(--bg-base);
       border: 1px solid var(--border-subtle);
       color: var(--text-main);
       font-family: var(--font-mono);
-      font-size: 0.78rem;
-      resize: vertical;
+      font-size: 0.82rem;
     }
+
+    .field-input:focus {
+      outline: none;
+      border-color: var(--cyan);
+    }
+
+    .guide-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .guide-step {
+      display: flex;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .guide-step strong { color: var(--cyan); flex-shrink: 0; }
 
     .modal-actions {
       display: flex;
@@ -924,31 +1009,23 @@
     }
 
     .btn-primary {
+      min-height: 40px;
       padding: 9px 16px;
       border-radius: var(--radius-sm);
       background: var(--cyan);
-      color: #04070f;
+      color: #041019;
       font-weight: 700;
       font-size: 0.85rem;
     }
 
     .btn-secondary {
+      min-height: 40px;
       padding: 9px 16px;
       border-radius: var(--radius-sm);
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       color: var(--text-main);
       font-weight: 600;
-      font-size: 0.85rem;
-    }
-
-    .btn-danger {
-      padding: 9px 16px;
-      border-radius: var(--radius-sm);
-      background: rgba(251, 113, 133, 0.16);
-      border: 1px solid rgba(251, 113, 133, 0.45);
-      color: var(--red);
-      font-weight: 700;
       font-size: 0.85rem;
     }
 
@@ -968,12 +1045,12 @@
     .toast {
       padding: 9px 16px;
       border-radius: 999px;
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(13, 20, 37, 0.96);
       border: 1px solid var(--cyan);
       color: var(--text-main);
       font-size: 0.82rem;
       font-weight: 600;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.55);
       animation: toastIn 0.2s ease;
     }
 
@@ -982,37 +1059,13 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .guide-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .guide-step {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: var(--radius-sm);
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .guide-step strong {
-      color: var(--cyan);
-      flex-shrink: 0;
-    }
-
     /* ==========================================================================
-       6. LAPTOP, TABLET & MOBILE RESPONSIVE LAYOUT
+       7. RESPONSIVE BREAKPOINTS (Laptop, Tablet, Mobile)
        ========================================================================== */
     /* Tablet Landscape / Small Laptop */
-    @media (max-width: 1100px) {
+    @media (max-width: 1120px) {
       .main-grid {
-        grid-template-columns: 1fr 360px;
+        grid-template-columns: 1fr 370px;
       }
 
       .top-bar {
@@ -1020,28 +1073,13 @@
         gap: 10px;
       }
 
-      .stat-pill {
-        min-width: 102px;
-        padding: 5px 10px;
-      }
-
-      .stat-pill.primary {
-        min-width: 136px;
-      }
-
-      .core-wrapper {
-        width: 210px;
-        height: 210px;
-      }
-
-      .core-button {
-        width: 180px;
-        height: 180px;
-      }
+      .core-wrapper { width: 210px; height: 210px; }
+      .core-button { width: 178px; height: 178px; }
+      .core-svg { width: 92px; height: 92px; }
     }
 
     /* Tablet Portrait & Mobile */
-    @media (max-width: 819px) {
+    @media (max-width: 840px) {
       .app-shell {
         height: auto;
         min-height: 100dvh;
@@ -1052,13 +1090,12 @@
       .top-bar {
         position: sticky;
         top: 0;
-        z-index: 30;
         flex-wrap: wrap;
         padding: 10px 12px;
         gap: 8px;
       }
 
-      .stats-cluster {
+      .stats-strip {
         order: 3;
         width: 100%;
         display: grid;
@@ -1066,20 +1103,10 @@
         gap: 6px;
       }
 
-      .stat-pill,
-      .stat-pill.primary {
-        min-width: 0;
+      .stat-chip {
+        justify-content: space-between;
+        border-radius: var(--radius-sm);
         padding: 6px 10px;
-      }
-
-      .stat-value,
-      .stat-pill.primary .stat-value {
-        font-size: 0.96rem;
-      }
-
-      .icon-btn {
-        min-height: 40px;
-        padding: 8px 11px;
       }
 
       .main-grid {
@@ -1088,24 +1115,13 @@
       }
 
       .click-arena {
-        min-height: 360px;
-        padding: 20px 14px;
+        min-height: 330px;
+        padding: 18px 14px;
       }
 
-      .core-wrapper {
-        width: 196px;
-        height: 196px;
-      }
-
-      .core-button {
-        width: 168px;
-        height: 168px;
-      }
-
-      .core-svg {
-        width: 86px;
-        height: 86px;
-      }
+      .core-wrapper { width: 188px; height: 188px; }
+      .core-button { width: 160px; height: 160px; }
+      .core-svg { width: 82px; height: 82px; }
 
       .shop-sidebar {
         border-left: none;
@@ -1120,163 +1136,144 @@
 
       .upgrade-card {
         min-height: 64px;
-        padding: 12px;
-      }
-
-      .buy-mode-btn {
-        min-height: 32px;
-        padding: 4px 10px;
       }
     }
 
     /* Small Phones */
     @media (max-width: 480px) {
-      .brand-title span {
-        display: none;
-      }
+      .brand-text span { display: none; }
+      .pill-btn .btn-label { display: none; }
+      .pill-btn { padding: 7px 11px; }
 
-      .icon-btn .btn-label {
-        display: none;
-      }
-
-      .click-arena {
-        min-height: 320px;
-        padding: 16px 12px;
-      }
-
-      .core-wrapper {
-        width: 176px;
-        height: 176px;
-      }
-
-      .core-button {
-        width: 152px;
-        height: 152px;
-      }
-
-      .core-svg {
-        width: 78px;
-        height: 78px;
-      }
+      .click-arena { min-height: 300px; padding: 14px 12px; }
+      .arena-readout { margin-bottom: 18px; }
+      .core-wrapper { width: 168px; height: 168px; }
+      .core-button { width: 144px; height: 144px; }
+      .core-svg { width: 74px; height: 74px; }
     }
   </style>
 </head>
 <body>
   <div class="app-shell">
-    <!-- ==================== TOP HUD BAR ==================== -->
+    <!-- ==================== TOP BAR ==================== -->
     <header class="top-bar">
       <div class="brand">
-        <div class="brand-badge" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div class="brand-logo" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none">
             <defs>
-              <linearGradient id="tapixGrad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+              <linearGradient id="tapixLogoGrad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="#22d3ee" />
-                <stop offset="100%" stop-color="#a855f7" />
+                <stop offset="100%" stop-color="#8b5cf6" />
               </linearGradient>
             </defs>
-            <polygon points="32,5 56,19 56,45 32,59 8,45 8,19" fill="url(#tapixGrad)" fill-opacity="0.2" stroke="url(#tapixGrad)" stroke-width="3.2" />
+            <polygon points="32,5 56,19 56,45 32,59 8,45 8,19" fill="url(#tapixLogoGrad)" fill-opacity="0.2" stroke="url(#tapixLogoGrad)" stroke-width="3.2" />
             <path d="M19 21H45V27.5H35.5V47H28.5V27.5H19V21Z" fill="#F8FAFC" />
             <circle cx="45" cy="43" r="4.2" fill="#22D3EE" />
           </svg>
         </div>
-        <div class="brand-title">
+        <div class="brand-text">
           <strong>Tapix</strong>
           <span>Cyber-Mining Empire</span>
         </div>
       </div>
 
-      <div class="stats-cluster">
-        <div class="stat-pill primary">
-          <span class="stat-label">Cyber Credits</span>
-          <span class="stat-value" id="hud-credits">0</span>
+      <div class="stats-strip">
+        <div class="stat-chip primary">
+          <span class="stat-chip-label">Credits</span>
+          <span class="stat-chip-val" id="hud-credits">0</span>
         </div>
-        <div class="stat-pill">
-          <span class="stat-label">Credits / Sec (CPS)</span>
-          <span class="stat-value" id="hud-cps">0/s</span>
+        <div class="stat-chip">
+          <span class="stat-chip-label">CPS</span>
+          <span class="stat-chip-val" id="hud-cps">0/s</span>
         </div>
-        <div class="stat-pill">
-          <span class="stat-label">Click Power</span>
-          <span class="stat-value" id="hud-click">+1</span>
+        <div class="stat-chip">
+          <span class="stat-chip-label">Tap</span>
+          <span class="stat-chip-val" id="hud-click">+1</span>
         </div>
-        <div class="stat-pill prestige">
-          <span class="stat-label">Prestige Gems</span>
-          <span class="stat-value" id="hud-gems">0 (x1.00)</span>
+        <div class="stat-chip gems">
+          <span class="stat-chip-label">Gems</span>
+          <span class="stat-chip-val" id="hud-gems">0 (x1.00)</span>
         </div>
       </div>
 
       <div class="header-actions">
-        <button class="icon-btn" id="btn-help" title="How to Play" aria-label="How to Play">
-          <span>❓</span>
+        <button class="pill-btn" id="btn-cloud" type="button" title="Supabase Cloud Sync">
+          <span class="status-dot" id="cloud-dot"></span>
+          <span id="cloud-label">Cloud Sync</span>
+        </button>
+        <button class="pill-btn" id="btn-help" type="button" title="How to Play" aria-label="How to Play">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
           <span class="btn-label">Guide</span>
-        </button>
-        <button class="icon-btn active" id="btn-sound" title="Toggle Sound Effects" aria-label="Toggle Sound Effects">
-          <span id="sound-icon">🔊</span>
-          <span class="btn-label">SFX</span>
-        </button>
-        <button class="icon-btn" id="btn-save-menu" title="Save, Export & Import" aria-label="Save, Export and Import">
-          <span>💾</span>
-          <span class="btn-label">Save</span>
         </button>
       </div>
     </header>
 
-    <!-- ==================== MAIN SPLIT WORKSPACE ==================== -->
+    <!-- ==================== MAIN SPLIT ==================== -->
     <main class="main-grid">
-      <!-- LEFT: INTERACTIVE CLICKER ARENA -->
+      <!-- LEFT: CLICK ARENA -->
       <section class="click-arena" id="click-arena">
         <canvas id="particle-canvas"></canvas>
 
         <div class="overclock-banner" id="overclock-banner">
-          <span>⚡</span>
-          <span>2X OVERCLOCK SURGE ACTIVE — <span id="overclock-timer">20.0s</span></span>
+          <span>2X OVERCLOCK SURGE</span>
+          <span id="overclock-timer">20.0s</span>
         </div>
 
-        <div class="arena-score-readout">
+        <div class="arena-readout">
           <div class="arena-credits" id="arena-credits">0</div>
-          <div class="arena-sub" id="arena-sub">0.0 credits / sec • +1 per tap</div>
+          <div class="arena-sub" id="arena-sub">0.0 / sec • +1 per tap</div>
         </div>
 
         <div class="core-wrapper">
-          <div class="core-ring outer"></div>
-          <div class="core-ring inner"></div>
-          <button
-            class="core-button"
-            id="core-button"
-            aria-label="Mine Tapix Core"
-            type="button"
-          >
-            <!-- Vector Tapix Core Crystal -->
+          <div class="core-orbit outer"></div>
+          <div class="core-orbit inner"></div>
+          <button class="core-button" id="core-button" aria-label="Mine Tapix Core" type="button">
             <svg class="core-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-              <polygon points="50,6 88,28 88,72 50,94 12,72 12,28" stroke="#e0f2fe" stroke-width="3" fill="rgba(255,255,255,0.12)" />
-              <polygon points="50,18 76,34 76,66 50,82 24,66 24,34" stroke="#67e8f9" stroke-width="2.5" fill="rgba(34,211,238,0.22)" />
+              <polygon points="50,6 88,28 88,72 50,94 12,72 12,28" stroke="#e0f2fe" stroke-width="3" fill="rgba(255,255,255,0.1)" />
+              <polygon points="50,18 76,34 76,66 50,82 24,66 24,34" stroke="#67e8f9" stroke-width="2.2" fill="rgba(34,211,238,0.2)" />
               <path d="M33 36H67V44H54.5V69H45.5V44H33V36Z" fill="#ffffff" />
               <circle cx="66" cy="63" r="5" fill="#22d3ee" />
             </svg>
           </button>
         </div>
 
-        <p class="arena-hint">Tap the Tapix Core (or press Space) to mine Cyber Credits. Catch Golden Stars for bonuses!</p>
-        <p class="creator-credit">Created by Raza</p>
+        <div class="arena-footer">
+          <p class="arena-hint">Tap the Tapix Core (or press Space) • Catch Golden Stars for bonus surges</p>
+          <p class="creator-badge">Created by Raza</p>
+        </div>
       </section>
 
-      <!-- RIGHT: UPGRADE SHOP & PRESTIGE SIDEBAR -->
+      <!-- RIGHT: UPGRADE SHOP & PRESTIGE -->
       <aside class="shop-sidebar">
         <div class="shop-tabs">
           <button class="tab-btn active" id="tab-shop" type="button">
-            <span>Upgrade Shop</span>
+            <span>Upgrades</span>
             <span class="tab-badge hidden" id="shop-buyable-badge">0</span>
           </button>
           <button class="tab-btn prestige-tab" id="tab-prestige" type="button">
-            <span>Prestige Core</span>
+            <span>Rebirth</span>
             <span class="tab-badge prestige-ready hidden" id="prestige-ready-badge">READY</span>
           </button>
         </div>
 
         <div class="shop-scroll" id="panel-shop">
+          <!-- Easy 1-Tap Recommended Upgrade -->
+          <div class="quick-buy-bar hidden" id="quick-buy-bar">
+            <div class="quick-buy-meta">
+              <span>Recommended Next Buy</span>
+              <strong id="quick-buy-name">Auto-Cursor (+1/s)</strong>
+            </div>
+            <button class="quick-buy-btn" id="quick-buy-btn" type="button">Buy 15</button>
+          </div>
+
           <!-- Click-Power Multipliers -->
           <div>
             <div class="section-header">
-              <span class="section-title">Click-Power Multipliers</span>
+              <span class="section-title">Click Multipliers</span>
             </div>
             <div class="upgrade-list" id="multiplier-list"></div>
           </div>
@@ -1284,7 +1281,7 @@
           <!-- Auto-Clickers / Buildings -->
           <div>
             <div class="section-header">
-              <span class="section-title">Mining Operations (Auto-CPS)</span>
+              <span class="section-title">Auto-Miners</span>
               <div class="buy-mode-group" role="group" aria-label="Purchase quantity">
                 <button class="buy-mode-btn active" data-buy="1" type="button">x1</button>
                 <button class="buy-mode-btn" data-buy="10" type="button">x10</button>
@@ -1301,8 +1298,8 @@
             <div class="prestige-hero">
               <h3>Quantum Rebirth</h3>
               <p>
-                Reset your Credits, Miners, and Click Multipliers to crystallize permanent
-                <strong>Prestige Gems</strong>. Each Gem permanently boosts <strong>all earnings by +25%</strong>!
+                Reset your Credits, Auto-Miners, and Multipliers to claim permanent
+                <strong>Prestige Gems</strong>. Each Gem permanently boosts <strong>all earnings by +25%</strong>.
               </p>
               <div class="prestige-gems-big" id="prestige-claimable">+0 Gems</div>
               <p id="prestige-milestone-text">Reach 100,000 run credits to unlock Rebirth</p>
@@ -1317,23 +1314,23 @@
 
             <div class="stats-box">
               <div class="stats-row">
-                <span>Current Prestige Multiplier</span>
+                <span>Prestige Multiplier</span>
                 <strong id="stat-prestige-mult">x1.00</strong>
               </div>
               <div class="stats-row">
-                <span>Run Credits Earned</span>
+                <span>Run Credits</span>
                 <strong id="stat-run-credits">0</strong>
               </div>
               <div class="stats-row">
-                <span>Lifetime Credits Earned</span>
+                <span>Lifetime Credits</span>
                 <strong id="stat-total-credits">0</strong>
               </div>
               <div class="stats-row">
-                <span>Total Manual Taps</span>
+                <span>Manual Taps</span>
                 <strong id="stat-total-clicks">0</strong>
               </div>
               <div class="stats-row">
-                <span>Golden Packets Caught</span>
+                <span>Golden Stars Caught</span>
                 <strong id="stat-golden-caught">0</strong>
               </div>
               <div class="stats-row">
@@ -1348,28 +1345,28 @@
   </div>
 
   <!-- ==================== MODALS ==================== -->
-  <!-- Save / Export / Import Modal -->
-  <div class="modal-backdrop" id="save-modal">
+  <!-- Supabase Cloud Sync Modal -->
+  <div class="modal-backdrop" id="cloud-modal">
     <div class="modal-card">
-      <h2>Save Data Management</h2>
-      <p>Your progress auto-saves every 5 seconds to local storage. Export your save code to back it up or move devices.</p>
-      <textarea class="modal-textarea" id="save-textarea" placeholder="Paste an exported save string here to import..."></textarea>
-      <div class="modal-actions">
-        <button class="btn-danger" id="btn-hard-reset" type="button">Hard Reset</button>
-        <button class="btn-secondary" id="btn-import-save" type="button">Import</button>
-        <button class="btn-primary" id="btn-export-save" type="button">Export &amp; Copy</button>
-        <button class="btn-secondary" id="btn-close-save" type="button">Close</button>
+      <h2>Supabase Cloud Progress</h2>
+      <p id="cloud-modal-desc">
+        Tapix automatically saves your progress locally and syncs to Supabase table <code>tapix_progress</code> whenever connected.
+      </p>
+      <div class="field-group">
+        <label for="input-player-id">Player ID (Username)</label>
+        <input class="field-input" id="input-player-id" type="text" placeholder="e.g. raza" />
       </div>
-    </div>
-  </div>
-
-  <!-- Offline Progress Modal -->
-  <div class="modal-backdrop" id="offline-modal">
-    <div class="modal-card">
-      <h2>Offline Mining Complete</h2>
-      <p id="offline-summary">Your cyber-miners kept working while you were away!</p>
+      <div class="field-group">
+        <label for="input-sb-url">Supabase Project URL</label>
+        <input class="field-input" id="input-sb-url" type="url" placeholder="https://your-project.supabase.co" />
+      </div>
+      <div class="field-group">
+        <label for="input-sb-key">Supabase Anon Key</label>
+        <input class="field-input" id="input-sb-key" type="password" placeholder="eyJhbGciOi..." />
+      </div>
       <div class="modal-actions">
-        <button class="btn-primary" id="btn-claim-offline" type="button">Collect Credits</button>
+        <button class="btn-secondary" id="btn-cloud-close" type="button">Close</button>
+        <button class="btn-primary" id="btn-cloud-connect" type="button">Save &amp; Sync Now</button>
       </div>
     </div>
   </div>
@@ -1381,23 +1378,34 @@
       <div class="guide-steps">
         <div class="guide-step">
           <strong>1. Tap:</strong>
-          <span>Tap the glowing Tapix Core (or press Space on a laptop) to mine Cyber Credits.</span>
+          <span>Tap the Tapix Core (or press Space on a laptop) to mine Cyber Credits.</span>
         </div>
         <div class="guide-step">
           <strong>2. Upgrade:</strong>
-          <span>Cards with a green glow are ready to buy. Get Click Multipliers for stronger taps and Miners for automatic CPS.</span>
+          <span>Use the Recommended Next Buy bar or green-highlighted cards to grow faster.</span>
         </div>
         <div class="guide-step">
-          <strong>3. Catch Stars:</strong>
-          <span>Golden Stars appear occasionally for 10 seconds — tap them for an instant jackpot or 2x Overclock!</span>
+          <strong>3. Golden Stars:</strong>
+          <span>Tap glowing Golden Stars within 10 seconds for a jackpot or 2x Overclock surge.</span>
         </div>
         <div class="guide-step">
           <strong>4. Rebirth:</strong>
-          <span>Reach 100,000 run credits to Rebirth for permanent Prestige Gems (+25% all earnings each).</span>
+          <span>At 100,000 run credits, Rebirth for permanent Prestige Gems (+25% earnings each).</span>
         </div>
       </div>
       <div class="modal-actions">
         <button class="btn-primary" id="btn-close-help" type="button">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offline Progress Modal -->
+  <div class="modal-backdrop" id="offline-modal">
+    <div class="modal-card">
+      <h2>Offline Mining Complete</h2>
+      <p id="offline-summary">Your miners kept working while you were away.</p>
+      <div class="modal-actions">
+        <button class="btn-primary" id="btn-claim-offline" type="button">Collect Credits</button>
       </div>
     </div>
   </div>
@@ -1421,101 +1429,51 @@
       'use strict';
 
       /* ========================================================================
-         1. GAME CONFIGURATION & CATALOGS
+         1. CONFIG & SUPABASE SETTINGS
          ======================================================================== */
       const SAVE_KEY = 'tapix_cyber_miner_v1';
       const LEGACY_SAVE_KEY = 'neon_core_cyber_miner_v1';
+      const CLOUD_CFG_KEY = 'tapix_supabase_cfg_v1';
       const PRESTIGE_MILESTONE = 100_000;
-      const GEM_BONUS_PER_GEM = 0.25; // +25% permanent multiplier per Prestige Gem
-      const OFFLINE_CAP_SECONDS = 86_400; // Max 24 hours of offline mining
-      const GOLDEN_DURATION_MS = 10_000; // Golden target stays for 10 seconds
+      const GEM_BONUS_PER_GEM = 0.25;
+      const OFFLINE_CAP_SECONDS = 86_400;
+      const GOLDEN_DURATION_MS = 10_000;
 
-      // 3 Click-Power Multiplier Upgrades
+      // Optional hardcoded Supabase credentials (or configure via Cloud Sync button)
+      const DEFAULT_SUPABASE = {
+        url: '',
+        anonKey: '',
+        playerId: 'raza'
+      };
+
+      // Clean stroke-based SVG icon library
+      const ICONS = {
+        bolt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+        flame: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+        gem: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 18 3 22 9 12 22 2 9 6 3"/><line x1="2" y1="9" x2="22" y2="9"/></svg>',
+        cursor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 4 7.07 17 2.51-7.39L21 11.07z"/></svg>',
+        drone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M3 7h4l2 2M21 7h-4l-2 2M3 17h4l2-2M21 17h-4l-2-2"/></svg>',
+        bot: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M12 2v6M8 14h.01M16 14h.01"/></svg>',
+        drill: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 14 20 4M4 14l6 6M3 21l3-3"/></svg>',
+        factory: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20V9l6 4V9l6 4V5l8 4v11H2z"/></svg>',
+        orbit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(35 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-35 12 12)"/></svg>',
+        cpu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 1v5M15 1v5M9 18v5M15 18v5M1 9h5M1 15h5M18 9h5M18 15h5"/></svg>'
+      };
+
       const CLICK_MULTIPLIERS = [
-        {
-          id: 'mult_flux',
-          name: 'Flux Amplifier',
-          icon: '⚡',
-          mult: 2,
-          baseCost: 120,
-          desc: 'Doubles your Click Power (2x Clicks)'
-        },
-        {
-          id: 'mult_plasma',
-          name: 'Plasma Overdrive',
-          icon: '🔥',
-          mult: 3,
-          baseCost: 3_500,
-          desc: 'Triples your Click Power (3x Clicks)'
-        },
-        {
-          id: 'mult_quantum',
-          name: 'Quantum Singularity',
-          icon: '💠',
-          mult: 5,
-          baseCost: 65_000,
-          desc: 'Multiplies Click Power by 5x (5x Clicks)'
-        }
+        { id: 'mult_flux', name: 'Flux Amplifier', icon: ICONS.bolt, mult: 2, baseCost: 120, desc: '2x Click Power' },
+        { id: 'mult_plasma', name: 'Plasma Overdrive', icon: ICONS.flame, mult: 3, baseCost: 3_500, desc: '3x Click Power' },
+        { id: 'mult_quantum', name: 'Quantum Singularity', icon: ICONS.gem, mult: 5, baseCost: 65_000, desc: '5x Click Power' }
       ];
 
-      // 7 Auto-Clickers / Buildings with standard baseCost * 1.15^owned scaling
       const BUILDINGS = [
-        {
-          id: 'cursor',
-          name: 'Auto-Cursor',
-          icon: '🖱️',
-          baseCost: 15,
-          cps: 1,
-          desc: 'Taps the core automatically (+1 CPS)'
-        },
-        {
-          id: 'drone',
-          name: 'Scrap Drone',
-          icon: '🛸',
-          baseCost: 100,
-          cps: 5,
-          desc: 'Swarms energy vents (+5 CPS)'
-        },
-        {
-          id: 'worker',
-          name: 'Cyber Worker',
-          icon: '🤖',
-          baseCost: 850,
-          cps: 28,
-          desc: 'Synthesizes crystal shards (+28 CPS)'
-        },
-        {
-          id: 'drill',
-          name: 'Plasma Drill',
-          icon: '⛏️',
-          baseCost: 6_500,
-          cps: 140,
-          desc: 'Deep-core laser extraction (+140 CPS)'
-        },
-        {
-          id: 'factory',
-          name: 'Nano Factory',
-          icon: '🏭',
-          baseCost: 48_000,
-          cps: 720,
-          desc: 'Automated dark-matter foundry (+720 CPS)'
-        },
-        {
-          id: 'orbital',
-          name: 'Orbital Rig',
-          icon: '🛰️',
-          baseCost: 380_000,
-          cps: 3_800,
-          desc: 'Harvests solar-grid beams (+3.8K CPS)'
-        },
-        {
-          id: 'aibot',
-          name: 'Singularity AI',
-          icon: '🧠',
-          baseCost: 3_200_000,
-          cps: 21_000,
-          desc: 'Predicts quantum credit hashes (+21K CPS)'
-        }
+        { id: 'cursor', name: 'Auto-Cursor', icon: ICONS.cursor, baseCost: 15, cps: 1, desc: '+1 CPS each' },
+        { id: 'drone', name: 'Scrap Drone', icon: ICONS.drone, baseCost: 100, cps: 5, desc: '+5 CPS each' },
+        { id: 'worker', name: 'Cyber Worker', icon: ICONS.bot, baseCost: 850, cps: 28, desc: '+28 CPS each' },
+        { id: 'drill', name: 'Plasma Drill', icon: ICONS.drill, baseCost: 6_500, cps: 140, desc: '+140 CPS each' },
+        { id: 'factory', name: 'Nano Factory', icon: ICONS.factory, baseCost: 48_000, cps: 720, desc: '+720 CPS each' },
+        { id: 'orbital', name: 'Orbital Rig', icon: ICONS.orbit, baseCost: 380_000, cps: 3_800, desc: '+3.8K CPS each' },
+        { id: 'aibot', name: 'Singularity AI', icon: ICONS.cpu, baseCost: 3_200_000, cps: 21_000, desc: '+21K CPS each' }
       ];
 
       /* ========================================================================
@@ -1538,85 +1496,20 @@
           buildings,
           multipliers,
           overclockUntil: 0,
-          soundEnabled: true,
           lastSaved: Date.now()
         };
       }
 
       let state = createDefaultState();
-      let buyMode = '1'; // '1' | '10' | 'max'
+      let buyMode = '1';
       let lastTick = performance.now();
       let activeGoldenEl = null;
       let goldenTimeoutId = null;
       let nextGoldenSpawnId = null;
+      let quickBuyTarget = null;
 
       /* ========================================================================
-         3. WEB AUDIO API SYNTHESIZER (No external audio files)
-         ======================================================================== */
-      const Sound = (() => {
-        let ctx = null;
-
-        function ensureContext() {
-          if (!state.soundEnabled) return null;
-          if (!ctx) {
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            if (!AudioCtx) return null;
-            ctx = new AudioCtx();
-          }
-          if (ctx.state === 'suspended') {
-            ctx.resume().catch(() => {});
-          }
-          return ctx;
-        }
-
-        function playTone(freq, endFreq, duration, type = 'sine', gainPeak = 0.12, delay = 0) {
-          const ac = ensureContext();
-          if (!ac) return;
-          const t = ac.currentTime + delay;
-          const osc = ac.createOscillator();
-          const gain = ac.createGain();
-          osc.type = type;
-          osc.frequency.setValueAtTime(freq, t);
-          if (endFreq !== freq) {
-            osc.frequency.exponentialRampToValueAtTime(Math.max(20, endFreq), t + duration);
-          }
-          gain.gain.setValueAtTime(0.0001, t);
-          gain.gain.exponentialRampToValueAtTime(gainPeak, t + 0.012);
-          gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
-          osc.connect(gain);
-          gain.connect(ac.destination);
-          osc.start(t);
-          osc.stop(t + duration + 0.02);
-        }
-
-        return {
-          click() {
-            const jitter = 0.94 + Math.random() * 0.14;
-            playTone(520 * jitter, 190 * jitter, 0.065, 'triangle', 0.11);
-          },
-          buy() {
-            playTone(440, 587, 0.08, 'sine', 0.10, 0);
-            playTone(659, 880, 0.12, 'triangle', 0.10, 0.05);
-          },
-          goldenSpawn() {
-            playTone(784, 1046, 0.16, 'sine', 0.08, 0);
-            playTone(1046, 1318, 0.22, 'sine', 0.08, 0.1);
-          },
-          goldenCollect() {
-            [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
-              playTone(f, f * 1.03, 0.18, 'triangle', 0.12, idx * 0.055);
-            });
-          },
-          rebirth() {
-            [220, 330, 440, 660, 880].forEach((f, idx) => {
-              playTone(f, f * 1.25, 0.32, 'sawtooth', 0.07, idx * 0.07);
-            });
-          }
-        };
-      })();
-
-      /* ========================================================================
-         4. PARTICLE CANVAS SYSTEM
+         3. PARTICLE CANVAS SYSTEM
          ======================================================================== */
       const Particles = (() => {
         const canvas = document.getElementById('particle-canvas');
@@ -1631,22 +1524,21 @@
           ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
-        function burst(clientX, clientY, count = 10, color = '#22d3ee') {
+        function burst(clientX, clientY, count = 9, color = '#22d3ee') {
           const rect = canvas.getBoundingClientRect();
           const x = clientX - rect.left;
           const y = clientY - rect.top;
           for (let i = 0; i < count; i++) {
-            if (pool.length > 180) pool.shift();
+            if (pool.length > 160) pool.shift();
             const angle = Math.random() * Math.PI * 2;
-            const speed = 1.6 + Math.random() * 4.4;
+            const speed = 1.6 + Math.random() * 4.2;
             pool.push({
-              x,
-              y,
+              x, y,
               vx: Math.cos(angle) * speed,
               vy: Math.sin(angle) * speed - 1.2,
-              size: 2 + Math.random() * 3.2,
+              size: 2 + Math.random() * 3,
               alpha: 1,
-              decay: 0.024 + Math.random() * 0.02,
+              decay: 0.025 + Math.random() * 0.02,
               color
             });
           }
@@ -1658,7 +1550,7 @@
             const p = pool[i];
             p.x += p.vx;
             p.y += p.vy;
-            p.vy += 0.12; // subtle gravity
+            p.vy += 0.12;
             p.alpha -= p.decay;
             if (p.alpha <= 0) {
               pool.splice(i, 1);
@@ -1675,62 +1567,40 @@
 
         window.addEventListener('resize', resize);
         resize();
-
         return { burst, updateAndDraw, resize };
       })();
 
       /* ========================================================================
-         5. ECONOMY & FORMULAS
+         4. ECONOMY & FORMATTING
          ======================================================================== */
-      function getPrestigeMultiplier() {
-        return 1 + state.prestigeGems * GEM_BONUS_PER_GEM;
-      }
-
-      function getOverclockMultiplier() {
-        return Date.now() < state.overclockUntil ? 2 : 1;
-      }
-
-      function getGlobalMultiplier() {
-        return getPrestigeMultiplier() * getOverclockMultiplier();
-      }
+      const getPrestigeMultiplier = () => 1 + state.prestigeGems * GEM_BONUS_PER_GEM;
+      const getOverclockMultiplier = () => (Date.now() < state.overclockUntil ? 2 : 1);
+      const getGlobalMultiplier = () => getPrestigeMultiplier() * getOverclockMultiplier();
 
       function getBaseCps() {
-        let total = 0;
-        for (const b of BUILDINGS) {
-          total += (state.buildings[b.id] || 0) * b.cps;
-        }
-        return total;
+        return BUILDINGS.reduce((sum, b) => sum + (state.buildings[b.id] || 0) * b.cps, 0);
       }
 
-      function getEffectiveCps() {
-        return getBaseCps() * getGlobalMultiplier();
-      }
+      const getEffectiveCps = () => getBaseCps() * getGlobalMultiplier();
 
       function getClickPower() {
         let mult = 1;
         for (const m of CLICK_MULTIPLIERS) {
           if (state.multipliers[m.id]) mult *= m.mult;
         }
-        return 1 * mult * getGlobalMultiplier();
+        return mult * getGlobalMultiplier();
       }
 
-      function getBuildingSingleCost(building, ownedCount) {
-        return Math.floor(building.baseCost * Math.pow(1.15, ownedCount));
-      }
+      const getBuildingSingleCost = (b, owned) => Math.floor(b.baseCost * Math.pow(1.15, owned));
 
       function getBuildingBulkQuote(building, mode) {
         const owned = state.buildings[building.id] || 0;
-        if (mode === '1') {
-          return { qty: 1, cost: getBuildingSingleCost(building, owned) };
-        }
+        if (mode === '1') return { qty: 1, cost: getBuildingSingleCost(building, owned) };
         if (mode === '10') {
           let cost = 0;
-          for (let i = 0; i < 10; i++) {
-            cost += getBuildingSingleCost(building, owned + i);
-          }
+          for (let i = 0; i < 10; i++) cost += getBuildingSingleCost(building, owned + i);
           return { qty: 10, cost };
         }
-        // 'max' mode: compute how many can be afforded (cap loop at 200 for safety)
         let qty = 0;
         let cost = 0;
         while (qty < 200) {
@@ -1739,15 +1609,12 @@
           cost += nextCost;
           qty++;
         }
-        if (qty === 0) {
-          return { qty: 1, cost: getBuildingSingleCost(building, owned), affordable: false };
-        }
+        if (qty === 0) return { qty: 1, cost: getBuildingSingleCost(building, owned), affordable: false };
         return { qty, cost, affordable: true };
       }
 
       function getClaimableGems() {
-        if (state.runCredits < PRESTIGE_MILESTONE) return 0;
-        return Math.floor(Math.sqrt(state.runCredits / PRESTIGE_MILESTONE));
+        return state.runCredits < PRESTIGE_MILESTONE ? 0 : Math.floor(Math.sqrt(state.runCredits / PRESTIGE_MILESTONE));
       }
 
       function addCredits(amount) {
@@ -1757,21 +1624,13 @@
         state.totalCredits += amount;
       }
 
-      /* ========================================================================
-         6. FORMATTING & VISUAL HELPERS
-         ======================================================================== */
       const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc'];
-
       function formatNum(value, decimals = 0) {
         if (!Number.isFinite(value)) return '0';
-        if (value < 1000) {
-          return decimals > 0 ? value.toFixed(decimals) : Math.floor(value).toLocaleString();
-        }
-        const tier = Math.min(Math.floor(Math.log10(value) / 3), SUFFIXES.length - 1);
-        if (tier === 0) return Math.floor(value).toLocaleString();
+        if (value < 1000) return decimals > 0 ? value.toFixed(decimals) : Math.floor(value).toLocaleString();
         if (value < 1_000_000) return Math.floor(value).toLocaleString();
-        const scaled = value / Math.pow(1000, tier);
-        return scaled.toFixed(2) + SUFFIXES[tier];
+        const tier = Math.min(Math.floor(Math.log10(value) / 3), SUFFIXES.length - 1);
+        return (value / Math.pow(1000, tier)).toFixed(2) + SUFFIXES[tier];
       }
 
       function formatDuration(seconds) {
@@ -1804,11 +1663,9 @@
         const el = document.createElement('div');
         el.className = isGolden ? 'floating-num golden' : 'floating-num';
         el.textContent = text;
-        const offsetX = (Math.random() - 0.5) * 26;
-        el.style.left = `${x + offsetX}px`;
+        el.style.left = `${x + (Math.random() - 0.5) * 26}px`;
         el.style.top = `${y - 10}px`;
         document.body.appendChild(el);
-
         const cleanup = () => {
           if (el.parentNode) {
             el.remove();
@@ -1816,11 +1673,175 @@
           }
         };
         el.addEventListener('animationend', cleanup, { once: true });
-        setTimeout(cleanup, 950);
+        setTimeout(cleanup, 900);
       }
 
       /* ========================================================================
-         7. DOM REFERENCES & SHOP INITIALIZATION
+         5. SUPABASE CLOUD SYNC & LOCAL STORAGE
+         ======================================================================== */
+      const CloudSync = (() => {
+        let cfg = { ...DEFAULT_SUPABASE };
+        let client = null;
+        let syncing = false;
+
+        function loadConfig() {
+          try {
+            const raw = localStorage.getItem(CLOUD_CFG_KEY);
+            if (raw) cfg = { ...DEFAULT_SUPABASE, ...JSON.parse(raw) };
+          } catch {}
+          initClient();
+        }
+
+        function saveConfig(next) {
+          cfg = { ...cfg, ...next };
+          try {
+            localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cfg));
+          } catch {}
+          initClient();
+        }
+
+        function initClient() {
+          client = null;
+          if (cfg.url && cfg.anonKey && window.supabase && typeof window.supabase.createClient === 'function') {
+            try {
+              client = window.supabase.createClient(cfg.url.trim(), cfg.anonKey.trim());
+            } catch (err) {
+              console.warn('Supabase client init failed:', err);
+            }
+          }
+          updateBadge();
+        }
+
+        function updateBadge(statusText) {
+          const dot = document.getElementById('cloud-dot');
+          const label = document.getElementById('cloud-label');
+          if (!dot || !label) return;
+          if (client) {
+            dot.classList.add('online');
+            label.textContent = statusText || `Cloud: ${cfg.playerId || 'Player'}`;
+          } else {
+            dot.classList.remove('online');
+            label.textContent = 'Setup Cloud';
+          }
+        }
+
+        async function pull() {
+          if (!client || !cfg.playerId) return false;
+          try {
+            updateBadge('Syncing...');
+            const { data, error } = await client
+              .from('tapix_progress')
+              .select('state_json, updated_at')
+              .eq('player_id', cfg.playerId.trim())
+              .maybeSingle();
+            if (error) throw error;
+            if (data && data.state_json) {
+              const cloudState = data.state_json;
+              if ((cloudState.totalCredits || 0) >= state.totalCredits) {
+                const merged = createDefaultState();
+                Object.assign(merged, cloudState);
+                merged.buildings = { ...merged.buildings, ...(cloudState.buildings || {}) };
+                merged.multipliers = { ...merged.multipliers, ...(cloudState.multipliers || {}) };
+                state = merged;
+                applyOfflineProgress();
+                saveLocal();
+                refreshUI();
+                showToast(`Cloud save loaded for ${cfg.playerId}`);
+              }
+            }
+            updateBadge(`Synced`);
+            return true;
+          } catch (err) {
+            console.warn('Supabase pull failed:', err);
+            updateBadge('Cloud Error');
+            return false;
+          }
+        }
+
+        async function push() {
+          if (!client || !cfg.playerId || syncing) return;
+          syncing = true;
+          try {
+            state.lastSaved = Date.now();
+            const payload = {
+              player_id: cfg.playerId.trim(),
+              credits: Math.floor(state.credits),
+              run_credits: Math.floor(state.runCredits),
+              total_credits: Math.floor(state.totalCredits),
+              total_clicks: Math.floor(state.totalClicks),
+              golden_caught: Math.floor(state.goldenCaught),
+              prestige_gems: Math.floor(state.prestigeGems),
+              rebirths: Math.floor(state.rebirths),
+              state_json: state,
+              updated_at: new Date().toISOString()
+            };
+            const { error } = await client
+              .from('tapix_progress')
+              .upsert(payload, { onConflict: 'player_id' });
+            if (error) throw error;
+            updateBadge('Synced');
+          } catch (err) {
+            console.warn('Supabase push failed:', err);
+            updateBadge('Sync Retry');
+          } finally {
+            syncing = false;
+          }
+        }
+
+        return {
+          loadConfig,
+          saveConfig,
+          getConfig: () => ({ ...cfg }),
+          isConnected: () => !!client,
+          pull,
+          push
+        };
+      })();
+
+      function saveLocal() {
+        try {
+          state.lastSaved = Date.now();
+          localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+        } catch {}
+      }
+
+      function saveAll(syncCloud = false) {
+        saveLocal();
+        if (syncCloud) CloudSync.push();
+      }
+
+      function applyOfflineProgress() {
+        const now = Date.now();
+        const elapsedSec = Math.min(Math.max(0, (now - (state.lastSaved || now)) / 1000), OFFLINE_CAP_SECONDS);
+        const cps = getBaseCps() * getPrestigeMultiplier();
+        if (elapsedSec >= 5 && cps > 0) {
+          const offlineEarned = Math.floor(cps * elapsedSec);
+          if (offlineEarned > 0) {
+            addCredits(offlineEarned);
+            document.getElementById('offline-summary').innerHTML =
+              `You were away for <strong>${formatDuration(elapsedSec)}</strong>.<br>` +
+              `Your miners extracted <strong>+${formatNum(offlineEarned)} Credits</strong>!`;
+            document.getElementById('offline-modal').classList.add('open');
+          }
+        }
+      }
+
+      function loadLocal() {
+        try {
+          const raw = localStorage.getItem(SAVE_KEY) || localStorage.getItem(LEGACY_SAVE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          const merged = createDefaultState();
+          Object.assign(merged, parsed);
+          merged.buildings = { ...merged.buildings, ...(parsed.buildings || {}) };
+          merged.multipliers = { ...merged.multipliers, ...(parsed.multipliers || {}) };
+          state = merged;
+          applyOfflineProgress();
+        } catch {}
+      }
+
+      /* ========================================================================
+         6. DOM REFS & SHOP BUILDER
          ======================================================================== */
       const els = {
         hudCredits: document.getElementById('hud-credits'),
@@ -1833,6 +1854,9 @@
         clickArena: document.getElementById('click-arena'),
         overclockBanner: document.getElementById('overclock-banner'),
         overclockTimer: document.getElementById('overclock-timer'),
+        quickBuyBar: document.getElementById('quick-buy-bar'),
+        quickBuyName: document.getElementById('quick-buy-name'),
+        quickBuyBtn: document.getElementById('quick-buy-btn'),
         multiplierList: document.getElementById('multiplier-list'),
         buildingList: document.getElementById('building-list'),
         tabShop: document.getElementById('tab-shop'),
@@ -1851,13 +1875,9 @@
         statTotalClicks: document.getElementById('stat-total-clicks'),
         statGoldenCaught: document.getElementById('stat-golden-caught'),
         statRebirths: document.getElementById('stat-rebirths'),
-        btnSound: document.getElementById('btn-sound'),
-        soundIcon: document.getElementById('sound-icon'),
+        cloudModal: document.getElementById('cloud-modal'),
         helpModal: document.getElementById('help-modal'),
-        saveModal: document.getElementById('save-modal'),
-        saveTextarea: document.getElementById('save-textarea'),
         offlineModal: document.getElementById('offline-modal'),
-        offlineSummary: document.getElementById('offline-summary'),
         rebirthModal: document.getElementById('rebirth-modal'),
         rebirthConfirmText: document.getElementById('rebirth-confirm-text')
       };
@@ -1866,7 +1886,6 @@
       const buildingNodes = {};
 
       function buildShopDOM() {
-        // Click Multipliers
         els.multiplierList.innerHTML = '';
         for (const m of CLICK_MULTIPLIERS) {
           const btn = document.createElement('button');
@@ -1874,25 +1893,24 @@
           btn.className = 'upgrade-card multiplier-card';
           btn.innerHTML = `
             <div class="upgrade-icon">${m.icon}</div>
-            <div class="upgrade-info">
-              <div class="upgrade-name-row">
-                <span class="upgrade-name">${m.name}</span>
-                <span class="upgrade-owned" data-role="badge">x${m.mult}</span>
-              </div>
-              <div class="upgrade-desc">${m.desc}</div>
-              <div class="upgrade-cost" data-role="cost">${formatNum(m.baseCost)} Credits</div>
+            <div class="upgrade-main">
+              <div class="upgrade-name">${m.name}</div>
+              <div class="upgrade-effect">${m.desc}</div>
+            </div>
+            <div class="upgrade-right">
+              <span class="upgrade-cost-pill" data-role="cost">${formatNum(m.baseCost)}</span>
+              <span class="upgrade-owned" data-role="badge">x${m.mult}</span>
             </div>
           `;
           btn.addEventListener('click', () => buyMultiplier(m.id));
           els.multiplierList.appendChild(btn);
           multiplierNodes[m.id] = {
             btn,
-            badge: btn.querySelector('[data-role="badge"]'),
-            cost: btn.querySelector('[data-role="cost"]')
+            cost: btn.querySelector('[data-role="cost"]'),
+            badge: btn.querySelector('[data-role="badge"]')
           };
         }
 
-        // Auto-Clickers / Buildings
         els.buildingList.innerHTML = '';
         for (const b of BUILDINGS) {
           const btn = document.createElement('button');
@@ -1900,42 +1918,39 @@
           btn.className = 'upgrade-card';
           btn.innerHTML = `
             <div class="upgrade-icon">${b.icon}</div>
-            <div class="upgrade-info">
-              <div class="upgrade-name-row">
-                <span class="upgrade-name">${b.name}</span>
-                <span class="upgrade-owned" data-role="owned">0</span>
-              </div>
-              <div class="upgrade-desc">${b.desc}</div>
-              <div class="upgrade-cost" data-role="cost">${formatNum(b.baseCost)} Credits</div>
+            <div class="upgrade-main">
+              <div class="upgrade-name">${b.name}</div>
+              <div class="upgrade-effect">${b.desc}</div>
+            </div>
+            <div class="upgrade-right">
+              <span class="upgrade-cost-pill" data-role="cost">${formatNum(b.baseCost)}</span>
+              <span class="upgrade-owned" data-role="owned">Owned: 0</span>
             </div>
           `;
           btn.addEventListener('click', () => buyBuilding(b.id));
           els.buildingList.appendChild(btn);
           buildingNodes[b.id] = {
             btn,
-            owned: btn.querySelector('[data-role="owned"]'),
-            cost: btn.querySelector('[data-role="cost"]')
+            cost: btn.querySelector('[data-role="cost"]'),
+            owned: btn.querySelector('[data-role="owned"]')
           };
         }
       }
 
       /* ========================================================================
-         8. PLAYER ACTIONS (Clicking, Buying, Rebirth)
+         7. ACTIONS & GOLDEN EVENTS
          ======================================================================== */
       function handleCoreTap(clientX, clientY) {
         const gain = getClickPower();
         addCredits(gain);
         state.totalClicks += 1;
-
-        Sound.click();
         spawnFloatingText(clientX, clientY, `+${formatNum(gain)}`, getOverclockMultiplier() > 1);
         Particles.burst(
           clientX,
           clientY,
           getOverclockMultiplier() > 1 ? 14 : 9,
-          getOverclockMultiplier() > 1 ? '#fbbf24' : '#22d3ee'
+          getOverclockMultiplier() > 1 ? '#f59e0b' : '#22d3ee'
         );
-
         els.coreButton.classList.add('is-pressed');
         setTimeout(() => els.coreButton.classList.remove('is-pressed'), 75);
         refreshUI();
@@ -1946,27 +1961,25 @@
         if (!m || state.multipliers[id] || state.credits < m.baseCost) return;
         state.credits -= m.baseCost;
         state.multipliers[id] = true;
-        Sound.buy();
-        showToast(`Unlocked ${m.name} (${m.mult}x Click Power)!`);
+        showToast(`Unlocked ${m.name} (${m.mult}x Click Power)`);
+        saveAll(true);
         refreshUI();
       }
 
-      function buyBuilding(id) {
+      function buyBuilding(id, forceSingle = false) {
         const b = BUILDINGS.find((x) => x.id === id);
         if (!b) return;
-        const quote = getBuildingBulkQuote(b, buyMode);
+        const quote = getBuildingBulkQuote(b, forceSingle ? '1' : buyMode);
         if (quote.affordable === false || state.credits < quote.cost || quote.qty <= 0) return;
-
         state.credits -= quote.cost;
         state.buildings[id] = (state.buildings[id] || 0) + quote.qty;
-        Sound.buy();
+        saveAll(false);
         refreshUI();
       }
 
       function performRebirth() {
         const claimable = getClaimableGems();
         if (claimable <= 0) return;
-
         state.prestigeGems += claimable;
         state.rebirths += 1;
         state.credits = 0;
@@ -1975,54 +1988,34 @@
         for (const b of BUILDINGS) state.buildings[b.id] = 0;
         for (const m of CLICK_MULTIPLIERS) state.multipliers[m.id] = false;
 
-        Sound.rebirth();
         const rect = els.coreButton.getBoundingClientRect();
-        Particles.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 42, '#c084fc');
-        showToast(`Quantum Rebirth! +${claimable} Prestige Gem${claimable > 1 ? 's' : ''} acquired!`);
-        saveToStorage();
+        Particles.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 42, '#8b5cf6');
+        showToast(`Quantum Rebirth: +${claimable} Prestige Gem${claimable > 1 ? 's' : ''}`);
+        saveAll(true);
         refreshUI();
       }
 
-      /* ========================================================================
-         9. RANDOM GOLDEN EVENTS (10s duration, Instant Reward or 2x Overclock)
-         ======================================================================== */
       function clearGoldenTarget() {
-        if (goldenTimeoutId) {
-          clearTimeout(goldenTimeoutId);
-          goldenTimeoutId = null;
-        }
-        if (activeGoldenEl) {
-          activeGoldenEl.remove();
-          activeGoldenEl = null;
-        }
+        if (goldenTimeoutId) { clearTimeout(goldenTimeoutId); goldenTimeoutId = null; }
+        if (activeGoldenEl) { activeGoldenEl.remove(); activeGoldenEl = null; }
       }
 
       function scheduleNextGoldenEvent() {
         if (nextGoldenSpawnId) clearTimeout(nextGoldenSpawnId);
-        // Spawn every 30 to 55 seconds
-        const delayMs = 30_000 + Math.random() * 25_000;
-        nextGoldenSpawnId = setTimeout(spawnGoldenTarget, delayMs);
+        nextGoldenSpawnId = setTimeout(spawnGoldenTarget, 30_000 + Math.random() * 25_000);
       }
 
       function spawnGoldenTarget() {
         clearGoldenTarget();
-
         const target = document.createElement('button');
         target.type = 'button';
         target.className = 'golden-target';
-        target.setAttribute('aria-label', 'Golden Data Packet');
-
-        // Safe random placement inside click-arena (14% - 86%)
-        const leftPct = 14 + Math.random() * 72;
-        const topPct = 18 + Math.random() * 64;
-        target.style.left = `${leftPct}%`;
-        target.style.top = `${topPct}%`;
-
+        target.setAttribute('aria-label', 'Golden Star Bonus');
+        target.style.left = `${14 + Math.random() * 72}%`;
+        target.style.top = `${18 + Math.random() * 64}%`;
         target.innerHTML = `
-          <svg class="golden-timer-ring" viewBox="0 0 80 80">
-            <circle cx="40" cy="40" r="36"></circle>
-          </svg>
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <svg class="golden-timer-ring" viewBox="0 0 80 80"><circle cx="40" cy="40" r="36"></circle></svg>
+          <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
           </svg>
         `;
@@ -2033,12 +2026,8 @@
         const spawnedAt = performance.now();
 
         const ringInterval = setInterval(() => {
-          if (!activeGoldenEl) {
-            clearInterval(ringInterval);
-            return;
-          }
-          const elapsed = performance.now() - spawnedAt;
-          const pct = Math.max(0, 1 - elapsed / GOLDEN_DURATION_MS);
+          if (!activeGoldenEl) { clearInterval(ringInterval); return; }
+          const pct = Math.max(0, 1 - (performance.now() - spawnedAt) / GOLDEN_DURATION_MS);
           ringCircle.style.strokeDashoffset = String(circumference * (1 - pct));
         }, 80);
 
@@ -2047,36 +2036,27 @@
           clearInterval(ringInterval);
           clearGoldenTarget();
           state.goldenCaught += 1;
-          Sound.goldenCollect();
-
           const rect = target.getBoundingClientRect();
           const cx = e.clientX || rect.left + rect.width / 2;
           const cy = e.clientY || rect.top + rect.height / 2;
-          Particles.burst(cx, cy, 28, '#fbbf24');
+          Particles.burst(cx, cy, 28, '#f59e0b');
 
-          // 50% Instant Jackpot, 50% Temporary 2x Overclock Multiplier
           if (Math.random() < 0.5) {
-            const reward = Math.max(
-              250 * getPrestigeMultiplier(),
-              Math.floor(getEffectiveCps() * 20 + getClickPower() * 35)
-            );
+            const reward = Math.max(250 * getPrestigeMultiplier(), Math.floor(getEffectiveCps() * 20 + getClickPower() * 35));
             addCredits(reward);
-            spawnFloatingText(cx, cy, `+${formatNum(reward)} JACKPOT!`, true);
-            showToast(`Golden Packet: +${formatNum(reward)} Cyber Credits!`);
+            spawnFloatingText(cx, cy, `+${formatNum(reward)} JACKPOT`, true);
+            showToast(`Golden Star: +${formatNum(reward)} Credits`);
           } else {
             state.overclockUntil = Math.max(Date.now(), state.overclockUntil) + 20_000;
-            spawnFloatingText(cx, cy, '2X OVERCLOCK!', true);
-            showToast('Golden Overclock: 2x All Earnings for 20 seconds!');
+            spawnFloatingText(cx, cy, '2X OVERCLOCK', true);
+            showToast('2x Earnings Overclock active for 20s');
           }
-
           refreshUI();
           scheduleNextGoldenEvent();
         });
 
         els.clickArena.appendChild(target);
         activeGoldenEl = target;
-        Sound.goldenSpawn();
-
         goldenTimeoutId = setTimeout(() => {
           clearInterval(ringInterval);
           clearGoldenTarget();
@@ -2085,76 +2065,7 @@
       }
 
       /* ========================================================================
-         10. SAVE SYSTEM (LocalStorage, Offline Progress, Export/Import)
-         ======================================================================== */
-      function serializeState() {
-        state.lastSaved = Date.now();
-        const bytes = new TextEncoder().encode(JSON.stringify(state));
-        let bin = '';
-        for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
-        return btoa(bin);
-      }
-
-      function deserializeState(encoded) {
-        const bin = atob(encoded.trim());
-        const bytes = new Uint8Array(bin.length);
-        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-        const parsed = JSON.parse(new TextDecoder().decode(bytes));
-        if (!parsed || typeof parsed !== 'object' || !Number.isFinite(parsed.credits)) {
-          throw new Error('Invalid save payload');
-        }
-        const merged = createDefaultState();
-        Object.assign(merged, parsed);
-        merged.credits = Math.max(0, Number(merged.credits) || 0);
-        merged.runCredits = Math.max(0, Number(merged.runCredits) || 0);
-        merged.totalCredits = Math.max(0, Number(merged.totalCredits) || 0);
-        merged.prestigeGems = Math.max(0, Math.floor(Number(merged.prestigeGems) || 0));
-        merged.buildings = { ...merged.buildings, ...(parsed.buildings || {}) };
-        merged.multipliers = { ...merged.multipliers, ...(parsed.multipliers || {}) };
-        return merged;
-      }
-
-      function saveToStorage() {
-        try {
-          state.lastSaved = Date.now();
-          localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-        } catch (err) {
-          console.warn('Could not save to localStorage:', err);
-        }
-      }
-
-      function loadFromStorage() {
-        try {
-          const raw = localStorage.getItem(SAVE_KEY) || localStorage.getItem(LEGACY_SAVE_KEY);
-          if (!raw) return;
-          const parsed = JSON.parse(raw);
-          const merged = createDefaultState();
-          Object.assign(merged, parsed);
-          merged.buildings = { ...merged.buildings, ...(parsed.buildings || {}) };
-          merged.multipliers = { ...merged.multipliers, ...(parsed.multipliers || {}) };
-          state = merged;
-
-          // Offline progress calculation
-          const now = Date.now();
-          const elapsedSec = Math.min(Math.max(0, (now - (state.lastSaved || now)) / 1000), OFFLINE_CAP_SECONDS);
-          const cps = getBaseCps() * getPrestigeMultiplier();
-          if (elapsedSec >= 5 && cps > 0) {
-            const offlineEarned = Math.floor(cps * elapsedSec);
-            if (offlineEarned > 0) {
-              addCredits(offlineEarned);
-              els.offlineSummary.innerHTML =
-                `You were offline for <strong>${formatDuration(elapsedSec)}</strong>.<br>` +
-                `Your autonomous miners extracted <strong>+${formatNum(offlineEarned)} Cyber Credits</strong>!`;
-              els.offlineModal.classList.add('open');
-            }
-          }
-        } catch (err) {
-          console.warn('Could not load save:', err);
-        }
-      }
-
-      /* ========================================================================
-         11. UI REFRESH & MAIN GAME LOOP
+         8. UI REFRESH & LOOP
          ======================================================================== */
       function refreshUI() {
         const cps = getEffectiveCps();
@@ -2162,16 +2073,15 @@
         const prestigeMult = getPrestigeMultiplier();
         const overclockRemaining = Math.max(0, (state.overclockUntil - Date.now()) / 1000);
 
-        // Top HUD & Arena Readout
         const creditsStr = formatNum(state.credits);
+        const cpsStr = `${formatNum(cps, cps < 100 && cps > 0 ? 1 : 0)}/s`;
         els.hudCredits.textContent = creditsStr;
         els.arenaCredits.textContent = creditsStr;
-        els.hudCps.textContent = `${formatNum(cps, cps < 100 && cps > 0 ? 1 : 0)}/s`;
+        els.hudCps.textContent = cpsStr;
         els.hudClick.textContent = `+${formatNum(clickPower)}`;
         els.hudGems.textContent = `${state.prestigeGems} (x${prestigeMult.toFixed(2)})`;
-        els.arenaSub.textContent = `${formatNum(cps, cps < 100 && cps > 0 ? 1 : 0)} credits / sec • +${formatNum(clickPower)} per tap`;
+        els.arenaSub.textContent = `${cpsStr} • +${formatNum(clickPower)} per tap`;
 
-        // Overclock Banner
         if (overclockRemaining > 0) {
           els.overclockBanner.classList.add('visible');
           els.overclockTimer.textContent = `${overclockRemaining.toFixed(1)}s`;
@@ -2179,58 +2089,72 @@
           els.overclockBanner.classList.remove('visible');
         }
 
-        // Click-Power Multipliers
         let buyableCount = 0;
+        let bestUpgrade = null;
+
         for (const m of CLICK_MULTIPLIERS) {
           const node = multiplierNodes[m.id];
           const isOwned = !!state.multipliers[m.id];
           if (isOwned) {
             node.btn.disabled = true;
             node.btn.classList.add('owned-max');
-            node.badge.textContent = 'ACTIVE';
             node.cost.textContent = 'OWNED';
+            node.badge.textContent = 'Active';
           } else {
             const canBuy = state.credits >= m.baseCost;
-            if (canBuy) buyableCount++;
+            if (canBuy) {
+              buyableCount++;
+              bestUpgrade = { type: 'mult', id: m.id, name: `${m.name} (${m.mult}x)`, cost: m.baseCost };
+            }
             node.btn.classList.remove('owned-max');
             node.btn.disabled = !canBuy;
-            node.badge.textContent = `x${m.mult}`;
-            node.cost.textContent = `${formatNum(m.baseCost)} Credits`;
+            node.cost.textContent = formatNum(m.baseCost);
+            node.badge.textContent = `x${m.mult} Click`;
           }
         }
 
-        // Auto-Clickers / Buildings
         for (const b of BUILDINGS) {
           const node = buildingNodes[b.id];
           const owned = state.buildings[b.id] || 0;
           const quote = getBuildingBulkQuote(b, buyMode);
           const canBuy = quote.affordable !== false && state.credits >= quote.cost;
-          if (canBuy) buyableCount++;
-          node.owned.textContent = owned;
+          if (canBuy) {
+            buyableCount++;
+            const singleCost = getBuildingSingleCost(b, owned);
+            if (!bestUpgrade || singleCost >= bestUpgrade.cost) {
+              bestUpgrade = { type: 'building', id: b.id, name: `${b.name} (+${formatNum(b.cps)}/s)`, cost: singleCost };
+            }
+          }
+          node.owned.textContent = `Owned: ${owned}`;
           node.btn.disabled = !canBuy;
-          node.cost.textContent = `${formatNum(quote.cost)} Credits${quote.qty > 1 ? ` (x${quote.qty})` : ''}`;
+          node.cost.textContent = `${formatNum(quote.cost)}${quote.qty > 1 ? ` x${quote.qty}` : ''}`;
+        }
+
+        quickBuyTarget = bestUpgrade;
+        if (bestUpgrade) {
+          els.quickBuyBar.classList.remove('hidden');
+          els.quickBuyName.textContent = bestUpgrade.name;
+          els.quickBuyBtn.textContent = `Buy ${formatNum(bestUpgrade.cost)}`;
+        } else {
+          els.quickBuyBar.classList.add('hidden');
         }
 
         els.shopBuyableBadge.textContent = String(buyableCount);
         els.shopBuyableBadge.classList.toggle('hidden', buyableCount === 0);
 
-        // Prestige Tab
         const claimable = getClaimableGems();
         els.prestigeReadyBadge.classList.toggle('hidden', claimable <= 0);
         els.prestigeClaimable.textContent = `+${claimable} Gem${claimable === 1 ? '' : 's'}`;
         els.btnRebirth.disabled = claimable <= 0;
 
-        const nextGemThreshold = Math.pow(claimable + 1, 2) * PRESTIGE_MILESTONE;
-        const prevGemThreshold = claimable === 0 ? 0 : Math.pow(claimable, 2) * PRESTIGE_MILESTONE;
-        const pct = Math.min(
-          100,
-          Math.max(0, ((state.runCredits - prevGemThreshold) / (nextGemThreshold - prevGemThreshold)) * 100)
-        );
+        const nextThreshold = Math.pow(claimable + 1, 2) * PRESTIGE_MILESTONE;
+        const prevThreshold = claimable === 0 ? 0 : Math.pow(claimable, 2) * PRESTIGE_MILESTONE;
+        const pct = Math.min(100, Math.max(0, ((state.runCredits - prevThreshold) / (nextThreshold - prevThreshold)) * 100));
         els.prestigeProgress.style.width = `${pct.toFixed(1)}%`;
         els.prestigeMilestoneText.textContent =
           claimable === 0
-            ? `Progress to first Gem: ${formatNum(state.runCredits)} / ${formatNum(PRESTIGE_MILESTONE)}`
-            : `Next Gem at ${formatNum(nextGemThreshold)} run credits`;
+            ? `Progress: ${formatNum(state.runCredits)} / ${formatNum(PRESTIGE_MILESTONE)}`
+            : `Next Gem at ${formatNum(nextThreshold)} run credits`;
 
         els.statPrestigeMult.textContent = `x${prestigeMult.toFixed(2)}`;
         els.statRunCredits.textContent = formatNum(state.runCredits);
@@ -2238,55 +2162,49 @@
         els.statTotalClicks.textContent = formatNum(state.totalClicks);
         els.statGoldenCaught.textContent = formatNum(state.goldenCaught);
         els.statRebirths.textContent = formatNum(state.rebirths);
-
-        // Sound button state
-        els.btnSound.classList.toggle('active', state.soundEnabled);
-        els.soundIcon.textContent = state.soundEnabled ? '🔊' : '🔇';
       }
 
-      let uiRefreshAccumulator = 0;
+      let uiRefreshAcc = 0;
       function gameLoop(now) {
         const dt = Math.min(Math.max(0, (now - lastTick) / 1000), 1.0);
         lastTick = now;
-
         const cps = getEffectiveCps();
-        if (cps > 0 && dt > 0) {
-          addCredits(cps * dt);
-        }
-
+        if (cps > 0 && dt > 0) addCredits(cps * dt);
         Particles.updateAndDraw();
-
-        uiRefreshAccumulator += dt;
-        if (uiRefreshAccumulator >= 0.08) {
-          uiRefreshAccumulator = 0;
+        uiRefreshAcc += dt;
+        if (uiRefreshAcc >= 0.08) {
+          uiRefreshAcc = 0;
           refreshUI();
         }
-
         requestAnimationFrame(gameLoop);
       }
 
       /* ========================================================================
-         12. EVENT LISTENERS & BOOTSTRAP
+         9. EVENTS & BOOTSTRAP
          ======================================================================== */
       function bindEvents() {
-        // Primary core tap (pointerdown for zero-latency mobile & desktop tapping)
         els.coreButton.addEventListener('pointerdown', (e) => {
           if (e.pointerType === 'mouse' && e.button !== 0) return;
           e.preventDefault();
           handleCoreTap(e.clientX, e.clientY);
         });
 
-        // Keyboard accessibility (Space) when no modal is open
         window.addEventListener('keydown', (e) => {
           if (e.repeat) return;
-          if (e.code === 'Space' && document.activeElement.tagName !== 'TEXTAREA' && !document.querySelector('.modal-backdrop.open')) {
+          const tag = document.activeElement ? document.activeElement.tagName : '';
+          if (e.code === 'Space' && tag !== 'INPUT' && tag !== 'TEXTAREA' && !document.querySelector('.modal-backdrop.open')) {
             e.preventDefault();
             const rect = els.coreButton.getBoundingClientRect();
             handleCoreTap(rect.left + rect.width / 2, rect.top + rect.height / 2);
           }
         });
 
-        // Shop Tabs
+        els.quickBuyBtn.addEventListener('click', () => {
+          if (!quickBuyTarget) return;
+          if (quickBuyTarget.type === 'mult') buyMultiplier(quickBuyTarget.id);
+          else buyBuilding(quickBuyTarget.id, true);
+        });
+
         els.tabShop.addEventListener('click', () => {
           els.tabShop.classList.add('active');
           els.tabPrestige.classList.remove('active');
@@ -2301,7 +2219,6 @@
           els.panelShop.style.display = 'none';
         });
 
-        // Buy Quantity Toggles (x1, x10, MAX)
         document.querySelectorAll('.buy-mode-btn').forEach((btn) => {
           btn.addEventListener('click', () => {
             buyMode = btn.dataset.buy;
@@ -2311,12 +2228,34 @@
           });
         });
 
-        // Sound Toggle
-        els.btnSound.addEventListener('click', () => {
-          state.soundEnabled = !state.soundEnabled;
-          if (state.soundEnabled) Sound.buy();
-          saveToStorage();
-          refreshUI();
+        // Guide Modal
+        document.getElementById('btn-help').addEventListener('click', () => els.helpModal.classList.add('open'));
+        document.getElementById('btn-close-help').addEventListener('click', () => els.helpModal.classList.remove('open'));
+
+        // Cloud Sync Modal
+        document.getElementById('btn-cloud').addEventListener('click', () => {
+          const cfg = CloudSync.getConfig();
+          document.getElementById('input-player-id').value = cfg.playerId || 'raza';
+          document.getElementById('input-sb-url').value = cfg.url || '';
+          document.getElementById('input-sb-key').value = cfg.anonKey || '';
+          els.cloudModal.classList.add('open');
+        });
+
+        document.getElementById('btn-cloud-close').addEventListener('click', () => els.cloudModal.classList.remove('open'));
+
+        document.getElementById('btn-cloud-connect').addEventListener('click', async () => {
+          const playerId = document.getElementById('input-player-id').value.trim() || 'raza';
+          const url = document.getElementById('input-sb-url').value.trim();
+          const anonKey = document.getElementById('input-sb-key').value.trim();
+          CloudSync.saveConfig({ playerId, url, anonKey });
+          els.cloudModal.classList.remove('open');
+          if (CloudSync.isConnected()) {
+            await CloudSync.pull();
+            await CloudSync.push();
+            showToast('Connected & synced with Supabase');
+          } else {
+            showToast('Saved locally. Add Supabase URL & Key to sync.');
+          }
         });
 
         // Rebirth Flow
@@ -2324,103 +2263,35 @@
           const claimable = getClaimableGems();
           if (claimable <= 0) return;
           els.rebirthConfirmText.innerHTML =
-            `You will reset your Credits, Miners, and Click Multipliers to gain <strong>+${claimable} Prestige Gem${claimable > 1 ? 's' : ''}</strong> ` +
-            `(new total bonus: <strong>x${((1 + (state.prestigeGems + claimable) * GEM_BONUS_PER_GEM)).toFixed(2)}</strong>).`;
+            `You will reset your Credits, Miners, and Multipliers to gain <strong>+${claimable} Prestige Gem${claimable > 1 ? 's' : ''}</strong> ` +
+            `(new multiplier: <strong>x${(1 + (state.prestigeGems + claimable) * GEM_BONUS_PER_GEM).toFixed(2)}</strong>).`;
           els.rebirthModal.classList.add('open');
         });
 
-        document.getElementById('btn-cancel-rebirth').addEventListener('click', () => {
-          els.rebirthModal.classList.remove('open');
-        });
-
+        document.getElementById('btn-cancel-rebirth').addEventListener('click', () => els.rebirthModal.classList.remove('open'));
         document.getElementById('btn-confirm-rebirth').addEventListener('click', () => {
           els.rebirthModal.classList.remove('open');
           performRebirth();
         });
 
-        // How to Play Guide Modal
-        document.getElementById('btn-help').addEventListener('click', () => {
-          els.helpModal.classList.add('open');
-        });
+        document.getElementById('btn-claim-offline').addEventListener('click', () => els.offlineModal.classList.remove('open'));
 
-        document.getElementById('btn-close-help').addEventListener('click', () => {
-          els.helpModal.classList.remove('open');
-        });
-
-        // Save / Export / Import Modal
-        document.getElementById('btn-save-menu').addEventListener('click', () => {
-          els.saveTextarea.value = serializeState();
-          els.saveModal.classList.add('open');
-        });
-
-        document.getElementById('btn-close-save').addEventListener('click', () => {
-          els.saveModal.classList.remove('open');
-        });
-
-        document.getElementById('btn-export-save').addEventListener('click', async () => {
-          const code = serializeState();
-          els.saveTextarea.value = code;
-          els.saveTextarea.select();
-          try {
-            await navigator.clipboard.writeText(code);
-            showToast('Save code exported & copied to clipboard!');
-          } catch {
-            showToast('Save code generated — copy it from the box!');
-          }
-        });
-
-        document.getElementById('btn-import-save').addEventListener('click', () => {
-          const raw = els.saveTextarea.value;
-          if (!raw.trim()) {
-            showToast('Paste a save code first.');
-            return;
-          }
-          try {
-            state = deserializeState(raw);
-            saveToStorage();
-            refreshUI();
-            els.saveModal.classList.remove('open');
-            showToast('Save imported successfully!');
-          } catch {
-            showToast('Invalid save code!');
-          }
-        });
-
-        document.getElementById('btn-hard-reset').addEventListener('click', () => {
-          if (!els.saveTextarea.dataset.confirmReset) {
-            els.saveTextarea.dataset.confirmReset = '1';
-            showToast('Click Hard Reset again to wipe all progress!');
-            setTimeout(() => { delete els.saveTextarea.dataset.confirmReset; }, 4000);
-            return;
-          }
-          delete els.saveTextarea.dataset.confirmReset;
-          localStorage.removeItem(SAVE_KEY);
-          state = createDefaultState();
-          saveToStorage();
-          refreshUI();
-          els.saveModal.classList.remove('open');
-          showToast('All progress wiped.');
-        });
-
-        document.getElementById('btn-claim-offline').addEventListener('click', () => {
-          els.offlineModal.classList.remove('open');
-        });
-
-        // Persist on tab hide / close
-        window.addEventListener('beforeunload', saveToStorage);
+        window.addEventListener('beforeunload', () => saveAll(false));
         document.addEventListener('visibilitychange', () => {
-          if (document.hidden) saveToStorage();
+          if (document.hidden) saveAll(true);
         });
       }
 
-      // Initialize Game
-      loadFromStorage();
+      loadLocal();
+      CloudSync.loadConfig();
       buildShopDOM();
       bindEvents();
       refreshUI();
       Particles.resize();
       scheduleNextGoldenEvent();
-      setInterval(saveToStorage, 5000);
+      if (CloudSync.isConnected()) CloudSync.pull();
+      setInterval(() => saveAll(false), 5000);
+      setInterval(() => { if (CloudSync.isConnected()) CloudSync.push(); }, 10000);
       requestAnimationFrame(gameLoop);
     })();
   </script>
