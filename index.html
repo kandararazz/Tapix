@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Tapix — Cyber-Mining Clicker</title>
+  <title>Tapix — Coin Clicker</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2322d3ee'/%3E%3Cstop offset='100%25' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%23060913'/%3E%3Cpolygon points='32,6 56,20 56,44 32,58 8,44 8,20' fill='url(%23g)' fill-opacity='0.22' stroke='url(%23g)' stroke-width='3'/%3E%3Cpath d='M20 22h24v6h-9v20h-6V28h-9z' fill='%23ffffff'/%3E%3Ccircle cx='46' cy='44' r='4' fill='%2322d3ee'/%3E%3C/svg%3E" />
   <!-- Supabase JS SDK v2 (graceful fallback to localStorage if offline/unconfigured) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -134,7 +134,28 @@
 
     .brand-text span {
       font-size: 0.72rem;
-      color: var(--text-muted);
+      font-weight: 600;
+      color: var(--cyan);
+    }
+
+    .coin-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .coin-icon.lg {
+      width: 30px;
+      height: 30px;
+    }
+
+    .arena-credits-row {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
     /* Unified Live Stats Strip */
@@ -699,44 +720,23 @@
       gap: 8px;
     }
 
-    /* Modern Horizontal Upgrade Card */
+    /* Modern Horizontal Upgrade Card with Dedicated Buy Button */
     .upgrade-card {
       width: 100%;
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 11px 13px;
+      padding: 11px 12px;
       border-radius: var(--radius-md);
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       text-align: left;
-      transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+      transition: border-color 0.15s ease, background 0.15s ease;
     }
 
-    .upgrade-card:not(:disabled) {
+    .upgrade-card.is-affordable {
       border-color: var(--border-green);
       background: linear-gradient(90deg, rgba(16, 185, 129, 0.08), rgba(20, 29, 51, 0.85));
-    }
-
-    .upgrade-card:hover:not(:disabled) {
-      background: var(--bg-card-hover);
-      border-color: var(--emerald);
-      transform: translateY(-1px);
-    }
-
-    .upgrade-card:active:not(:disabled) {
-      transform: scale(0.985);
-    }
-
-    .upgrade-card:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .upgrade-card.owned-max {
-      opacity: 0.72;
-      border-color: rgba(16, 185, 129, 0.35);
-      background: rgba(16, 185, 129, 0.07);
     }
 
     .upgrade-icon {
@@ -756,7 +756,7 @@
       height: 20px;
     }
 
-    .upgrade-card.multiplier-card .upgrade-icon {
+    .upgrade-card.tap-card .upgrade-icon {
       background: var(--amber-soft);
       border-color: rgba(245, 158, 11, 0.32);
       color: var(--amber);
@@ -765,6 +765,12 @@
     .upgrade-main {
       flex: 1;
       min-width: 0;
+    }
+
+    .upgrade-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .upgrade-name {
@@ -776,49 +782,76 @@
       text-overflow: ellipsis;
     }
 
+    .upgrade-owned {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.12);
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
     .upgrade-effect {
       margin-top: 2px;
       font-size: 0.75rem;
       color: var(--text-muted);
     }
 
-    .upgrade-right {
-      display: flex;
+    .card-buy-btn {
+      display: inline-flex;
       flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
+      align-items: center;
+      justify-content: center;
+      min-width: 88px;
+      min-height: 42px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--emerald);
+      color: #03150e;
+      font-weight: 800;
       flex-shrink: 0;
+      transition: transform 0.1s ease, filter 0.15s ease, opacity 0.15s ease;
     }
 
-    .upgrade-cost-pill {
+    .card-buy-btn:hover:not(:disabled) {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .card-buy-btn:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+
+    .card-buy-btn:disabled {
+      background: rgba(148, 163, 184, 0.12);
+      color: var(--text-dim);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      cursor: not-allowed;
+    }
+
+    .card-buy-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      line-height: 1.1;
+    }
+
+    .card-buy-price {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       font-family: var(--font-mono);
       font-variant-numeric: tabular-nums;
       font-size: 0.76rem;
-      font-weight: 700;
-      padding: 4px 9px;
-      border-radius: 999px;
-      background: var(--emerald-soft);
-      color: var(--emerald);
-      border: 1px solid rgba(16, 185, 129, 0.35);
+      font-weight: 800;
+      margin-top: 2px;
     }
 
-    .upgrade-card:disabled .upgrade-cost-pill {
-      background: rgba(251, 113, 133, 0.12);
-      color: var(--rose);
-      border-color: rgba(251, 113, 133, 0.28);
-    }
-
-    .upgrade-card.owned-max .upgrade-cost-pill {
-      background: var(--emerald-soft);
-      color: var(--emerald);
-      border-color: rgba(16, 185, 129, 0.35);
-    }
-
-    .upgrade-owned {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--text-dim);
+    .card-buy-price .coin-icon {
+      width: 13px;
+      height: 13px;
     }
 
     /* Prestige Panel */
@@ -1141,7 +1174,6 @@
 
     /* Small Phones */
     @media (max-width: 480px) {
-      .brand-text span { display: none; }
       .pill-btn .btn-label { display: none; }
       .pill-btn { padding: 7px 11px; }
 
@@ -1173,13 +1205,18 @@
         </div>
         <div class="brand-text">
           <strong>Tapix</strong>
-          <span>Cyber-Mining Empire</span>
+          <span>Created by Raza</span>
         </div>
       </div>
 
       <div class="stats-strip">
         <div class="stat-chip primary">
-          <span class="stat-chip-label">Credits</span>
+          <svg class="coin-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" fill="#f59e0b" stroke="#fde68a" stroke-width="1.8" />
+            <circle cx="12" cy="12" r="6.5" fill="none" stroke="#fef3c7" stroke-width="1.2" opacity="0.7" />
+            <text x="12" y="15.5" text-anchor="middle" font-size="10" font-weight="800" fill="#451a03" font-family="sans-serif">$</text>
+          </svg>
+          <span class="stat-chip-label">Coins</span>
           <span class="stat-chip-val" id="hud-credits">0</span>
         </div>
         <div class="stat-chip">
@@ -1224,14 +1261,21 @@
         </div>
 
         <div class="arena-readout">
-          <div class="arena-credits" id="arena-credits">0</div>
-          <div class="arena-sub" id="arena-sub">0.0 / sec • +1 per tap</div>
+          <div class="arena-credits-row">
+            <svg class="coin-icon lg" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" fill="#f59e0b" stroke="#fde68a" stroke-width="1.8" />
+              <circle cx="12" cy="12" r="6.5" fill="none" stroke="#fef3c7" stroke-width="1.2" opacity="0.7" />
+              <text x="12" y="15.5" text-anchor="middle" font-size="10" font-weight="800" fill="#451a03" font-family="sans-serif">$</text>
+            </svg>
+            <div class="arena-credits" id="arena-credits">0</div>
+          </div>
+          <div class="arena-sub" id="arena-sub">0.0 coins/sec • +1 coin per tap</div>
         </div>
 
         <div class="core-wrapper">
           <div class="core-orbit outer"></div>
           <div class="core-orbit inner"></div>
-          <button class="core-button" id="core-button" aria-label="Mine Tapix Core" type="button">
+          <button class="core-button" id="core-button" aria-label="Tap to earn Coins" type="button">
             <svg class="core-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
               <polygon points="50,6 88,28 88,72 50,94 12,72 12,28" stroke="#e0f2fe" stroke-width="3" fill="rgba(255,255,255,0.1)" />
               <polygon points="50,18 76,34 76,66 50,82 24,66 24,34" stroke="#67e8f9" stroke-width="2.2" fill="rgba(34,211,238,0.2)" />
@@ -1242,8 +1286,7 @@
         </div>
 
         <div class="arena-footer">
-          <p class="arena-hint">Tap the Tapix Core (or press Space) • Catch Golden Stars for bonus surges</p>
-          <p class="creator-badge">Created by Raza</p>
+          <p class="arena-hint">Tap the Tapix Core (or press Space) to earn Coins • Catch Golden Stars for bonus surges</p>
         </div>
       </section>
 
@@ -1265,15 +1308,15 @@
           <div class="quick-buy-bar hidden" id="quick-buy-bar">
             <div class="quick-buy-meta">
               <span>Recommended Next Buy</span>
-              <strong id="quick-buy-name">Auto-Cursor (+1/s)</strong>
+              <strong id="quick-buy-name">Power Tap (+9/tap)</strong>
             </div>
-            <button class="quick-buy-btn" id="quick-buy-btn" type="button">Buy 15</button>
+            <button class="quick-buy-btn" id="quick-buy-btn" type="button">Buy 25</button>
           </div>
 
-          <!-- Click-Power Multipliers -->
+          <!-- Tap Power Upgrades -->
           <div>
             <div class="section-header">
-              <span class="section-title">Click Multipliers</span>
+              <span class="section-title">Coins Per Tap Upgrades</span>
             </div>
             <div class="upgrade-list" id="multiplier-list"></div>
           </div>
@@ -1281,7 +1324,7 @@
           <!-- Auto-Clickers / Buildings -->
           <div>
             <div class="section-header">
-              <span class="section-title">Auto-Miners</span>
+              <span class="section-title">Auto-Miners (Coins/Sec)</span>
               <div class="buy-mode-group" role="group" aria-label="Purchase quantity">
                 <button class="buy-mode-btn active" data-buy="1" type="button">x1</button>
                 <button class="buy-mode-btn" data-buy="10" type="button">x10</button>
@@ -1298,11 +1341,11 @@
             <div class="prestige-hero">
               <h3>Quantum Rebirth</h3>
               <p>
-                Reset your Credits, Auto-Miners, and Multipliers to claim permanent
-                <strong>Prestige Gems</strong>. Each Gem permanently boosts <strong>all earnings by +25%</strong>.
+                Reset your Coins, Auto-Miners, and Tap Upgrades to claim permanent
+                <strong>Prestige Gems</strong>. Each Gem permanently boosts <strong>all coins earned by +25%</strong>.
               </p>
               <div class="prestige-gems-big" id="prestige-claimable">+0 Gems</div>
-              <p id="prestige-milestone-text">Reach 100,000 run credits to unlock Rebirth</p>
+              <p id="prestige-milestone-text">Reach 100,000 run coins to unlock Rebirth</p>
               <div class="progress-track">
                 <div class="progress-fill" id="prestige-progress"></div>
               </div>
@@ -1318,11 +1361,11 @@
                 <strong id="stat-prestige-mult">x1.00</strong>
               </div>
               <div class="stats-row">
-                <span>Run Credits</span>
+                <span>Run Coins</span>
                 <strong id="stat-run-credits">0</strong>
               </div>
               <div class="stats-row">
-                <span>Lifetime Credits</span>
+                <span>Lifetime Coins</span>
                 <strong id="stat-total-credits">0</strong>
               </div>
               <div class="stats-row">
@@ -1378,19 +1421,19 @@
       <div class="guide-steps">
         <div class="guide-step">
           <strong>1. Tap:</strong>
-          <span>Tap the Tapix Core (or press Space on a laptop) to mine Cyber Credits.</span>
+          <span>Tap the Tapix Core (or press Space on a laptop) to earn Coins — starting at 1 Coin per tap.</span>
         </div>
         <div class="guide-step">
           <strong>2. Upgrade:</strong>
-          <span>Use the Recommended Next Buy bar or green-highlighted cards to grow faster.</span>
+          <span>Press any green Buy button! Buying Power Tap boosts you from 1 to 10 Coins per tap, and each upgrade adds a different boost.</span>
         </div>
         <div class="guide-step">
           <strong>3. Golden Stars:</strong>
-          <span>Tap glowing Golden Stars within 10 seconds for a jackpot or 2x Overclock surge.</span>
+          <span>Tap glowing Golden Stars within 10 seconds for a Coin jackpot or 2x Overclock surge.</span>
         </div>
         <div class="guide-step">
           <strong>4. Rebirth:</strong>
-          <span>At 100,000 run credits, Rebirth for permanent Prestige Gems (+25% earnings each).</span>
+          <span>At 100,000 run Coins, Rebirth for permanent Prestige Gems (+25% Coins each).</span>
         </div>
       </div>
       <div class="modal-actions">
@@ -1403,9 +1446,9 @@
   <div class="modal-backdrop" id="offline-modal">
     <div class="modal-card">
       <h2>Offline Mining Complete</h2>
-      <p id="offline-summary">Your miners kept working while you were away.</p>
+      <p id="offline-summary">Your miners kept collecting Coins while you were away.</p>
       <div class="modal-actions">
-        <button class="btn-primary" id="btn-claim-offline" type="button">Collect Credits</button>
+        <button class="btn-primary" id="btn-claim-offline" type="button">Collect Coins</button>
       </div>
     </div>
   </div>
@@ -1460,20 +1503,24 @@
         cpu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 1v5M15 1v5M9 18v5M15 18v5M1 9h5M1 15h5M18 9h5M18 15h5"/></svg>'
       };
 
-      const CLICK_MULTIPLIERS = [
-        { id: 'mult_flux', name: 'Flux Amplifier', icon: ICONS.bolt, mult: 2, baseCost: 120, desc: '2x Click Power' },
-        { id: 'mult_plasma', name: 'Plasma Overdrive', icon: ICONS.flame, mult: 3, baseCost: 3_500, desc: '3x Click Power' },
-        { id: 'mult_quantum', name: 'Quantum Singularity', icon: ICONS.gem, mult: 5, baseCost: 65_000, desc: '5x Click Power' }
+      const COIN_SVG = '<svg class="coin-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f59e0b" stroke="#fde68a" stroke-width="1.8"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#fef3c7" stroke-width="1.2" opacity="0.7"/><text x="12" y="15.5" text-anchor="middle" font-size="10" font-weight="800" fill="#451a03" font-family="sans-serif">$</text></svg>';
+
+      // Repeatable Per-Tap Upgrades (Start at 1 coin/tap; first Power Tap makes it 10/tap, each tier different!)
+      const TAP_UPGRADES = [
+        { id: 'tap_power', name: 'Power Tap', icon: ICONS.bolt, bonus: 9, baseCost: 25, desc: '+9 Coins per tap (1 → 10)' },
+        { id: 'tap_turbo', name: 'Turbo Tap', icon: ICONS.flame, bonus: 50, baseCost: 350, desc: '+50 Coins per tap' },
+        { id: 'tap_hyper', name: 'Hyper Tap', icon: ICONS.gem, bonus: 250, baseCost: 3_200, desc: '+250 Coins per tap' },
+        { id: 'tap_quantum', name: 'Quantum Tap', icon: ICONS.cpu, bonus: 1_500, baseCost: 28_000, desc: '+1,500 Coins per tap' }
       ];
 
       const BUILDINGS = [
-        { id: 'cursor', name: 'Auto-Cursor', icon: ICONS.cursor, baseCost: 15, cps: 1, desc: '+1 CPS each' },
-        { id: 'drone', name: 'Scrap Drone', icon: ICONS.drone, baseCost: 100, cps: 5, desc: '+5 CPS each' },
-        { id: 'worker', name: 'Cyber Worker', icon: ICONS.bot, baseCost: 850, cps: 28, desc: '+28 CPS each' },
-        { id: 'drill', name: 'Plasma Drill', icon: ICONS.drill, baseCost: 6_500, cps: 140, desc: '+140 CPS each' },
-        { id: 'factory', name: 'Nano Factory', icon: ICONS.factory, baseCost: 48_000, cps: 720, desc: '+720 CPS each' },
-        { id: 'orbital', name: 'Orbital Rig', icon: ICONS.orbit, baseCost: 380_000, cps: 3_800, desc: '+3.8K CPS each' },
-        { id: 'aibot', name: 'Singularity AI', icon: ICONS.cpu, baseCost: 3_200_000, cps: 21_000, desc: '+21K CPS each' }
+        { id: 'cursor', name: 'Auto-Cursor', icon: ICONS.cursor, baseCost: 15, cps: 1, desc: '+1 Coin/s each' },
+        { id: 'drone', name: 'Scrap Drone', icon: ICONS.drone, baseCost: 100, cps: 5, desc: '+5 Coins/s each' },
+        { id: 'worker', name: 'Cyber Worker', icon: ICONS.bot, baseCost: 850, cps: 28, desc: '+28 Coins/s each' },
+        { id: 'drill', name: 'Plasma Drill', icon: ICONS.drill, baseCost: 6_500, cps: 140, desc: '+140 Coins/s each' },
+        { id: 'factory', name: 'Nano Factory', icon: ICONS.factory, baseCost: 48_000, cps: 720, desc: '+720 Coins/s each' },
+        { id: 'orbital', name: 'Orbital Rig', icon: ICONS.orbit, baseCost: 380_000, cps: 3_800, desc: '+3.8K Coins/s each' },
+        { id: 'aibot', name: 'Singularity AI', icon: ICONS.cpu, baseCost: 3_200_000, cps: 21_000, desc: '+21K Coins/s each' }
       ];
 
       /* ========================================================================
@@ -1482,8 +1529,8 @@
       function createDefaultState() {
         const buildings = {};
         BUILDINGS.forEach((b) => { buildings[b.id] = 0; });
-        const multipliers = {};
-        CLICK_MULTIPLIERS.forEach((m) => { multipliers[m.id] = false; });
+        const tapUpgrades = {};
+        TAP_UPGRADES.forEach((t) => { tapUpgrades[t.id] = 0; });
 
         return {
           credits: 0,
@@ -1494,7 +1541,7 @@
           prestigeGems: 0,
           rebirths: 0,
           buildings,
-          multipliers,
+          tapUpgrades,
           overclockUntil: 0,
           lastSaved: Date.now()
         };
@@ -1584,12 +1631,14 @@
       const getEffectiveCps = () => getBaseCps() * getGlobalMultiplier();
 
       function getClickPower() {
-        let mult = 1;
-        for (const m of CLICK_MULTIPLIERS) {
-          if (state.multipliers[m.id]) mult *= m.mult;
+        let baseTap = 1;
+        for (const t of TAP_UPGRADES) {
+          baseTap += (state.tapUpgrades[t.id] || 0) * t.bonus;
         }
-        return mult * getGlobalMultiplier();
+        return baseTap * getGlobalMultiplier();
       }
+
+      const getTapUpgradeCost = (t, owned) => Math.floor(t.baseCost * Math.pow(1.25, owned));
 
       const getBuildingSingleCost = (b, owned) => Math.floor(b.baseCost * Math.pow(1.15, owned));
 
@@ -1741,7 +1790,7 @@
                 const merged = createDefaultState();
                 Object.assign(merged, cloudState);
                 merged.buildings = { ...merged.buildings, ...(cloudState.buildings || {}) };
-                merged.multipliers = { ...merged.multipliers, ...(cloudState.multipliers || {}) };
+                merged.tapUpgrades = { ...merged.tapUpgrades, ...(cloudState.tapUpgrades || {}) };
                 state = merged;
                 applyOfflineProgress();
                 saveLocal();
@@ -1820,7 +1869,7 @@
             addCredits(offlineEarned);
             document.getElementById('offline-summary').innerHTML =
               `You were away for <strong>${formatDuration(elapsedSec)}</strong>.<br>` +
-              `Your miners extracted <strong>+${formatNum(offlineEarned)} Credits</strong>!`;
+              `Your miners collected <strong>+${formatNum(offlineEarned)} Coins</strong>!`;
             document.getElementById('offline-modal').classList.add('open');
           }
         }
@@ -1834,7 +1883,7 @@
           const merged = createDefaultState();
           Object.assign(merged, parsed);
           merged.buildings = { ...merged.buildings, ...(parsed.buildings || {}) };
-          merged.multipliers = { ...merged.multipliers, ...(parsed.multipliers || {}) };
+          merged.tapUpgrades = { ...merged.tapUpgrades, ...(parsed.tapUpgrades || {}) };
           state = merged;
           applyOfflineProgress();
         } catch {}
@@ -1882,57 +1931,66 @@
         rebirthConfirmText: document.getElementById('rebirth-confirm-text')
       };
 
-      const multiplierNodes = {};
+      const tapNodes = {};
       const buildingNodes = {};
 
       function buildShopDOM() {
         els.multiplierList.innerHTML = '';
-        for (const m of CLICK_MULTIPLIERS) {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'upgrade-card multiplier-card';
-          btn.innerHTML = `
-            <div class="upgrade-icon">${m.icon}</div>
+        for (const t of TAP_UPGRADES) {
+          const card = document.createElement('div');
+          card.className = 'upgrade-card tap-card';
+          card.innerHTML = `
+            <div class="upgrade-icon">${t.icon}</div>
             <div class="upgrade-main">
-              <div class="upgrade-name">${m.name}</div>
-              <div class="upgrade-effect">${m.desc}</div>
+              <div class="upgrade-name-row">
+                <span class="upgrade-name">${t.name}</span>
+                <span class="upgrade-owned" data-role="owned">Lv 0</span>
+              </div>
+              <div class="upgrade-effect">${t.desc}</div>
             </div>
-            <div class="upgrade-right">
-              <span class="upgrade-cost-pill" data-role="cost">${formatNum(m.baseCost)}</span>
-              <span class="upgrade-owned" data-role="badge">x${m.mult}</span>
-            </div>
+            <button type="button" class="card-buy-btn" data-role="buy">
+              <span class="card-buy-label">Buy</span>
+              <span class="card-buy-price">${COIN_SVG}<span data-role="cost">${formatNum(t.baseCost)}</span></span>
+            </button>
           `;
-          btn.addEventListener('click', () => buyMultiplier(m.id));
-          els.multiplierList.appendChild(btn);
-          multiplierNodes[m.id] = {
-            btn,
-            cost: btn.querySelector('[data-role="cost"]'),
-            badge: btn.querySelector('[data-role="badge"]')
+          const buyBtn = card.querySelector('[data-role="buy"]');
+          buyBtn.addEventListener('click', () => buyTapUpgrade(t.id));
+          els.multiplierList.appendChild(card);
+          tapNodes[t.id] = {
+            card,
+            buyBtn,
+            cost: card.querySelector('[data-role="cost"]'),
+            owned: card.querySelector('[data-role="owned"]')
           };
         }
 
         els.buildingList.innerHTML = '';
         for (const b of BUILDINGS) {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'upgrade-card';
-          btn.innerHTML = `
+          const card = document.createElement('div');
+          card.className = 'upgrade-card';
+          card.innerHTML = `
             <div class="upgrade-icon">${b.icon}</div>
             <div class="upgrade-main">
-              <div class="upgrade-name">${b.name}</div>
+              <div class="upgrade-name-row">
+                <span class="upgrade-name">${b.name}</span>
+                <span class="upgrade-owned" data-role="owned">0</span>
+              </div>
               <div class="upgrade-effect">${b.desc}</div>
             </div>
-            <div class="upgrade-right">
-              <span class="upgrade-cost-pill" data-role="cost">${formatNum(b.baseCost)}</span>
-              <span class="upgrade-owned" data-role="owned">Owned: 0</span>
-            </div>
+            <button type="button" class="card-buy-btn" data-role="buy">
+              <span class="card-buy-label" data-role="label">Buy</span>
+              <span class="card-buy-price">${COIN_SVG}<span data-role="cost">${formatNum(b.baseCost)}</span></span>
+            </button>
           `;
-          btn.addEventListener('click', () => buyBuilding(b.id));
-          els.buildingList.appendChild(btn);
+          const buyBtn = card.querySelector('[data-role="buy"]');
+          buyBtn.addEventListener('click', () => buyBuilding(b.id));
+          els.buildingList.appendChild(card);
           buildingNodes[b.id] = {
-            btn,
-            cost: btn.querySelector('[data-role="cost"]'),
-            owned: btn.querySelector('[data-role="owned"]')
+            card,
+            buyBtn,
+            label: card.querySelector('[data-role="label"]'),
+            cost: card.querySelector('[data-role="cost"]'),
+            owned: card.querySelector('[data-role="owned"]')
           };
         }
       }
@@ -1956,12 +2014,15 @@
         refreshUI();
       }
 
-      function buyMultiplier(id) {
-        const m = CLICK_MULTIPLIERS.find((x) => x.id === id);
-        if (!m || state.multipliers[id] || state.credits < m.baseCost) return;
-        state.credits -= m.baseCost;
-        state.multipliers[id] = true;
-        showToast(`Unlocked ${m.name} (${m.mult}x Click Power)`);
+      function buyTapUpgrade(id) {
+        const t = TAP_UPGRADES.find((x) => x.id === id);
+        if (!t) return;
+        const owned = state.tapUpgrades[id] || 0;
+        const cost = getTapUpgradeCost(t, owned);
+        if (state.credits < cost) return;
+        state.credits -= cost;
+        state.tapUpgrades[id] = owned + 1;
+        showToast(`${t.name} Lv ${owned + 1}! Now +${formatNum(getClickPower())} Coins/tap`);
         saveAll(true);
         refreshUI();
       }
@@ -1986,7 +2047,7 @@
         state.runCredits = 0;
         state.overclockUntil = 0;
         for (const b of BUILDINGS) state.buildings[b.id] = 0;
-        for (const m of CLICK_MULTIPLIERS) state.multipliers[m.id] = false;
+        for (const t of TAP_UPGRADES) state.tapUpgrades[t.id] = 0;
 
         const rect = els.coreButton.getBoundingClientRect();
         Particles.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 42, '#8b5cf6');
@@ -2044,12 +2105,12 @@
           if (Math.random() < 0.5) {
             const reward = Math.max(250 * getPrestigeMultiplier(), Math.floor(getEffectiveCps() * 20 + getClickPower() * 35));
             addCredits(reward);
-            spawnFloatingText(cx, cy, `+${formatNum(reward)} JACKPOT`, true);
-            showToast(`Golden Star: +${formatNum(reward)} Credits`);
+            spawnFloatingText(cx, cy, `+${formatNum(reward)} COINS`, true);
+            showToast(`Golden Star: +${formatNum(reward)} Coins`);
           } else {
             state.overclockUntil = Math.max(Date.now(), state.overclockUntil) + 20_000;
             spawnFloatingText(cx, cy, '2X OVERCLOCK', true);
-            showToast('2x Earnings Overclock active for 20s');
+            showToast('2x Coins Overclock active for 20s');
           }
           refreshUI();
           scheduleNextGoldenEvent();
@@ -2080,7 +2141,7 @@
         els.hudCps.textContent = cpsStr;
         els.hudClick.textContent = `+${formatNum(clickPower)}`;
         els.hudGems.textContent = `${state.prestigeGems} (x${prestigeMult.toFixed(2)})`;
-        els.arenaSub.textContent = `${cpsStr} • +${formatNum(clickPower)} per tap`;
+        els.arenaSub.textContent = `${formatNum(cps, cps < 100 && cps > 0 ? 1 : 0)} coins/sec • +${formatNum(clickPower)} coin${clickPower === 1 ? '' : 's'} per tap`;
 
         if (overclockRemaining > 0) {
           els.overclockBanner.classList.add('visible');
@@ -2092,25 +2153,19 @@
         let buyableCount = 0;
         let bestUpgrade = null;
 
-        for (const m of CLICK_MULTIPLIERS) {
-          const node = multiplierNodes[m.id];
-          const isOwned = !!state.multipliers[m.id];
-          if (isOwned) {
-            node.btn.disabled = true;
-            node.btn.classList.add('owned-max');
-            node.cost.textContent = 'OWNED';
-            node.badge.textContent = 'Active';
-          } else {
-            const canBuy = state.credits >= m.baseCost;
-            if (canBuy) {
-              buyableCount++;
-              bestUpgrade = { type: 'mult', id: m.id, name: `${m.name} (${m.mult}x)`, cost: m.baseCost };
-            }
-            node.btn.classList.remove('owned-max');
-            node.btn.disabled = !canBuy;
-            node.cost.textContent = formatNum(m.baseCost);
-            node.badge.textContent = `x${m.mult} Click`;
+        for (const t of TAP_UPGRADES) {
+          const node = tapNodes[t.id];
+          const owned = state.tapUpgrades[t.id] || 0;
+          const cost = getTapUpgradeCost(t, owned);
+          const canBuy = state.credits >= cost;
+          if (canBuy) {
+            buyableCount++;
+            bestUpgrade = { type: 'tap', id: t.id, name: `${t.name} (+${formatNum(t.bonus)}/tap)`, cost };
           }
+          node.card.classList.toggle('is-affordable', canBuy);
+          node.buyBtn.disabled = !canBuy;
+          node.cost.textContent = formatNum(cost);
+          node.owned.textContent = `Lv ${owned}`;
         }
 
         for (const b of BUILDINGS) {
@@ -2125,9 +2180,11 @@
               bestUpgrade = { type: 'building', id: b.id, name: `${b.name} (+${formatNum(b.cps)}/s)`, cost: singleCost };
             }
           }
-          node.owned.textContent = `Owned: ${owned}`;
-          node.btn.disabled = !canBuy;
-          node.cost.textContent = `${formatNum(quote.cost)}${quote.qty > 1 ? ` x${quote.qty}` : ''}`;
+          node.card.classList.toggle('is-affordable', canBuy);
+          node.buyBtn.disabled = !canBuy;
+          node.owned.textContent = `${owned}`;
+          node.label.textContent = quote.qty > 1 ? `Buy x${quote.qty}` : 'Buy';
+          node.cost.textContent = formatNum(quote.cost);
         }
 
         quickBuyTarget = bestUpgrade;
@@ -2153,8 +2210,8 @@
         els.prestigeProgress.style.width = `${pct.toFixed(1)}%`;
         els.prestigeMilestoneText.textContent =
           claimable === 0
-            ? `Progress: ${formatNum(state.runCredits)} / ${formatNum(PRESTIGE_MILESTONE)}`
-            : `Next Gem at ${formatNum(nextThreshold)} run credits`;
+            ? `Progress: ${formatNum(state.runCredits)} / ${formatNum(PRESTIGE_MILESTONE)} coins`
+            : `Next Gem at ${formatNum(nextThreshold)} run coins`;
 
         els.statPrestigeMult.textContent = `x${prestigeMult.toFixed(2)}`;
         els.statRunCredits.textContent = formatNum(state.runCredits);
@@ -2201,7 +2258,7 @@
 
         els.quickBuyBtn.addEventListener('click', () => {
           if (!quickBuyTarget) return;
-          if (quickBuyTarget.type === 'mult') buyMultiplier(quickBuyTarget.id);
+          if (quickBuyTarget.type === 'tap') buyTapUpgrade(quickBuyTarget.id);
           else buyBuilding(quickBuyTarget.id, true);
         });
 
@@ -2263,7 +2320,7 @@
           const claimable = getClaimableGems();
           if (claimable <= 0) return;
           els.rebirthConfirmText.innerHTML =
-            `You will reset your Credits, Miners, and Multipliers to gain <strong>+${claimable} Prestige Gem${claimable > 1 ? 's' : ''}</strong> ` +
+            `You will reset your Coins, Auto-Miners, and Tap Upgrades to gain <strong>+${claimable} Prestige Gem${claimable > 1 ? 's' : ''}</strong> ` +
             `(new multiplier: <strong>x${(1 + (state.prestigeGems + claimable) * GEM_BONUS_PER_GEM).toFixed(2)}</strong>).`;
           els.rebirthModal.classList.add('open');
         });
