@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Tapix — Coin Clicker</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23fbbf24'/%3E%3Cstop offset='100%25' stop-color='%23f43f5e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%230b0912'/%3E%3Cpolygon points='32,6 56,20 56,44 32,58 8,44 8,20' fill='url(%23g)' fill-opacity='0.24' stroke='url(%23g)' stroke-width='3'/%3E%3Cpath d='M20 22h24v6h-9v20h-6V28h-9z' fill='%23ffffff'/%3E%3Ccircle cx='46' cy='44' r='4' fill='%23fbbf24'/%3E%3C/svg%3E" />
-  <!-- Supabase JS SDK v2 (graceful fallback to localStorage if offline/unconfigured) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* ==========================================================================
        1. DESIGN TOKENS & RESET (Solar Gold & Obsidian Vault Theme)
@@ -626,58 +624,6 @@
       background: rgba(148, 163, 184, 0.22);
       border-radius: 999px;
     }
-
-    /* Quick Next Upgrade Banner */
-    .quick-buy-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: var(--radius-md);
-      background: linear-gradient(90deg, rgba(16, 185, 129, 0.12), rgba(34, 211, 238, 0.08));
-      border: 1px solid rgba(16, 185, 129, 0.35);
-    }
-
-    .quick-buy-bar.hidden {
-      display: none;
-    }
-
-    .quick-buy-meta {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .quick-buy-meta span {
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--emerald);
-      font-weight: 700;
-    }
-
-    .quick-buy-meta strong {
-      font-size: 0.86rem;
-      color: var(--text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .quick-buy-btn {
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
-      background: var(--emerald);
-      color: #03150e;
-      font-size: 0.78rem;
-      font-weight: 800;
-      flex-shrink: 0;
-      transition: transform 0.1s ease, filter 0.15s ease;
-    }
-
-    .quick-buy-btn:hover { filter: brightness(1.1); }
-    .quick-buy-btn:active { transform: scale(0.95); }
 
     .section-header {
       display: flex;
@@ -1309,10 +1255,6 @@
       </div>
 
       <div class="header-actions">
-        <button class="pill-btn" id="btn-cloud" type="button" title="Supabase Cloud Sync">
-          <span class="status-dot" id="cloud-dot"></span>
-          <span id="cloud-label">Cloud Sync</span>
-        </button>
         <button class="pill-btn" id="btn-help" type="button" title="How to Play" aria-label="How to Play">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="10"></circle>
@@ -1382,15 +1324,6 @@
         </div>
 
         <div class="shop-scroll" id="panel-shop">
-          <!-- Easy 1-Tap Recommended Upgrade -->
-          <div class="quick-buy-bar hidden" id="quick-buy-bar">
-            <div class="quick-buy-meta">
-              <span>Recommended Next Buy</span>
-              <strong id="quick-buy-name">Power Tap (+9/tap)</strong>
-            </div>
-            <button class="quick-buy-btn" id="quick-buy-btn" type="button">Buy 100</button>
-          </div>
-
           <!-- Tap Power Upgrades -->
           <div>
             <div class="section-header">
@@ -1473,7 +1406,7 @@
               <span class="coming-soon-pill">Coming Soon</span>
               <h3>Global Leaderboard</h3>
               <p>
-                Compete with players worldwide for Top Coins Mined, Highest Rebirths, and Fastest Coins/Sec via Supabase!
+                Compete with players worldwide for Top Coins Mined, Highest Rebirths, and Fastest Coins/Sec!
               </p>
             </div>
 
@@ -1509,32 +1442,6 @@
   </div>
 
   <!-- ==================== MODALS ==================== -->
-  <!-- Supabase Cloud Sync Modal -->
-  <div class="modal-backdrop" id="cloud-modal">
-    <div class="modal-card">
-      <h2>Supabase Cloud Progress</h2>
-      <p id="cloud-modal-desc">
-        Tapix automatically saves your progress locally and syncs to Supabase table <code>tapix_progress</code> whenever connected.
-      </p>
-      <div class="field-group">
-        <label for="input-player-id">Player ID (Username)</label>
-        <input class="field-input" id="input-player-id" type="text" placeholder="e.g. raza" />
-      </div>
-      <div class="field-group">
-        <label for="input-sb-url">Supabase Project URL</label>
-        <input class="field-input" id="input-sb-url" type="url" placeholder="https://your-project.supabase.co" />
-      </div>
-      <div class="field-group">
-        <label for="input-sb-key">Supabase Anon Key</label>
-        <input class="field-input" id="input-sb-key" type="password" placeholder="eyJhbGciOi..." />
-      </div>
-      <div class="modal-actions">
-        <button class="btn-secondary" id="btn-cloud-close" type="button">Close</button>
-        <button class="btn-primary" id="btn-cloud-connect" type="button">Save &amp; Sync Now</button>
-      </div>
-    </div>
-  </div>
-
   <!-- How to Play Modal -->
   <div class="modal-backdrop" id="help-modal">
     <div class="modal-card">
@@ -1546,7 +1453,7 @@
         </div>
         <div class="guide-step">
           <strong>2. Upgrade:</strong>
-          <span>Press any green Buy button! Buying Power Tap boosts you from 1 to 10 Coins per tap, and each upgrade adds a different boost.</span>
+          <span>Press any green Buy button! Power Tap (100 Coins) boosts you from 1 to 10 Coins per tap, and each upgrade adds a different boost.</span>
         </div>
         <div class="guide-step">
           <strong>3. Golden Stars:</strong>
@@ -1593,22 +1500,14 @@
       'use strict';
 
       /* ========================================================================
-         1. CONFIG & SUPABASE SETTINGS
+         1. CONFIG
          ======================================================================== */
       const SAVE_KEY = 'tapix_cyber_miner_v1';
       const LEGACY_SAVE_KEY = 'neon_core_cyber_miner_v1';
-      const CLOUD_CFG_KEY = 'tapix_supabase_cfg_v1';
       const PRESTIGE_MILESTONE = 100_000;
       const GEM_BONUS_PER_GEM = 0.25;
       const OFFLINE_CAP_SECONDS = 86_400;
       const GOLDEN_DURATION_MS = 10_000;
-
-      // Optional hardcoded Supabase credentials (or configure via Cloud Sync button)
-      const DEFAULT_SUPABASE = {
-        url: '',
-        anonKey: '',
-        playerId: 'raza'
-      };
 
       // Clean stroke-based SVG icon library
       const ICONS = {
@@ -1674,7 +1573,7 @@
       let activeGoldenEl = null;
       let goldenTimeoutId = null;
       let nextGoldenSpawnId = null;
-      let quickBuyTarget = null;
+      let lastCorePointerTapAt = 0;
 
       /* ========================================================================
          3. PARTICLE CANVAS SYSTEM
@@ -1847,137 +1746,13 @@
       }
 
       /* ========================================================================
-         5. SUPABASE CLOUD SYNC & LOCAL STORAGE
+         5. LOCAL STORAGE & OFFLINE PROGRESS
          ======================================================================== */
-      const CloudSync = (() => {
-        let cfg = { ...DEFAULT_SUPABASE };
-        let client = null;
-        let syncing = false;
-
-        function loadConfig() {
-          try {
-            const raw = localStorage.getItem(CLOUD_CFG_KEY);
-            if (raw) cfg = { ...DEFAULT_SUPABASE, ...JSON.parse(raw) };
-          } catch {}
-          initClient();
-        }
-
-        function saveConfig(next) {
-          cfg = { ...cfg, ...next };
-          try {
-            localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cfg));
-          } catch {}
-          initClient();
-        }
-
-        function initClient() {
-          client = null;
-          if (cfg.url && cfg.anonKey && window.supabase && typeof window.supabase.createClient === 'function') {
-            try {
-              client = window.supabase.createClient(cfg.url.trim(), cfg.anonKey.trim());
-            } catch (err) {
-              console.warn('Supabase client init failed:', err);
-            }
-          }
-          updateBadge();
-        }
-
-        function updateBadge(statusText) {
-          const dot = document.getElementById('cloud-dot');
-          const label = document.getElementById('cloud-label');
-          if (!dot || !label) return;
-          if (client) {
-            dot.classList.add('online');
-            label.textContent = statusText || `Cloud: ${cfg.playerId || 'Player'}`;
-          } else {
-            dot.classList.remove('online');
-            label.textContent = 'Setup Cloud';
-          }
-        }
-
-        async function pull() {
-          if (!client || !cfg.playerId) return false;
-          try {
-            updateBadge('Syncing...');
-            const { data, error } = await client
-              .from('tapix_progress')
-              .select('state_json, updated_at')
-              .eq('player_id', cfg.playerId.trim())
-              .maybeSingle();
-            if (error) throw error;
-            if (data && data.state_json) {
-              const cloudState = data.state_json;
-              if ((cloudState.totalCredits || 0) >= state.totalCredits) {
-                const merged = createDefaultState();
-                Object.assign(merged, cloudState);
-                merged.buildings = { ...merged.buildings, ...(cloudState.buildings || {}) };
-                merged.tapUpgrades = { ...merged.tapUpgrades, ...(cloudState.tapUpgrades || {}) };
-                state = merged;
-                applyOfflineProgress();
-                saveLocal();
-                refreshUI();
-                showToast(`Cloud save loaded for ${cfg.playerId}`);
-              }
-            }
-            updateBadge(`Synced`);
-            return true;
-          } catch (err) {
-            console.warn('Supabase pull failed:', err);
-            updateBadge('Cloud Error');
-            return false;
-          }
-        }
-
-        async function push() {
-          if (!client || !cfg.playerId || syncing) return;
-          syncing = true;
-          try {
-            state.lastSaved = Date.now();
-            const payload = {
-              player_id: cfg.playerId.trim(),
-              credits: Math.floor(state.credits),
-              run_credits: Math.floor(state.runCredits),
-              total_credits: Math.floor(state.totalCredits),
-              total_clicks: Math.floor(state.totalClicks),
-              golden_caught: Math.floor(state.goldenCaught),
-              prestige_gems: Math.floor(state.prestigeGems),
-              rebirths: Math.floor(state.rebirths),
-              state_json: state,
-              updated_at: new Date().toISOString()
-            };
-            const { error } = await client
-              .from('tapix_progress')
-              .upsert(payload, { onConflict: 'player_id' });
-            if (error) throw error;
-            updateBadge('Synced');
-          } catch (err) {
-            console.warn('Supabase push failed:', err);
-            updateBadge('Sync Retry');
-          } finally {
-            syncing = false;
-          }
-        }
-
-        return {
-          loadConfig,
-          saveConfig,
-          getConfig: () => ({ ...cfg }),
-          isConnected: () => !!client,
-          pull,
-          push
-        };
-      })();
-
       function saveLocal() {
         try {
           state.lastSaved = Date.now();
           localStorage.setItem(SAVE_KEY, JSON.stringify(state));
         } catch {}
-      }
-
-      function saveAll(syncCloud = false) {
-        saveLocal();
-        if (syncCloud) CloudSync.push();
       }
 
       function applyOfflineProgress() {
@@ -2024,9 +1799,6 @@
         clickArena: document.getElementById('click-arena'),
         overclockBanner: document.getElementById('overclock-banner'),
         overclockTimer: document.getElementById('overclock-timer'),
-        quickBuyBar: document.getElementById('quick-buy-bar'),
-        quickBuyName: document.getElementById('quick-buy-name'),
-        quickBuyBtn: document.getElementById('quick-buy-btn'),
         multiplierList: document.getElementById('multiplier-list'),
         buildingList: document.getElementById('building-list'),
         tabShop: document.getElementById('tab-shop'),
@@ -2050,7 +1822,6 @@
         statRebirths: document.getElementById('stat-rebirths'),
         lbYourCoins: document.getElementById('lb-your-coins'),
         lbYourRebirths: document.getElementById('lb-your-rebirths'),
-        cloudModal: document.getElementById('cloud-modal'),
         helpModal: document.getElementById('help-modal'),
         offlineModal: document.getElementById('offline-modal'),
         rebirthModal: document.getElementById('rebirth-modal'),
@@ -2080,7 +1851,14 @@
             </button>
           `;
           const buyBtn = card.querySelector('[data-role="buy"]');
-          buyBtn.addEventListener('click', () => buyTapUpgrade(t.id));
+          buyBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            buyTapUpgrade(t.id);
+          });
+          card.addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
+            buyTapUpgrade(t.id);
+          });
           els.multiplierList.appendChild(card);
           tapNodes[t.id] = {
             card,
@@ -2109,7 +1887,14 @@
             </button>
           `;
           const buyBtn = card.querySelector('[data-role="buy"]');
-          buyBtn.addEventListener('click', () => buyBuilding(b.id));
+          buyBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            buyBuilding(b.id);
+          });
+          card.addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
+            buyBuilding(b.id);
+          });
           els.buildingList.appendChild(card);
           buildingNodes[b.id] = {
             card,
@@ -2149,18 +1934,18 @@
         state.credits -= cost;
         state.tapUpgrades[id] = owned + 1;
         showToast(`${t.name} Lv ${owned + 1}! Now +${formatNum(getClickPower())} Coins/tap`);
-        saveAll(true);
+        saveLocal();
         refreshUI();
       }
 
-      function buyBuilding(id, forceSingle = false) {
+      function buyBuilding(id) {
         const b = BUILDINGS.find((x) => x.id === id);
         if (!b) return;
-        const quote = getBuildingBulkQuote(b, forceSingle ? '1' : buyMode);
+        const quote = getBuildingBulkQuote(b, buyMode);
         if (quote.affordable === false || state.credits < quote.cost || quote.qty <= 0) return;
         state.credits -= quote.cost;
         state.buildings[id] = (state.buildings[id] || 0) + quote.qty;
-        saveAll(false);
+        saveLocal();
         refreshUI();
       }
 
@@ -2176,9 +1961,9 @@
         for (const t of TAP_UPGRADES) state.tapUpgrades[t.id] = 0;
 
         const rect = els.coreButton.getBoundingClientRect();
-        Particles.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 42, '#8b5cf6');
+        Particles.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 42, '#fbbf24');
         showToast(`Quantum Rebirth: +${claimable} Prestige Gem${claimable > 1 ? 's' : ''}`);
-        saveAll(true);
+        saveLocal();
         refreshUI();
       }
 
@@ -2277,17 +2062,13 @@
         }
 
         let buyableCount = 0;
-        let bestUpgrade = null;
 
         for (const t of TAP_UPGRADES) {
           const node = tapNodes[t.id];
           const owned = state.tapUpgrades[t.id] || 0;
           const cost = getTapUpgradeCost(t, owned);
           const canBuy = state.credits >= cost;
-          if (canBuy) {
-            buyableCount++;
-            bestUpgrade = { type: 'tap', id: t.id, name: `${t.name} (+${formatNum(t.bonus)}/tap)`, cost };
-          }
+          if (canBuy) buyableCount++;
           node.card.classList.toggle('is-affordable', canBuy);
           node.buyBtn.disabled = !canBuy;
           node.cost.textContent = formatNum(cost);
@@ -2299,27 +2080,12 @@
           const owned = state.buildings[b.id] || 0;
           const quote = getBuildingBulkQuote(b, buyMode);
           const canBuy = quote.affordable !== false && state.credits >= quote.cost;
-          if (canBuy) {
-            buyableCount++;
-            const singleCost = getBuildingSingleCost(b, owned);
-            if (!bestUpgrade || singleCost >= bestUpgrade.cost) {
-              bestUpgrade = { type: 'building', id: b.id, name: `${b.name} (+${formatNum(b.cps)}/s)`, cost: singleCost };
-            }
-          }
+          if (canBuy) buyableCount++;
           node.card.classList.toggle('is-affordable', canBuy);
           node.buyBtn.disabled = !canBuy;
           node.owned.textContent = `${owned}`;
           node.label.textContent = quote.qty > 1 ? `Buy x${quote.qty}` : 'Buy';
           node.cost.textContent = formatNum(quote.cost);
-        }
-
-        quickBuyTarget = bestUpgrade;
-        if (bestUpgrade) {
-          els.quickBuyBar.classList.remove('hidden');
-          els.quickBuyName.textContent = bestUpgrade.name;
-          els.quickBuyBtn.textContent = `Buy ${formatNum(bestUpgrade.cost)}`;
-        } else {
-          els.quickBuyBar.classList.add('hidden');
         }
 
         els.shopBuyableBadge.textContent = String(buyableCount);
@@ -2372,7 +2138,16 @@
         els.coreButton.addEventListener('pointerdown', (e) => {
           if (e.pointerType === 'mouse' && e.button !== 0) return;
           e.preventDefault();
+          lastCorePointerTapAt = performance.now();
           handleCoreTap(e.clientX, e.clientY);
+        });
+
+        els.coreButton.addEventListener('click', (e) => {
+          if (performance.now() - lastCorePointerTapAt < 400) return;
+          const rect = els.coreButton.getBoundingClientRect();
+          const cx = e.clientX || rect.left + rect.width / 2;
+          const cy = e.clientY || rect.top + rect.height / 2;
+          handleCoreTap(cx, cy);
         });
 
         window.addEventListener('keydown', (e) => {
@@ -2383,12 +2158,6 @@
             const rect = els.coreButton.getBoundingClientRect();
             handleCoreTap(rect.left + rect.width / 2, rect.top + rect.height / 2);
           }
-        });
-
-        els.quickBuyBtn.addEventListener('click', () => {
-          if (!quickBuyTarget) return;
-          if (quickBuyTarget.type === 'tap') buyTapUpgrade(quickBuyTarget.id);
-          else buyBuilding(quickBuyTarget.id, true);
         });
 
         function switchTab(activeName) {
@@ -2417,30 +2186,11 @@
         document.getElementById('btn-help').addEventListener('click', () => els.helpModal.classList.add('open'));
         document.getElementById('btn-close-help').addEventListener('click', () => els.helpModal.classList.remove('open'));
 
-        // Cloud Sync Modal
-        document.getElementById('btn-cloud').addEventListener('click', () => {
-          const cfg = CloudSync.getConfig();
-          document.getElementById('input-player-id').value = cfg.playerId || 'raza';
-          document.getElementById('input-sb-url').value = cfg.url || '';
-          document.getElementById('input-sb-key').value = cfg.anonKey || '';
-          els.cloudModal.classList.add('open');
-        });
-
-        document.getElementById('btn-cloud-close').addEventListener('click', () => els.cloudModal.classList.remove('open'));
-
-        document.getElementById('btn-cloud-connect').addEventListener('click', async () => {
-          const playerId = document.getElementById('input-player-id').value.trim() || 'raza';
-          const url = document.getElementById('input-sb-url').value.trim();
-          const anonKey = document.getElementById('input-sb-key').value.trim();
-          CloudSync.saveConfig({ playerId, url, anonKey });
-          els.cloudModal.classList.remove('open');
-          if (CloudSync.isConnected()) {
-            await CloudSync.pull();
-            await CloudSync.push();
-            showToast('Connected & synced with Supabase');
-          } else {
-            showToast('Saved locally. Add Supabase URL & Key to sync.');
-          }
+        // Close any open modal when tapping the backdrop outside the card
+        document.querySelectorAll('.modal-backdrop').forEach((backdrop) => {
+          backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) backdrop.classList.remove('open');
+          });
         });
 
         // Rebirth Flow
@@ -2463,22 +2213,19 @@
 
         document.getElementById('btn-claim-offline').addEventListener('click', () => els.offlineModal.classList.remove('open'));
 
-        window.addEventListener('beforeunload', () => saveAll(false));
+        window.addEventListener('beforeunload', saveLocal);
         document.addEventListener('visibilitychange', () => {
-          if (document.hidden) saveAll(true);
+          if (document.hidden) saveLocal();
         });
       }
 
       loadLocal();
-      CloudSync.loadConfig();
       buildShopDOM();
       bindEvents();
       refreshUI();
       Particles.resize();
       scheduleNextGoldenEvent();
-      if (CloudSync.isConnected()) CloudSync.pull();
-      setInterval(() => saveAll(false), 5000);
-      setInterval(() => { if (CloudSync.isConnected()) CloudSync.push(); }, 10000);
+      setInterval(saveLocal, 5000);
       requestAnimationFrame(gameLoop);
     })();
   </script>
