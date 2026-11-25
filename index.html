@@ -1,0 +1,2217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>NEON CORE // Cyber-Mining Empire</title>
+  <style>
+    /* ==========================================================================
+       1. DESIGN TOKENS & RESET
+       ========================================================================== */
+    :root {
+      --bg-base: #070b14;
+      --bg-panel: #0d1424;
+      --bg-card: #121c33;
+      --bg-card-hover: #182542;
+      --border-subtle: rgba(56, 189, 248, 0.16);
+      --border-glow: rgba(56, 189, 248, 0.48);
+
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+
+      --cyan: #22d3ee;
+      --cyan-glow: rgba(34, 211, 238, 0.45);
+      --purple: #a855f7;
+      --purple-glow: rgba(168, 85, 247, 0.45);
+      --gold: #fbbf24;
+      --gold-glow: rgba(251, 191, 36, 0.55);
+      --green: #34d399;
+      --red: #fb7185;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      /* Disable double-tap zoom for rapid tapping on mobile */
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
+
+    button {
+      font-family: inherit;
+      color: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* ==========================================================================
+       2. APP SHELL & RESPONSIVE GRID (Desktop Left/Right, Mobile Stacked)
+       ========================================================================== */
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+      height: 100dvh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 25% 25%, rgba(34, 211, 238, 0.08), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.08), transparent 45%),
+        var(--bg-base);
+    }
+
+    /* Top Stats Header */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 20px;
+      background: rgba(13, 20, 36, 0.92);
+      border-bottom: 1px solid var(--border-subtle);
+      backdrop-filter: blur(12px);
+      z-index: 20;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 16px;
+      color: #04070f;
+      box-shadow: 0 0 16px var(--cyan-glow);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+
+    .brand-title strong {
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-main);
+    }
+
+    .brand-title span {
+      font-size: 0.72rem;
+      color: var(--cyan);
+      letter-spacing: 0.04em;
+    }
+
+    .stats-cluster {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .stat-pill {
+      display: flex;
+      flex-direction: column;
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      min-width: 120px;
+    }
+
+    .stat-pill.primary {
+      border-color: rgba(34, 211, 238, 0.35);
+      box-shadow: inset 0 0 14px rgba(34, 211, 238, 0.08);
+      min-width: 165px;
+    }
+
+    .stat-pill.prestige {
+      border-color: rgba(168, 85, 247, 0.35);
+      box-shadow: inset 0 0 14px rgba(168, 85, 247, 0.08);
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .stat-pill.primary .stat-value {
+      color: var(--cyan);
+      font-size: 1.22rem;
+    }
+
+    .stat-pill.prestige .stat-value {
+      color: #d8b4fe;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-main);
+      border-color: var(--border-glow);
+    }
+
+    .icon-btn.active {
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    /* Main Workspace Split */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* ==========================================================================
+       3. LEFT: CLICKER ARENA
+       ========================================================================== */
+    .click-arena {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.09) 0%, transparent 58%);
+    }
+
+    /* Subtle cyber grid background */
+    .click-arena::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(circle at center, black 35%, transparent 80%);
+      pointer-events: none;
+    }
+
+    #particle-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    /* Active 2x Overclock Banner */
+    .overclock-banner {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-16px);
+      opacity: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.35));
+      border: 1px solid var(--gold);
+      box-shadow: 0 0 24px var(--gold-glow);
+      color: #fef08a;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      z-index: 25;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .overclock-banner.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .arena-score-readout {
+      text-align: center;
+      margin-bottom: 24px;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .arena-credits {
+      font-family: var(--font-mono);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(180deg, #ffffff 20%, #67e8f9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.35));
+    }
+
+    .arena-sub {
+      margin-top: 4px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* Central Click Core */
+    .core-wrapper {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      display: grid;
+      place-items: center;
+      z-index: 10;
+    }
+
+    .core-ring {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .core-ring.outer {
+      inset: -14px;
+      border: 2px dashed rgba(34, 211, 238, 0.28);
+      animation: spinSlow 24s linear infinite;
+    }
+
+    .core-ring.inner {
+      inset: 6px;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      animation: spinReverse 16s linear infinite;
+    }
+
+    @keyframes spinSlow {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes spinReverse {
+      to { transform: rotate(-360deg); }
+    }
+
+    .core-button {
+      position: relative;
+      width: 204px;
+      height: 204px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 30%, #67e8f9 0%, #0891b2 38%, #1e1b4b 78%, #090d1a 100%);
+      border: 3px solid rgba(103, 232, 249, 0.7);
+      box-shadow:
+        0 0 38px rgba(34, 211, 238, 0.4),
+        inset 0 0 32px rgba(103, 232, 249, 0.45),
+        inset 0 -18px 30px rgba(88, 28, 135, 0.6);
+      display: grid;
+      place-items: center;
+      transition: transform 0.08s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.15s ease;
+      outline: none;
+    }
+
+    .core-button:hover {
+      transform: scale(1.03);
+      box-shadow:
+        0 0 50px rgba(34, 211, 238, 0.6),
+        inset 0 0 36px rgba(103, 232, 249, 0.6);
+    }
+
+    .core-button:active,
+    .core-button.is-pressed {
+      transform: scale(0.92);
+      box-shadow:
+        0 0 60px rgba(34, 211, 238, 0.8),
+        inset 0 0 44px rgba(255, 255, 255, 0.55);
+    }
+
+    .core-button:focus-visible {
+      box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.5), 0 0 45px var(--cyan-glow);
+    }
+
+    .core-svg {
+      width: 108px;
+      height: 108px;
+      filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.6));
+      pointer-events: none;
+      transition: transform 0.1s ease;
+    }
+
+    .core-button.is-pressed .core-svg {
+      transform: scale(0.94) rotate(4deg);
+    }
+
+    .arena-hint {
+      margin-top: 24px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      z-index: 5;
+      text-align: center;
+    }
+
+    .creator-credit {
+      margin-top: 10px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(34, 211, 238, 0.08);
+      border: 1px solid rgba(34, 211, 238, 0.24);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      z-index: 5;
+      text-align: center;
+    }
+
+    /* Floating '+X' text numbers */
+    .floating-num {
+      position: fixed;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: #67e8f9;
+      text-shadow: 0 0 10px rgba(34, 211, 238, 0.85), 0 2px 4px rgba(0, 0, 0, 0.8);
+      pointer-events: none;
+      z-index: 40;
+      transform: translate(-50%, -50%);
+      animation: floatUpFade 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity;
+    }
+
+    .floating-num.golden {
+      color: #fde047;
+      font-size: 1.45rem;
+      text-shadow: 0 0 14px var(--gold-glow), 0 2px 6px rgba(0, 0, 0, 0.9);
+    }
+
+    @keyframes floatUpFade {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.85);
+      }
+      25% {
+        opacity: 1;
+        transform: translate(-50%, -78%) scale(1.12);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -175%) scale(0.95);
+      }
+    }
+
+    /* Random Golden Target */
+    .golden-target {
+      position: absolute;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fef08a, #f59e0b 65%, #b45309 100%);
+      border: 2px solid #fef9c3;
+      box-shadow: 0 0 28px var(--gold-glow), 0 0 54px rgba(251, 191, 36, 0.35);
+      display: grid;
+      place-items: center;
+      z-index: 50;
+      cursor: pointer;
+      animation: goldenPulse 0.9s ease-in-out infinite alternate;
+      transform: translate(-50%, -50%);
+    }
+
+    .golden-target svg {
+      width: 30px;
+      height: 30px;
+      color: #451a03;
+      pointer-events: none;
+    }
+
+    .golden-timer-ring {
+      position: absolute;
+      inset: -6px;
+      width: 80px;
+      height: 80px;
+      transform: rotate(-90deg);
+      pointer-events: none;
+    }
+
+    .golden-timer-ring circle {
+      fill: none;
+      stroke: #fef08a;
+      stroke-width: 3;
+      stroke-dasharray: 226;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.1s linear;
+    }
+
+    @keyframes goldenPulse {
+      from { transform: translate(-50%, -50%) scale(0.95); }
+      to { transform: translate(-50%, -50%) scale(1.08); }
+    }
+
+    /* ==========================================================================
+       4. RIGHT: UPGRADE SHOP & PRESTIGE SIDEBAR
+       ========================================================================== */
+    .shop-sidebar {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border-subtle);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .shop-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(7, 11, 20, 0.5);
+      flex-shrink: 0;
+    }
+
+    .tab-btn {
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--bg-card);
+      color: var(--cyan);
+      border-color: var(--border-glow);
+      box-shadow: 0 0 14px rgba(34, 211, 238, 0.12);
+    }
+
+    .tab-btn.prestige-tab.active {
+      color: #d8b4fe;
+      border-color: rgba(168, 85, 247, 0.5);
+      box-shadow: 0 0 14px rgba(168, 85, 247, 0.18);
+    }
+
+    .shop-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .shop-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .shop-scroll::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.25);
+      border-radius: 999px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+
+    .buy-mode-group {
+      display: inline-flex;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .buy-mode-btn {
+      padding: 3px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 4px;
+      color: var(--text-dim);
+    }
+
+    .buy-mode-btn.active {
+      background: var(--cyan);
+      color: #04070f;
+    }
+
+    .upgrade-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .upgrade-card {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 12px;
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      text-align: left;
+      transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+    }
+
+    .upgrade-card:hover:not(:disabled) {
+      background: var(--bg-card-hover);
+      border-color: var(--border-glow);
+      transform: translateY(-1px);
+    }
+
+    .upgrade-card:active:not(:disabled) {
+      transform: scale(0.985);
+    }
+
+    .upgrade-card:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+
+    .upgrade-card.owned-max {
+      opacity: 0.75;
+      border-color: rgba(52, 211, 153, 0.35);
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    .upgrade-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(34, 211, 238, 0.1);
+      border: 1px solid rgba(34, 211, 238, 0.22);
+      display: grid;
+      place-items: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .upgrade-card.multiplier-card .upgrade-icon {
+      background: rgba(251, 191, 36, 0.12);
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    .upgrade-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .upgrade-name-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .upgrade-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .upgrade-owned {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.85);
+      color: var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .upgrade-desc {
+      margin-top: 2px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .upgrade-cost {
+      margin-top: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    .upgrade-card:disabled .upgrade-cost {
+      color: var(--red);
+    }
+
+    .upgrade-card.owned-max .upgrade-cost {
+      color: var(--green);
+    }
+
+    /* Prestige Panel */
+    .prestige-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .prestige-hero {
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(145deg, rgba(88, 28, 135, 0.32), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      text-align: center;
+    }
+
+    .prestige-hero h3 {
+      font-size: 1.05rem;
+      color: #e9d5ff;
+      margin-bottom: 6px;
+    }
+
+    .prestige-hero p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .prestige-gems-big {
+      margin: 14px 0 6px;
+      font-family: var(--font-mono);
+      font-size: 2rem;
+      font-weight: 800;
+      color: #d8b4fe;
+      text-shadow: 0 0 18px var(--purple-glow);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      overflow: hidden;
+      margin: 12px 0 6px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--purple), var(--cyan));
+      transition: width 0.25s ease;
+    }
+
+    .prestige-btn {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #9333ea, #6366f1);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.04em;
+      box-shadow: 0 0 22px rgba(147, 51, 234, 0.45);
+      transition: transform 0.12s ease, opacity 0.15s ease;
+    }
+
+    .prestige-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+
+    .prestige-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .stats-box {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.82rem;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+    }
+
+    .stats-row strong {
+      font-family: var(--font-mono);
+      color: var(--text-main);
+    }
+
+    /* ==========================================================================
+       5. MODALS & TOASTS
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.78);
+      backdrop-filter: blur(6px);
+      display: none;
+      place-items: center;
+      padding: 16px;
+      z-index: 100;
+    }
+
+    .modal-backdrop.open {
+      display: grid;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 460px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-card h2 {
+      font-size: 1.15rem;
+      color: var(--cyan);
+    }
+
+    .modal-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .modal-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      resize: vertical;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--cyan);
+      color: #04070f;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .btn-secondary {
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .btn-danger {
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      background: rgba(251, 113, 133, 0.16);
+      border: 1px solid rgba(251, 113, 133, 0.45);
+      color: var(--red);
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 120;
+      pointer-events: none;
+    }
+
+    .toast {
+      padding: 9px 16px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--cyan);
+      color: var(--text-main);
+      font-size: 0.82rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      animation: toastIn 0.2s ease;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       6. MOBILE & TABLET RESPONSIVE LAYOUT
+       ========================================================================== */
+    @media (max-width: 900px) {
+      .app-shell {
+        height: auto;
+        min-height: 100dvh;
+        overflow-y: auto;
+      }
+
+      .top-bar {
+        flex-wrap: wrap;
+        padding: 10px 12px;
+        gap: 8px;
+      }
+
+      .brand-title span {
+        display: none;
+      }
+
+      .stats-cluster {
+        order: 3;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+      }
+
+      .stat-pill,
+      .stat-pill.primary {
+        min-width: 0;
+        padding: 6px 10px;
+      }
+
+      .stat-value,
+      .stat-pill.primary .stat-value {
+        font-size: 0.96rem;
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+        overflow: visible;
+      }
+
+      .click-arena {
+        min-height: 360px;
+        padding: 20px 14px;
+      }
+
+      .core-wrapper {
+        width: 196px;
+        height: 196px;
+      }
+
+      .core-button {
+        width: 168px;
+        height: 168px;
+      }
+
+      .core-svg {
+        width: 86px;
+        height: 86px;
+      }
+
+      .shop-sidebar {
+        border-left: none;
+        border-top: 1px solid var(--border-subtle);
+        overflow: visible;
+      }
+
+      .shop-scroll {
+        overflow-y: visible;
+        padding-bottom: 32px;
+      }
+
+      .upgrade-card {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- ==================== TOP HUD BAR ==================== -->
+    <header class="top-bar">
+      <div class="brand">
+        <div class="brand-badge">N</div>
+        <div class="brand-title">
+          <strong>Neon Core</strong>
+          <span>Cyber-Mining Empire</span>
+        </div>
+      </div>
+
+      <div class="stats-cluster">
+        <div class="stat-pill primary">
+          <span class="stat-label">Cyber Credits</span>
+          <span class="stat-value" id="hud-credits">0</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">Credits / Sec (CPS)</span>
+          <span class="stat-value" id="hud-cps">0/s</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">Click Power</span>
+          <span class="stat-value" id="hud-click">+1</span>
+        </div>
+        <div class="stat-pill prestige">
+          <span class="stat-label">Prestige Gems</span>
+          <span class="stat-value" id="hud-gems">0 (x1.00)</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="icon-btn active" id="btn-sound" title="Toggle Sound Effects">
+          <span id="sound-icon">🔊</span>
+          <span>SFX</span>
+        </button>
+        <button class="icon-btn" id="btn-save-menu" title="Save, Export & Import">
+          <span>💾</span>
+          <span>Save</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ==================== MAIN SPLIT WORKSPACE ==================== -->
+    <main class="main-grid">
+      <!-- LEFT: INTERACTIVE CLICKER ARENA -->
+      <section class="click-arena" id="click-arena">
+        <canvas id="particle-canvas"></canvas>
+
+        <div class="overclock-banner" id="overclock-banner">
+          <span>⚡</span>
+          <span>2X OVERCLOCK SURGE ACTIVE — <span id="overclock-timer">20.0s</span></span>
+        </div>
+
+        <div class="arena-score-readout">
+          <div class="arena-credits" id="arena-credits">0</div>
+          <div class="arena-sub" id="arena-sub">0.0 credits / sec • +1 per tap</div>
+        </div>
+
+        <div class="core-wrapper">
+          <div class="core-ring outer"></div>
+          <div class="core-ring inner"></div>
+          <button
+            class="core-button"
+            id="core-button"
+            aria-label="Mine Cyber Core"
+            type="button"
+          >
+            <!-- Vector Cyber Core Crystal -->
+            <svg class="core-svg" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+              <polygon points="50,6 88,28 88,72 50,94 12,72 12,28" stroke="#e0f2fe" stroke-width="3" fill="rgba(255,255,255,0.12)" />
+              <polygon points="50,18 76,34 76,66 50,82 24,66 24,34" stroke="#67e8f9" stroke-width="2.5" fill="rgba(34,211,238,0.22)" />
+              <polygon points="50,30 64,50 50,70 36,50" fill="#ffffff" />
+              <circle cx="50" cy="50" r="6" fill="#22d3ee" />
+            </svg>
+          </button>
+        </div>
+
+        <p class="arena-hint">Tap the Neon Core (or press Space) to extract Cyber Credits. Watch for Golden Packets!</p>
+        <p class="creator-credit">Created by Raza</p>
+      </section>
+
+      <!-- RIGHT: UPGRADE SHOP & PRESTIGE SIDEBAR -->
+      <aside class="shop-sidebar">
+        <div class="shop-tabs">
+          <button class="tab-btn active" id="tab-shop" type="button">Upgrade Shop</button>
+          <button class="tab-btn prestige-tab" id="tab-prestige" type="button">Prestige Core</button>
+        </div>
+
+        <div class="shop-scroll" id="panel-shop">
+          <!-- Click-Power Multipliers -->
+          <div>
+            <div class="section-header">
+              <span class="section-title">Click-Power Multipliers</span>
+            </div>
+            <div class="upgrade-list" id="multiplier-list"></div>
+          </div>
+
+          <!-- Auto-Clickers / Buildings -->
+          <div>
+            <div class="section-header">
+              <span class="section-title">Mining Operations (Auto-CPS)</span>
+              <div class="buy-mode-group" role="group" aria-label="Purchase quantity">
+                <button class="buy-mode-btn active" data-buy="1" type="button">x1</button>
+                <button class="buy-mode-btn" data-buy="10" type="button">x10</button>
+                <button class="buy-mode-btn" data-buy="max" type="button">MAX</button>
+              </div>
+            </div>
+            <div class="upgrade-list" id="building-list"></div>
+          </div>
+        </div>
+
+        <!-- Prestige / Rebirth Tab -->
+        <div class="shop-scroll" id="panel-prestige" style="display: none;">
+          <div class="prestige-panel">
+            <div class="prestige-hero">
+              <h3>Quantum Rebirth</h3>
+              <p>
+                Reset your Credits, Miners, and Click Multipliers to crystallize permanent
+                <strong>Prestige Gems</strong>. Each Gem permanently boosts <strong>all earnings by +25%</strong>!
+              </p>
+              <div class="prestige-gems-big" id="prestige-claimable">+0 Gems</div>
+              <p id="prestige-milestone-text">Reach 100,000 run credits to unlock Rebirth</p>
+              <div class="progress-track">
+                <div class="progress-fill" id="prestige-progress"></div>
+              </div>
+            </div>
+
+            <button class="prestige-btn" id="btn-rebirth" type="button" disabled>
+              Rebirth &amp; Claim Gems
+            </button>
+
+            <div class="stats-box">
+              <div class="stats-row">
+                <span>Current Prestige Multiplier</span>
+                <strong id="stat-prestige-mult">x1.00</strong>
+              </div>
+              <div class="stats-row">
+                <span>Run Credits Earned</span>
+                <strong id="stat-run-credits">0</strong>
+              </div>
+              <div class="stats-row">
+                <span>Lifetime Credits Earned</span>
+                <strong id="stat-total-credits">0</strong>
+              </div>
+              <div class="stats-row">
+                <span>Total Manual Taps</span>
+                <strong id="stat-total-clicks">0</strong>
+              </div>
+              <div class="stats-row">
+                <span>Golden Packets Caught</span>
+                <strong id="stat-golden-caught">0</strong>
+              </div>
+              <div class="stats-row">
+                <span>Total Rebirths</span>
+                <strong id="stat-rebirths">0</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+  <!-- Save / Export / Import Modal -->
+  <div class="modal-backdrop" id="save-modal">
+    <div class="modal-card">
+      <h2>Save Data Management</h2>
+      <p>Your progress auto-saves every 5 seconds to local storage. Export your save code to back it up or move devices.</p>
+      <textarea class="modal-textarea" id="save-textarea" placeholder="Paste an exported save string here to import..."></textarea>
+      <div class="modal-actions">
+        <button class="btn-danger" id="btn-hard-reset" type="button">Hard Reset</button>
+        <button class="btn-secondary" id="btn-import-save" type="button">Import</button>
+        <button class="btn-primary" id="btn-export-save" type="button">Export &amp; Copy</button>
+        <button class="btn-secondary" id="btn-close-save" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offline Progress Modal -->
+  <div class="modal-backdrop" id="offline-modal">
+    <div class="modal-card">
+      <h2>Offline Mining Complete</h2>
+      <p id="offline-summary">Your cyber-miners kept working while you were away!</p>
+      <div class="modal-actions">
+        <button class="btn-primary" id="btn-claim-offline" type="button">Collect Credits</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rebirth Confirmation Modal -->
+  <div class="modal-backdrop" id="rebirth-modal">
+    <div class="modal-card">
+      <h2>Confirm Quantum Rebirth</h2>
+      <p id="rebirth-confirm-text">You will reset your current run in exchange for Prestige Gems.</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btn-cancel-rebirth" type="button">Cancel</button>
+        <button class="btn-primary" id="btn-confirm-rebirth" type="button">Rebirth Now</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      /* ========================================================================
+         1. GAME CONFIGURATION & CATALOGS
+         ======================================================================== */
+      const SAVE_KEY = 'neon_core_cyber_miner_v1';
+      const PRESTIGE_MILESTONE = 100_000;
+      const GEM_BONUS_PER_GEM = 0.25; // +25% permanent multiplier per Prestige Gem
+      const OFFLINE_CAP_SECONDS = 86_400; // Max 24 hours of offline mining
+      const GOLDEN_DURATION_MS = 10_000; // Golden target stays for 10 seconds
+
+      // 3 Click-Power Multiplier Upgrades
+      const CLICK_MULTIPLIERS = [
+        {
+          id: 'mult_flux',
+          name: 'Flux Amplifier',
+          icon: '⚡',
+          mult: 2,
+          baseCost: 120,
+          desc: 'Doubles your Click Power (2x Clicks)'
+        },
+        {
+          id: 'mult_plasma',
+          name: 'Plasma Overdrive',
+          icon: '🔥',
+          mult: 3,
+          baseCost: 3_500,
+          desc: 'Triples your Click Power (3x Clicks)'
+        },
+        {
+          id: 'mult_quantum',
+          name: 'Quantum Singularity',
+          icon: '💠',
+          mult: 5,
+          baseCost: 65_000,
+          desc: 'Multiplies Click Power by 5x (5x Clicks)'
+        }
+      ];
+
+      // 7 Auto-Clickers / Buildings with standard baseCost * 1.15^owned scaling
+      const BUILDINGS = [
+        {
+          id: 'cursor',
+          name: 'Auto-Cursor',
+          icon: '🖱️',
+          baseCost: 15,
+          cps: 1,
+          desc: 'Taps the core automatically (+1 CPS)'
+        },
+        {
+          id: 'drone',
+          name: 'Scrap Drone',
+          icon: '🛸',
+          baseCost: 100,
+          cps: 5,
+          desc: 'Swarms energy vents (+5 CPS)'
+        },
+        {
+          id: 'worker',
+          name: 'Cyber Worker',
+          icon: '🤖',
+          baseCost: 850,
+          cps: 28,
+          desc: 'Synthesizes crystal shards (+28 CPS)'
+        },
+        {
+          id: 'drill',
+          name: 'Plasma Drill',
+          icon: '⛏️',
+          baseCost: 6_500,
+          cps: 140,
+          desc: 'Deep-core laser extraction (+140 CPS)'
+        },
+        {
+          id: 'factory',
+          name: 'Nano Factory',
+          icon: '🏭',
+          baseCost: 48_000,
+          cps: 720,
+          desc: 'Automated dark-matter foundry (+720 CPS)'
+        },
+        {
+          id: 'orbital',
+          name: 'Orbital Rig',
+          icon: '🛰️',
+          baseCost: 380_000,
+          cps: 3_800,
+          desc: 'Harvests solar-grid beams (+3.8K CPS)'
+        },
+        {
+          id: 'aibot',
+          name: 'Singularity AI',
+          icon: '🧠',
+          baseCost: 3_200_000,
+          cps: 21_000,
+          desc: 'Predicts quantum credit hashes (+21K CPS)'
+        }
+      ];
+
+      /* ========================================================================
+         2. GAME STATE
+         ======================================================================== */
+      function createDefaultState() {
+        const buildings = {};
+        BUILDINGS.forEach((b) => { buildings[b.id] = 0; });
+        const multipliers = {};
+        CLICK_MULTIPLIERS.forEach((m) => { multipliers[m.id] = false; });
+
+        return {
+          credits: 0,
+          runCredits: 0,
+          totalCredits: 0,
+          totalClicks: 0,
+          goldenCaught: 0,
+          prestigeGems: 0,
+          rebirths: 0,
+          buildings,
+          multipliers,
+          overclockUntil: 0,
+          soundEnabled: true,
+          lastSaved: Date.now()
+        };
+      }
+
+      let state = createDefaultState();
+      let buyMode = '1'; // '1' | '10' | 'max'
+      let lastTick = performance.now();
+      let activeGoldenEl = null;
+      let goldenTimeoutId = null;
+      let nextGoldenSpawnId = null;
+
+      /* ========================================================================
+         3. WEB AUDIO API SYNTHESIZER (No external audio files)
+         ======================================================================== */
+      const Sound = (() => {
+        let ctx = null;
+
+        function ensureContext() {
+          if (!state.soundEnabled) return null;
+          if (!ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return null;
+            ctx = new AudioCtx();
+          }
+          if (ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+          }
+          return ctx;
+        }
+
+        function playTone(freq, endFreq, duration, type = 'sine', gainPeak = 0.12, delay = 0) {
+          const ac = ensureContext();
+          if (!ac) return;
+          const t = ac.currentTime + delay;
+          const osc = ac.createOscillator();
+          const gain = ac.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, t);
+          if (endFreq !== freq) {
+            osc.frequency.exponentialRampToValueAtTime(Math.max(20, endFreq), t + duration);
+          }
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.exponentialRampToValueAtTime(gainPeak, t + 0.012);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+          osc.connect(gain);
+          gain.connect(ac.destination);
+          osc.start(t);
+          osc.stop(t + duration + 0.02);
+        }
+
+        return {
+          click() {
+            const jitter = 0.94 + Math.random() * 0.14;
+            playTone(520 * jitter, 190 * jitter, 0.065, 'triangle', 0.11);
+          },
+          buy() {
+            playTone(440, 587, 0.08, 'sine', 0.10, 0);
+            playTone(659, 880, 0.12, 'triangle', 0.10, 0.05);
+          },
+          goldenSpawn() {
+            playTone(784, 1046, 0.16, 'sine', 0.08, 0);
+            playTone(1046, 1318, 0.22, 'sine', 0.08, 0.1);
+          },
+          goldenCollect() {
+            [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
+              playTone(f, f * 1.03, 0.18, 'triangle', 0.12, idx * 0.055);
+            });
+          },
+          rebirth() {
+            [220, 330, 440, 660, 880].forEach((f, idx) => {
+              playTone(f, f * 1.25, 0.32, 'sawtooth', 0.07, idx * 0.07);
+            });
+          }
+        };
+      })();
+
+      /* ========================================================================
+         4. PARTICLE CANVAS SYSTEM
+         ======================================================================== */
+      const Particles = (() => {
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        const pool = [];
+
+        function resize() {
+          const rect = canvas.parentElement.getBoundingClientRect();
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+          canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function burst(clientX, clientY, count = 10, color = '#22d3ee') {
+          const rect = canvas.getBoundingClientRect();
+          const x = clientX - rect.left;
+          const y = clientY - rect.top;
+          for (let i = 0; i < count; i++) {
+            if (pool.length > 180) pool.shift();
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 1.6 + Math.random() * 4.4;
+            pool.push({
+              x,
+              y,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed - 1.2,
+              size: 2 + Math.random() * 3.2,
+              alpha: 1,
+              decay: 0.024 + Math.random() * 0.02,
+              color
+            });
+          }
+        }
+
+        function updateAndDraw() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          for (let i = pool.length - 1; i >= 0; i--) {
+            const p = pool[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.12; // subtle gravity
+            p.alpha -= p.decay;
+            if (p.alpha <= 0) {
+              pool.splice(i, 1);
+              continue;
+            }
+            ctx.globalAlpha = p.alpha;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        return { burst, updateAndDraw, resize };
+      })();
+
+      /* ========================================================================
+         5. ECONOMY & FORMULAS
+         ======================================================================== */
+      function getPrestigeMultiplier() {
+        return 1 + state.prestigeGems * GEM_BONUS_PER_GEM;
+      }
+
+      function getOverclockMultiplier() {
+        return Date.now() < state.overclockUntil ? 2 : 1;
+      }
+
+      function getGlobalMultiplier() {
+        return getPrestigeMultiplier() * getOverclockMultiplier();
+      }
+
+      function getBaseCps() {
+        let total = 0;
+        for (const b of BUILDINGS) {
+          total += (state.buildings[b.id] || 0) * b.cps;
+        }
+        return total;
+      }
+
+      function getEffectiveCps() {
+        return getBaseCps() * getGlobalMultiplier();
+      }
+
+      function getClickPower() {
+        let mult = 1;
+        for (const m of CLICK_MULTIPLIERS) {
+          if (state.multipliers[m.id]) mult *= m.mult;
+        }
+        return 1 * mult * getGlobalMultiplier();
+      }
+
+      function getBuildingSingleCost(building, ownedCount) {
+        return Math.floor(building.baseCost * Math.pow(1.15, ownedCount));
+      }
+
+      function getBuildingBulkQuote(building, mode) {
+        const owned = state.buildings[building.id] || 0;
+        if (mode === '1') {
+          return { qty: 1, cost: getBuildingSingleCost(building, owned) };
+        }
+        if (mode === '10') {
+          let cost = 0;
+          for (let i = 0; i < 10; i++) {
+            cost += getBuildingSingleCost(building, owned + i);
+          }
+          return { qty: 10, cost };
+        }
+        // 'max' mode: compute how many can be afforded (cap loop at 200 for safety)
+        let qty = 0;
+        let cost = 0;
+        while (qty < 200) {
+          const nextCost = getBuildingSingleCost(building, owned + qty);
+          if (cost + nextCost > state.credits) break;
+          cost += nextCost;
+          qty++;
+        }
+        if (qty === 0) {
+          return { qty: 1, cost: getBuildingSingleCost(building, owned), affordable: false };
+        }
+        return { qty, cost, affordable: true };
+      }
+
+      function getClaimableGems() {
+        if (state.runCredits < PRESTIGE_MILESTONE) return 0;
+        return Math.floor(Math.sqrt(state.runCredits / PRESTIGE_MILESTONE));
+      }
+
+      function addCredits(amount) {
+        if (amount <= 0 || !Number.isFinite(amount)) return;
+        state.credits += amount;
+        state.runCredits += amount;
+        state.totalCredits += amount;
+      }
+
+      /* ========================================================================
+         6. FORMATTING & VISUAL HELPERS
+         ======================================================================== */
+      const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc'];
+
+      function formatNum(value, decimals = 0) {
+        if (!Number.isFinite(value)) return '0';
+        if (value < 1000) {
+          return decimals > 0 ? value.toFixed(decimals) : Math.floor(value).toLocaleString();
+        }
+        const tier = Math.min(Math.floor(Math.log10(value) / 3), SUFFIXES.length - 1);
+        if (tier === 0) return Math.floor(value).toLocaleString();
+        if (value < 1_000_000) return Math.floor(value).toLocaleString();
+        const scaled = value / Math.pow(1000, tier);
+        return scaled.toFixed(2) + SUFFIXES[tier];
+      }
+
+      function formatDuration(seconds) {
+        const s = Math.floor(seconds);
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const rem = s % 60;
+        if (h > 0) return `${h}h ${m}m`;
+        if (m > 0) return `${m}m ${rem}s`;
+        return `${rem}s`;
+      }
+
+      function showToast(message) {
+        const container = document.getElementById('toast-container');
+        const el = document.createElement('div');
+        el.className = 'toast';
+        el.textContent = message;
+        container.appendChild(el);
+        setTimeout(() => {
+          el.style.opacity = '0';
+          el.style.transition = 'opacity 0.25s ease';
+          setTimeout(() => el.remove(), 260);
+        }, 2600);
+      }
+
+      let floatingCount = 0;
+      function spawnFloatingText(x, y, text, isGolden = false) {
+        if (floatingCount > 24) return;
+        floatingCount++;
+        const el = document.createElement('div');
+        el.className = isGolden ? 'floating-num golden' : 'floating-num';
+        el.textContent = text;
+        const offsetX = (Math.random() - 0.5) * 26;
+        el.style.left = `${x + offsetX}px`;
+        el.style.top = `${y - 10}px`;
+        document.body.appendChild(el);
+
+        const cleanup = () => {
+          if (el.parentNode) {
+            el.remove();
+            floatingCount = Math.max(0, floatingCount - 1);
+          }
+        };
+        el.addEventListener('animationend', cleanup, { once: true });
+        setTimeout(cleanup, 950);
+      }
+
+      /* ========================================================================
+         7. DOM REFERENCES & SHOP INITIALIZATION
+         ======================================================================== */
+      const els = {
+        hudCredits: document.getElementById('hud-credits'),
+        hudCps: document.getElementById('hud-cps'),
+        hudClick: document.getElementById('hud-click'),
+        hudGems: document.getElementById('hud-gems'),
+        arenaCredits: document.getElementById('arena-credits'),
+        arenaSub: document.getElementById('arena-sub'),
+        coreButton: document.getElementById('core-button'),
+        clickArena: document.getElementById('click-arena'),
+        overclockBanner: document.getElementById('overclock-banner'),
+        overclockTimer: document.getElementById('overclock-timer'),
+        multiplierList: document.getElementById('multiplier-list'),
+        buildingList: document.getElementById('building-list'),
+        tabShop: document.getElementById('tab-shop'),
+        tabPrestige: document.getElementById('tab-prestige'),
+        panelShop: document.getElementById('panel-shop'),
+        panelPrestige: document.getElementById('panel-prestige'),
+        prestigeClaimable: document.getElementById('prestige-claimable'),
+        prestigeMilestoneText: document.getElementById('prestige-milestone-text'),
+        prestigeProgress: document.getElementById('prestige-progress'),
+        btnRebirth: document.getElementById('btn-rebirth'),
+        statPrestigeMult: document.getElementById('stat-prestige-mult'),
+        statRunCredits: document.getElementById('stat-run-credits'),
+        statTotalCredits: document.getElementById('stat-total-credits'),
+        statTotalClicks: document.getElementById('stat-total-clicks'),
+        statGoldenCaught: document.getElementById('stat-golden-caught'),
+        statRebirths: document.getElementById('stat-rebirths'),
+        btnSound: document.getElementById('btn-sound'),
+        soundIcon: document.getElementById('sound-icon'),
+        saveModal: document.getElementById('save-modal'),
+        saveTextarea: document.getElementById('save-textarea'),
+        offlineModal: document.getElementById('offline-modal'),
+        offlineSummary: document.getElementById('offline-summary'),
+        rebirthModal: document.getElementById('rebirth-modal'),
+        rebirthConfirmText: document.getElementById('rebirth-confirm-text')
+      };
+
+      const multiplierNodes = {};
+      const buildingNodes = {};
+
+      function buildShopDOM() {
+        // Click Multipliers
+        els.multiplierList.innerHTML = '';
+        for (const m of CLICK_MULTIPLIERS) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'upgrade-card multiplier-card';
+          btn.innerHTML = `
+            <div class="upgrade-icon">${m.icon}</div>
+            <div class="upgrade-info">
+              <div class="upgrade-name-row">
+                <span class="upgrade-name">${m.name}</span>
+                <span class="upgrade-owned" data-role="badge">x${m.mult}</span>
+              </div>
+              <div class="upgrade-desc">${m.desc}</div>
+              <div class="upgrade-cost" data-role="cost">${formatNum(m.baseCost)} Credits</div>
+            </div>
+          `;
+          btn.addEventListener('click', () => buyMultiplier(m.id));
+          els.multiplierList.appendChild(btn);
+          multiplierNodes[m.id] = {
+            btn,
+            badge: btn.querySelector('[data-role="badge"]'),
+            cost: btn.querySelector('[data-role="cost"]')
+          };
+        }
+
+        // Auto-Clickers / Buildings
+        els.buildingList.innerHTML = '';
+        for (const b of BUILDINGS) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'upgrade-card';
+          btn.innerHTML = `
+            <div class="upgrade-icon">${b.icon}</div>
+            <div class="upgrade-info">
+              <div class="upgrade-name-row">
+                <span class="upgrade-name">${b.name}</span>
+                <span class="upgrade-owned" data-role="owned">0</span>
+              </div>
+              <div class="upgrade-desc">${b.desc}</div>
+              <div class="upgrade-cost" data-role="cost">${formatNum(b.baseCost)} Credits</div>
+            </div>
+          `;
+          btn.addEventListener('click', () => buyBuilding(b.id));
+          els.buildingList.appendChild(btn);
+          buildingNodes[b.id] = {
+            btn,
+            owned: btn.querySelector('[data-role="owned"]'),
+            cost: btn.querySelector('[data-role="cost"]')
+          };
+        }
+      }
+
+      /* ========================================================================
+         8. PLAYER ACTIONS (Clicking, Buying, Rebirth)
+         ======================================================================== */
+      function handleCoreTap(clientX, clientY) {
+        const gain = getClickPower();
+        addCredits(gain);
+        state.totalClicks += 1;
+
+        Sound.click();
+        spawnFloatingText(clientX, clientY, `+${formatNum(gain)}`, getOverclockMultiplier() > 1);
+        Particles.burst(
+          clientX,
+          clientY,
+          getOverclockMultiplier() > 1 ? 14 : 9,
+          getOverclockMultiplier() > 1 ? '#fbbf24' : '#22d3ee'
+        );
+
+        els.coreButton.classList.add('is-pressed');
+        setTimeout(() => els.coreButton.classList.remove('is-pressed'), 75);
+        refreshUI();
+      }
+
+      function buyMultiplier(id) {
+        const m = CLICK_MULTIPLIERS.find((x) => x.id === id);
+        if (!m || state.multipliers[id] || state.credits < m.baseCost) return;
+        state.credits -= m.baseCost;
+        state.multipliers[id] = true;
+        Sound.buy();
+        showToast(`Unlocked ${m.name} (${m.mult}x Click Power)!`);
+        refreshUI();
+      }
+
+      function buyBuilding(id) {
+        const b = BUILDINGS.find((x) => x.id === id);
+        if (!b) return;
+        const quote = getBuildingBulkQuote(b, buyMode);
+        if (quote.affordable === false || state.credits < quote.cost || quote.qty <= 0) return;
+
+        state.credits -= quote.cost;
+        state.buildings[id] = (state.buildings[id] || 0) + quote.qty;
+        Sound.buy();
+        refreshUI();
+      }
+
+      function performRebirth() {
+        const claimable = getClaimableGems();
+        if (claimable <= 0) return;
+
+        state.prestigeGems += claimable;
+        state.rebirths += 1;
+        state.credits = 0;
+        state.runCredits = 0;
+        state.overclockUntil = 0;
+        for (const b of BUILDINGS) state.buildings[b.id] = 0;
+        for (const m of CLICK_MULTIPLIERS) state.multipliers[m.id] = false;
+
+        Sound.rebirth();
+        const rect = els.coreButton.getBoundingClientRect();
+        Particles.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 42, '#c084fc');
+        showToast(`Quantum Rebirth! +${claimable} Prestige Gem${claimable > 1 ? 's' : ''} acquired!`);
+        saveToStorage();
+        refreshUI();
+      }
+
+      /* ========================================================================
+         9. RANDOM GOLDEN EVENTS (10s duration, Instant Reward or 2x Overclock)
+         ======================================================================== */
+      function clearGoldenTarget() {
+        if (goldenTimeoutId) {
+          clearTimeout(goldenTimeoutId);
+          goldenTimeoutId = null;
+        }
+        if (activeGoldenEl) {
+          activeGoldenEl.remove();
+          activeGoldenEl = null;
+        }
+      }
+
+      function scheduleNextGoldenEvent() {
+        if (nextGoldenSpawnId) clearTimeout(nextGoldenSpawnId);
+        // Spawn every 30 to 55 seconds
+        const delayMs = 30_000 + Math.random() * 25_000;
+        nextGoldenSpawnId = setTimeout(spawnGoldenTarget, delayMs);
+      }
+
+      function spawnGoldenTarget() {
+        clearGoldenTarget();
+
+        const target = document.createElement('button');
+        target.type = 'button';
+        target.className = 'golden-target';
+        target.setAttribute('aria-label', 'Golden Data Packet');
+
+        // Safe random placement inside click-arena (14% - 86%)
+        const leftPct = 14 + Math.random() * 72;
+        const topPct = 18 + Math.random() * 64;
+        target.style.left = `${leftPct}%`;
+        target.style.top = `${topPct}%`;
+
+        target.innerHTML = `
+          <svg class="golden-timer-ring" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="36"></circle>
+          </svg>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+          </svg>
+        `;
+
+        const ringCircle = target.querySelector('circle');
+        const circumference = 2 * Math.PI * 36;
+        ringCircle.style.strokeDasharray = String(circumference);
+        const spawnedAt = performance.now();
+
+        const ringInterval = setInterval(() => {
+          if (!activeGoldenEl) {
+            clearInterval(ringInterval);
+            return;
+          }
+          const elapsed = performance.now() - spawnedAt;
+          const pct = Math.max(0, 1 - elapsed / GOLDEN_DURATION_MS);
+          ringCircle.style.strokeDashoffset = String(circumference * (1 - pct));
+        }, 80);
+
+        target.addEventListener('pointerdown', (e) => {
+          e.stopPropagation();
+          clearInterval(ringInterval);
+          clearGoldenTarget();
+          state.goldenCaught += 1;
+          Sound.goldenCollect();
+
+          const rect = target.getBoundingClientRect();
+          const cx = e.clientX || rect.left + rect.width / 2;
+          const cy = e.clientY || rect.top + rect.height / 2;
+          Particles.burst(cx, cy, 28, '#fbbf24');
+
+          // 50% Instant Jackpot, 50% Temporary 2x Overclock Multiplier
+          if (Math.random() < 0.5) {
+            const reward = Math.max(
+              250 * getPrestigeMultiplier(),
+              Math.floor(getEffectiveCps() * 20 + getClickPower() * 35)
+            );
+            addCredits(reward);
+            spawnFloatingText(cx, cy, `+${formatNum(reward)} JACKPOT!`, true);
+            showToast(`Golden Packet: +${formatNum(reward)} Cyber Credits!`);
+          } else {
+            state.overclockUntil = Math.max(Date.now(), state.overclockUntil) + 20_000;
+            spawnFloatingText(cx, cy, '2X OVERCLOCK!', true);
+            showToast('Golden Overclock: 2x All Earnings for 20 seconds!');
+          }
+
+          refreshUI();
+          scheduleNextGoldenEvent();
+        });
+
+        els.clickArena.appendChild(target);
+        activeGoldenEl = target;
+        Sound.goldenSpawn();
+
+        goldenTimeoutId = setTimeout(() => {
+          clearInterval(ringInterval);
+          clearGoldenTarget();
+          scheduleNextGoldenEvent();
+        }, GOLDEN_DURATION_MS);
+      }
+
+      /* ========================================================================
+         10. SAVE SYSTEM (LocalStorage, Offline Progress, Export/Import)
+         ======================================================================== */
+      function serializeState() {
+        state.lastSaved = Date.now();
+        const bytes = new TextEncoder().encode(JSON.stringify(state));
+        let bin = '';
+        for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+        return btoa(bin);
+      }
+
+      function deserializeState(encoded) {
+        const bin = atob(encoded.trim());
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        const parsed = JSON.parse(new TextDecoder().decode(bytes));
+        if (!parsed || typeof parsed !== 'object' || !Number.isFinite(parsed.credits)) {
+          throw new Error('Invalid save payload');
+        }
+        const merged = createDefaultState();
+        Object.assign(merged, parsed);
+        merged.credits = Math.max(0, Number(merged.credits) || 0);
+        merged.runCredits = Math.max(0, Number(merged.runCredits) || 0);
+        merged.totalCredits = Math.max(0, Number(merged.totalCredits) || 0);
+        merged.prestigeGems = Math.max(0, Math.floor(Number(merged.prestigeGems) || 0));
+        merged.buildings = { ...merged.buildings, ...(parsed.buildings || {}) };
+        merged.multipliers = { ...merged.multipliers, ...(parsed.multipliers || {}) };
+        return merged;
+      }
+
+      function saveToStorage() {
+        try {
+          state.lastSaved = Date.now();
+          localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+        } catch (err) {
+          console.warn('Could not save to localStorage:', err);
+        }
+      }
+
+      function loadFromStorage() {
+        try {
+          const raw = localStorage.getItem(SAVE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          const merged = createDefaultState();
+          Object.assign(merged, parsed);
+          merged.buildings = { ...merged.buildings, ...(parsed.buildings || {}) };
+          merged.multipliers = { ...merged.multipliers, ...(parsed.multipliers || {}) };
+          state = merged;
+
+          // Offline progress calculation
+          const now = Date.now();
+          const elapsedSec = Math.min(Math.max(0, (now - (state.lastSaved || now)) / 1000), OFFLINE_CAP_SECONDS);
+          const cps = getBaseCps() * getPrestigeMultiplier();
+          if (elapsedSec >= 5 && cps > 0) {
+            const offlineEarned = Math.floor(cps * elapsedSec);
+            if (offlineEarned > 0) {
+              addCredits(offlineEarned);
+              els.offlineSummary.innerHTML =
+                `You were offline for <strong>${formatDuration(elapsedSec)}</strong>.<br>` +
+                `Your autonomous miners extracted <strong>+${formatNum(offlineEarned)} Cyber Credits</strong>!`;
+              els.offlineModal.classList.add('open');
+            }
+          }
+        } catch (err) {
+          console.warn('Could not load save:', err);
+        }
+      }
+
+      /* ========================================================================
+         11. UI REFRESH & MAIN GAME LOOP
+         ======================================================================== */
+      function refreshUI() {
+        const cps = getEffectiveCps();
+        const clickPower = getClickPower();
+        const prestigeMult = getPrestigeMultiplier();
+        const overclockRemaining = Math.max(0, (state.overclockUntil - Date.now()) / 1000);
+
+        // Top HUD & Arena Readout
+        const creditsStr = formatNum(state.credits);
+        els.hudCredits.textContent = creditsStr;
+        els.arenaCredits.textContent = creditsStr;
+        els.hudCps.textContent = `${formatNum(cps, cps < 100 && cps > 0 ? 1 : 0)}/s`;
+        els.hudClick.textContent = `+${formatNum(clickPower)}`;
+        els.hudGems.textContent = `${state.prestigeGems} (x${prestigeMult.toFixed(2)})`;
+        els.arenaSub.textContent = `${formatNum(cps, cps < 100 && cps > 0 ? 1 : 0)} credits / sec • +${formatNum(clickPower)} per tap`;
+
+        // Overclock Banner
+        if (overclockRemaining > 0) {
+          els.overclockBanner.classList.add('visible');
+          els.overclockTimer.textContent = `${overclockRemaining.toFixed(1)}s`;
+        } else {
+          els.overclockBanner.classList.remove('visible');
+        }
+
+        // Click-Power Multipliers
+        for (const m of CLICK_MULTIPLIERS) {
+          const node = multiplierNodes[m.id];
+          const isOwned = !!state.multipliers[m.id];
+          if (isOwned) {
+            node.btn.disabled = true;
+            node.btn.classList.add('owned-max');
+            node.badge.textContent = 'ACTIVE';
+            node.cost.textContent = 'OWNED';
+          } else {
+            node.btn.classList.remove('owned-max');
+            node.btn.disabled = state.credits < m.baseCost;
+            node.badge.textContent = `x${m.mult}`;
+            node.cost.textContent = `${formatNum(m.baseCost)} Credits`;
+          }
+        }
+
+        // Auto-Clickers / Buildings
+        for (const b of BUILDINGS) {
+          const node = buildingNodes[b.id];
+          const owned = state.buildings[b.id] || 0;
+          const quote = getBuildingBulkQuote(b, buyMode);
+          node.owned.textContent = owned;
+          node.btn.disabled = quote.affordable === false || state.credits < quote.cost;
+          node.cost.textContent = `${formatNum(quote.cost)} Credits${quote.qty > 1 ? ` (x${quote.qty})` : ''}`;
+        }
+
+        // Prestige Tab
+        const claimable = getClaimableGems();
+        els.prestigeClaimable.textContent = `+${claimable} Gem${claimable === 1 ? '' : 's'}`;
+        els.btnRebirth.disabled = claimable <= 0;
+
+        const nextGemThreshold = Math.pow(claimable + 1, 2) * PRESTIGE_MILESTONE;
+        const prevGemThreshold = claimable === 0 ? 0 : Math.pow(claimable, 2) * PRESTIGE_MILESTONE;
+        const pct = Math.min(
+          100,
+          Math.max(0, ((state.runCredits - prevGemThreshold) / (nextGemThreshold - prevGemThreshold)) * 100)
+        );
+        els.prestigeProgress.style.width = `${pct.toFixed(1)}%`;
+        els.prestigeMilestoneText.textContent =
+          claimable === 0
+            ? `Progress to first Gem: ${formatNum(state.runCredits)} / ${formatNum(PRESTIGE_MILESTONE)}`
+            : `Next Gem at ${formatNum(nextGemThreshold)} run credits`;
+
+        els.statPrestigeMult.textContent = `x${prestigeMult.toFixed(2)}`;
+        els.statRunCredits.textContent = formatNum(state.runCredits);
+        els.statTotalCredits.textContent = formatNum(state.totalCredits);
+        els.statTotalClicks.textContent = formatNum(state.totalClicks);
+        els.statGoldenCaught.textContent = formatNum(state.goldenCaught);
+        els.statRebirths.textContent = formatNum(state.rebirths);
+
+        // Sound button state
+        els.btnSound.classList.toggle('active', state.soundEnabled);
+        els.soundIcon.textContent = state.soundEnabled ? '🔊' : '🔇';
+      }
+
+      let uiRefreshAccumulator = 0;
+      function gameLoop(now) {
+        const dt = Math.min(Math.max(0, (now - lastTick) / 1000), 1.0);
+        lastTick = now;
+
+        const cps = getEffectiveCps();
+        if (cps > 0 && dt > 0) {
+          addCredits(cps * dt);
+        }
+
+        Particles.updateAndDraw();
+
+        uiRefreshAccumulator += dt;
+        if (uiRefreshAccumulator >= 0.08) {
+          uiRefreshAccumulator = 0;
+          refreshUI();
+        }
+
+        requestAnimationFrame(gameLoop);
+      }
+
+      /* ========================================================================
+         12. EVENT LISTENERS & BOOTSTRAP
+         ======================================================================== */
+      function bindEvents() {
+        // Primary core tap (pointerdown for zero-latency mobile & desktop tapping)
+        els.coreButton.addEventListener('pointerdown', (e) => {
+          if (e.pointerType === 'mouse' && e.button !== 0) return;
+          e.preventDefault();
+          handleCoreTap(e.clientX, e.clientY);
+        });
+
+        // Keyboard accessibility (Space) when no modal is open
+        window.addEventListener('keydown', (e) => {
+          if (e.repeat) return;
+          if (e.code === 'Space' && document.activeElement.tagName !== 'TEXTAREA' && !document.querySelector('.modal-backdrop.open')) {
+            e.preventDefault();
+            const rect = els.coreButton.getBoundingClientRect();
+            handleCoreTap(rect.left + rect.width / 2, rect.top + rect.height / 2);
+          }
+        });
+
+        // Shop Tabs
+        els.tabShop.addEventListener('click', () => {
+          els.tabShop.classList.add('active');
+          els.tabPrestige.classList.remove('active');
+          els.panelShop.style.display = 'flex';
+          els.panelPrestige.style.display = 'none';
+        });
+
+        els.tabPrestige.addEventListener('click', () => {
+          els.tabPrestige.classList.add('active');
+          els.tabShop.classList.remove('active');
+          els.panelPrestige.style.display = 'flex';
+          els.panelShop.style.display = 'none';
+        });
+
+        // Buy Quantity Toggles (x1, x10, MAX)
+        document.querySelectorAll('.buy-mode-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            buyMode = btn.dataset.buy;
+            document.querySelectorAll('.buy-mode-btn').forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            refreshUI();
+          });
+        });
+
+        // Sound Toggle
+        els.btnSound.addEventListener('click', () => {
+          state.soundEnabled = !state.soundEnabled;
+          if (state.soundEnabled) Sound.buy();
+          saveToStorage();
+          refreshUI();
+        });
+
+        // Rebirth Flow
+        els.btnRebirth.addEventListener('click', () => {
+          const claimable = getClaimableGems();
+          if (claimable <= 0) return;
+          els.rebirthConfirmText.innerHTML =
+            `You will reset your Credits, Miners, and Click Multipliers to gain <strong>+${claimable} Prestige Gem${claimable > 1 ? 's' : ''}</strong> ` +
+            `(new total bonus: <strong>x${((1 + (state.prestigeGems + claimable) * GEM_BONUS_PER_GEM)).toFixed(2)}</strong>).`;
+          els.rebirthModal.classList.add('open');
+        });
+
+        document.getElementById('btn-cancel-rebirth').addEventListener('click', () => {
+          els.rebirthModal.classList.remove('open');
+        });
+
+        document.getElementById('btn-confirm-rebirth').addEventListener('click', () => {
+          els.rebirthModal.classList.remove('open');
+          performRebirth();
+        });
+
+        // Save / Export / Import Modal
+        document.getElementById('btn-save-menu').addEventListener('click', () => {
+          els.saveTextarea.value = serializeState();
+          els.saveModal.classList.add('open');
+        });
+
+        document.getElementById('btn-close-save').addEventListener('click', () => {
+          els.saveModal.classList.remove('open');
+        });
+
+        document.getElementById('btn-export-save').addEventListener('click', async () => {
+          const code = serializeState();
+          els.saveTextarea.value = code;
+          els.saveTextarea.select();
+          try {
+            await navigator.clipboard.writeText(code);
+            showToast('Save code exported & copied to clipboard!');
+          } catch {
+            showToast('Save code generated — copy it from the box!');
+          }
+        });
+
+        document.getElementById('btn-import-save').addEventListener('click', () => {
+          const raw = els.saveTextarea.value;
+          if (!raw.trim()) {
+            showToast('Paste a save code first.');
+            return;
+          }
+          try {
+            state = deserializeState(raw);
+            saveToStorage();
+            refreshUI();
+            els.saveModal.classList.remove('open');
+            showToast('Save imported successfully!');
+          } catch {
+            showToast('Invalid save code!');
+          }
+        });
+
+        document.getElementById('btn-hard-reset').addEventListener('click', () => {
+          if (!els.saveTextarea.dataset.confirmReset) {
+            els.saveTextarea.dataset.confirmReset = '1';
+            showToast('Click Hard Reset again to wipe all progress!');
+            setTimeout(() => { delete els.saveTextarea.dataset.confirmReset; }, 4000);
+            return;
+          }
+          delete els.saveTextarea.dataset.confirmReset;
+          localStorage.removeItem(SAVE_KEY);
+          state = createDefaultState();
+          saveToStorage();
+          refreshUI();
+          els.saveModal.classList.remove('open');
+          showToast('All progress wiped.');
+        });
+
+        document.getElementById('btn-claim-offline').addEventListener('click', () => {
+          els.offlineModal.classList.remove('open');
+        });
+
+        // Persist on tab hide / close
+        window.addEventListener('beforeunload', saveToStorage);
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) saveToStorage();
+        });
+      }
+
+      // Initialize Game
+      loadFromStorage();
+      buildShopDOM();
+      bindEvents();
+      refreshUI();
+      Particles.resize();
+      scheduleNextGoldenEvent();
+      setInterval(saveToStorage, 5000);
+      requestAnimationFrame(gameLoop);
+    })();
+  </script>
+</body>
+</html>
