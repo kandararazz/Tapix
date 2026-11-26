@@ -437,36 +437,21 @@
       font-weight: 600;
     }
 
-    .arena-rebirth-btn {
-      position: absolute;
-      left: 18px;
-      bottom: 18px;
-      z-index: 20;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 42px;
-      padding: 9px 15px;
-      border-radius: 999px;
-      background: rgba(5, 36, 15, 0.88);
-      border: 1.5px solid rgba(251, 191, 36, 0.42);
+    .pill-btn.ranks-pill-btn {
+      border-color: rgba(74, 222, 128, 0.4);
+      color: #dcfce7;
+    }
+
+    .pill-btn.rebirth-pill-btn {
+      border-color: rgba(251, 191, 36, 0.42);
       color: #fef08a;
-      font-size: 0.8rem;
-      font-weight: 800;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
-      transition: transform 0.12s ease, box-shadow 0.15s ease, filter 0.15s ease;
     }
 
-    .arena-rebirth-btn:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.08);
-    }
-
-    .arena-rebirth-btn.ready {
+    .pill-btn.rebirth-pill-btn.ready {
       background: linear-gradient(135deg, #22c55e, #facc15);
       border-color: #fef08a;
       color: #03200c;
-      box-shadow: 0 0 24px rgba(250, 204, 21, 0.55);
+      box-shadow: 0 0 18px rgba(250, 204, 21, 0.45);
     }
 
     /* Floating '+X' text numbers */
@@ -555,45 +540,22 @@
       overflow: hidden;
     }
 
-    .shop-tabs {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      padding: 12px 14px;
+    .shop-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 16px;
       border-bottom: 1px solid var(--border-subtle);
       flex-shrink: 0;
     }
 
-    .tab-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-height: 42px;
-      padding: 8px 8px;
-      border-radius: var(--radius-sm);
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      background: rgba(4, 23, 10, 0.68);
-      border: 1px solid transparent;
-      transition: all 0.15s ease;
-    }
-
-    .tab-btn.active {
-      background: var(--bg-card-hover);
+    .shop-header-title {
+      font-size: 0.86rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
       color: #ffffff;
-      border-color: var(--border-accent);
-    }
-
-    .tab-btn.prestige-tab.active {
-      color: #fde68a;
-      border-color: rgba(251, 191, 36, 0.6);
-    }
-
-    .tab-btn.leaderboard-tab.active {
-      color: #86efac;
-      border-color: rgba(74, 222, 128, 0.6);
     }
 
     .tab-badge {
@@ -1047,24 +1009,6 @@
       border: 1px solid var(--border-subtle);
     }
 
-    .lb-setup-box {
-      padding: 13px;
-      border-radius: var(--radius-md);
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .lb-setup-box.hidden { display: none; }
-
-    .lb-setup-note {
-      font-size: 0.74rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
     .stats-box {
       padding: 14px;
       border-radius: var(--radius-md);
@@ -1118,6 +1062,44 @@
 
     .modal-card h2 { font-size: 1.12rem; color: var(--green-bright); }
     .modal-card p { font-size: 0.86rem; color: var(--text-muted); line-height: 1.5; }
+
+    .page-modal-card {
+      max-width: 520px;
+      max-height: 88dvh;
+      overflow-y: auto;
+    }
+
+    .page-modal-card::-webkit-scrollbar { width: 6px; }
+    .page-modal-card::-webkit-scrollbar-thumb {
+      background: rgba(74, 222, 128, 0.28);
+      border-radius: 999px;
+    }
+
+    .page-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .page-close-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      display: inline-grid;
+      place-items: center;
+      font-size: 1rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .page-close-btn:hover {
+      color: #ffffff;
+      border-color: var(--border-accent);
+    }
 
     .guide-steps { display: flex; flex-direction: column; gap: 9px; }
 
@@ -1235,10 +1217,6 @@
 
       .main-grid { grid-template-columns: 1fr; overflow: visible; }
       .click-arena { min-height: 330px; padding: 18px 14px; }
-      .arena-rebirth-btn {
-        position: static;
-        margin-top: 12px;
-      }
       .core-wrapper { width: 190px; height: 190px; }
       .core-button { width: 164px; height: 164px; }
 
@@ -1257,8 +1235,8 @@
     }
 
     @media (max-width: 480px) {
-      .pill-btn .btn-label { display: none; }
-      .pill-btn { padding: 7px 11px; }
+      #btn-help .btn-label { display: none; }
+      .pill-btn { padding: 7px 10px; font-size: 0.74rem; }
       .click-arena { min-height: 300px; padding: 14px 12px; }
       .arena-readout { margin-bottom: 16px; }
       .core-wrapper { width: 170px; height: 170px; }
@@ -1312,6 +1290,25 @@
           </svg>
           <span class="pill-name-tag" id="header-player-name">Raza</span>
         </button>
+        <button class="pill-btn ranks-pill-btn" id="btn-open-ranks" type="button" title="Most Coins Leaderboard" aria-label="Ranks">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+            <path d="M4 22h16"></path>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+          </svg>
+          <span class="btn-label">Ranks</span>
+        </button>
+        <button class="pill-btn rebirth-pill-btn" id="btn-open-rebirth" type="button" title="Quantum Rebirth" aria-label="Rebirth">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+          </svg>
+          <span class="btn-label">Rebirth</span>
+          <span class="tab-badge prestige-ready hidden" id="prestige-ready-badge">READY</span>
+        </button>
         <button class="pill-btn" id="btn-help" type="button" title="How to Play" aria-label="How to Play">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="10"></circle>
@@ -1357,26 +1354,13 @@
         <div class="arena-footer">
           <p class="arena-hint">Tap the face (or press Space) to earn Coins • Catch Golden Stars for bonus surges</p>
         </div>
-
-        <button class="arena-rebirth-btn" id="arena-rebirth-btn" type="button">
-          <span>Rebirth: 0 / 100K</span>
-        </button>
       </section>
 
-      <!-- RIGHT: UPGRADE SHOP, RANKS & REBIRTH -->
+      <!-- RIGHT: UPGRADE SHOP -->
       <aside class="shop-sidebar">
-        <div class="shop-tabs">
-          <button class="tab-btn active" id="tab-shop" type="button">
-            <span>Upgrades</span>
-            <span class="tab-badge hidden" id="shop-buyable-badge">0</span>
-          </button>
-          <button class="tab-btn leaderboard-tab" id="tab-leaderboard" type="button">
-            <span>Ranks</span>
-          </button>
-          <button class="tab-btn prestige-tab" id="tab-prestige" type="button">
-            <span>Rebirth</span>
-            <span class="tab-badge prestige-ready hidden" id="prestige-ready-badge">READY</span>
-          </button>
+        <div class="shop-header">
+          <span class="shop-header-title">Upgrades Shop</span>
+          <span class="tab-badge hidden" id="shop-buyable-badge">0</span>
         </div>
 
         <div class="shop-scroll" id="panel-shop">
@@ -1408,106 +1392,108 @@
             <div class="upgrade-list" id="building-list"></div>
           </div>
         </div>
-
-        <!-- Prestige / Rebirth Tab -->
-        <div class="shop-scroll" id="panel-prestige" style="display: none;">
-          <div class="prestige-panel">
-            <div class="prestige-hero">
-              <h3>Quantum Rebirth</h3>
-              <p>
-                Every Rebirth permanently gives <strong>+50% More Coins per Click</strong>,
-                <strong>+50% Faster Coins/Sec</strong>, plus permanent <strong>Prestige Gems (+25% each)</strong>!
-              </p>
-              <div class="prestige-gems-big" id="prestige-claimable">+0 Gems</div>
-              <p id="prestige-milestone-text">Reach 100,000 run coins to unlock Rebirth</p>
-              <div class="progress-track">
-                <div class="progress-fill" id="prestige-progress"></div>
-              </div>
-            </div>
-
-            <button class="prestige-btn" id="btn-rebirth" type="button" disabled>
-              Rebirth &amp; Claim Boost
-            </button>
-
-            <div class="stats-box">
-              <div class="stats-row">
-                <span>Click Power Boost</span>
-                <strong id="stat-prestige-mult">x1.00</strong>
-              </div>
-              <div class="stats-row">
-                <span>Auto-Miner Speed Boost</span>
-                <strong id="stat-cps-mult">x1.00</strong>
-              </div>
-              <div class="stats-row">
-                <span>Run Coins</span>
-                <strong id="stat-run-credits">0</strong>
-              </div>
-              <div class="stats-row">
-                <span>Lifetime Coins</span>
-                <strong id="stat-total-credits">0</strong>
-              </div>
-              <div class="stats-row">
-                <span>Manual Taps</span>
-                <strong id="stat-total-clicks">0</strong>
-              </div>
-              <div class="stats-row">
-                <span>Golden Stars Caught</span>
-                <strong id="stat-golden-caught">0</strong>
-              </div>
-              <div class="stats-row">
-                <span>Total Rebirths</span>
-                <strong id="stat-rebirths">0</strong>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Supabase Global Leaderboard Tab -->
-        <div class="shop-scroll" id="panel-leaderboard" style="display: none;">
-          <div class="prestige-panel">
-            <div class="leaderboard-hero">
-              <span class="coming-soon-pill" id="lb-status-pill">Supabase Live Ranks</span>
-              <h3>Most Coins Leaderboard</h3>
-              <p>See who has mined the most Coins in Tapix, synced via Supabase.</p>
-            </div>
-
-            <div class="lb-name-card">
-              <label class="lb-name-label" for="lb-player-name">Your Leaderboard Name</label>
-              <div class="lb-toolbar">
-                <input class="lb-input" id="lb-player-name" type="text" maxlength="24" autocomplete="nickname" placeholder="Enter your name (e.g. Raza)" />
-                <button class="lb-btn" id="btn-lb-sync" type="button">Save &amp; Sync</button>
-                <button class="lb-btn secondary" id="btn-lb-config" type="button">DB</button>
-              </div>
-            </div>
-
-            <div class="lb-setup-box hidden" id="lb-setup-box">
-              <p class="lb-setup-note">
-                Connect your Supabase project (table <code>tapix_leaderboard</code>) to load &amp; post global rankings:
-              </p>
-              <input class="lb-input" id="lb-sb-url" type="url" placeholder="Supabase URL (https://xxx.supabase.co)" />
-              <input class="lb-input" id="lb-sb-key" type="password" placeholder="Supabase Anon Key" />
-              <button class="lb-btn" id="btn-lb-save-cfg" type="button">Connect Supabase</button>
-            </div>
-
-            <div class="leaderboard-preview" id="lb-list"></div>
-
-            <div class="stats-box">
-              <div class="stats-row">
-                <span>Your Lifetime Coins</span>
-                <strong id="lb-your-coins">0</strong>
-              </div>
-              <div class="stats-row">
-                <span>Your Rebirths</span>
-                <strong id="lb-your-rebirths">0</strong>
-              </div>
-            </div>
-          </div>
-        </div>
       </aside>
     </main>
   </div>
 
-  <!-- ==================== MODALS ==================== -->
+  <!-- ==================== MODALS & OVERLAY PAGES ==================== -->
+  <!-- Ranks / Leaderboard Page Modal -->
+  <div class="modal-backdrop" id="ranks-page-modal">
+    <div class="modal-card page-modal-card">
+      <div class="page-modal-header">
+        <h2>Most Coins Leaderboard</h2>
+        <button class="page-close-btn" id="btn-close-ranks-page" type="button" aria-label="Close Ranks">✕</button>
+      </div>
+      <div class="prestige-panel">
+        <div class="leaderboard-hero">
+          <span class="coming-soon-pill" id="lb-status-pill">Most Coins</span>
+          <h3>Top Tapix Miners</h3>
+          <p>See who has mined the most Coins in Tapix.</p>
+        </div>
+
+        <div class="lb-name-card">
+          <label class="lb-name-label" for="lb-player-name">Your Leaderboard Name</label>
+          <div class="lb-toolbar">
+            <input class="lb-input" id="lb-player-name" type="text" maxlength="24" autocomplete="nickname" placeholder="Enter your name (e.g. Raza)" />
+            <button class="lb-btn" id="btn-lb-sync" type="button">Save Name</button>
+          </div>
+        </div>
+
+        <div class="leaderboard-preview" id="lb-list"></div>
+
+        <div class="stats-box">
+          <div class="stats-row">
+            <span>Your Lifetime Coins</span>
+            <strong id="lb-your-coins">0</strong>
+          </div>
+          <div class="stats-row">
+            <span>Your Rebirths</span>
+            <strong id="lb-your-rebirths">0</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rebirth Page Modal -->
+  <div class="modal-backdrop" id="rebirth-page-modal">
+    <div class="modal-card page-modal-card">
+      <div class="page-modal-header">
+        <h2>Quantum Rebirth</h2>
+        <button class="page-close-btn" id="btn-close-rebirth-page" type="button" aria-label="Close Rebirth">✕</button>
+      </div>
+      <div class="prestige-panel">
+        <div class="prestige-hero">
+          <h3>Reset &amp; Grow Stronger</h3>
+          <p>
+            Every Rebirth permanently gives <strong>+50% More Coins per Click</strong>,
+            <strong>+50% Faster Coins/Sec</strong>, plus permanent <strong>Prestige Gems (+25% each)</strong>!
+          </p>
+          <div class="prestige-gems-big" id="prestige-claimable">+0 Gems</div>
+          <p id="prestige-milestone-text">Reach 100,000 run coins to unlock Rebirth</p>
+          <div class="progress-track">
+            <div class="progress-fill" id="prestige-progress"></div>
+          </div>
+        </div>
+
+        <button class="prestige-btn" id="btn-rebirth" type="button" disabled>
+          Rebirth &amp; Claim Boost
+        </button>
+
+        <div class="stats-box">
+          <div class="stats-row">
+            <span>Click Power Boost</span>
+            <strong id="stat-prestige-mult">x1.00</strong>
+          </div>
+          <div class="stats-row">
+            <span>Auto-Miner Speed Boost</span>
+            <strong id="stat-cps-mult">x1.00</strong>
+          </div>
+          <div class="stats-row">
+            <span>Run Coins</span>
+            <strong id="stat-run-credits">0</strong>
+          </div>
+          <div class="stats-row">
+            <span>Lifetime Coins</span>
+            <strong id="stat-total-credits">0</strong>
+          </div>
+          <div class="stats-row">
+            <span>Manual Taps</span>
+            <strong id="stat-total-clicks">0</strong>
+          </div>
+          <div class="stats-row">
+            <span>Golden Stars Caught</span>
+            <strong id="stat-golden-caught">0</strong>
+          </div>
+          <div class="stats-row">
+            <span>Total Rebirths</span>
+            <strong id="stat-rebirths">0</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Player Name Modal -->
   <div class="modal-backdrop" id="name-modal">
     <div class="modal-card">
@@ -1893,9 +1879,7 @@
             }
           }
           const pill = document.getElementById('lb-status-pill');
-          const setupBox = document.getElementById('lb-setup-box');
-          if (pill) pill.textContent = client ? 'Supabase Connected' : 'Connect Supabase';
-          if (setupBox) setupBox.classList.toggle('hidden', !!client);
+          if (pill) pill.textContent = client ? 'Live Top 25' : 'Most Coins';
         }
 
         function render() {
@@ -2055,14 +2039,12 @@
         overclockTimer: document.getElementById('overclock-timer'),
         multiplierList: document.getElementById('multiplier-list'),
         buildingList: document.getElementById('building-list'),
-        tabShop: document.getElementById('tab-shop'),
-        tabPrestige: document.getElementById('tab-prestige'),
-        tabLeaderboard: document.getElementById('tab-leaderboard'),
         shopBuyableBadge: document.getElementById('shop-buyable-badge'),
         prestigeReadyBadge: document.getElementById('prestige-ready-badge'),
-        panelShop: document.getElementById('panel-shop'),
-        panelPrestige: document.getElementById('panel-prestige'),
-        panelLeaderboard: document.getElementById('panel-leaderboard'),
+        btnOpenRebirth: document.getElementById('btn-open-rebirth'),
+        btnOpenRanks: document.getElementById('btn-open-ranks'),
+        ranksPageModal: document.getElementById('ranks-page-modal'),
+        rebirthPageModal: document.getElementById('rebirth-page-modal'),
         prestigeClaimable: document.getElementById('prestige-claimable'),
         prestigeMilestoneText: document.getElementById('prestige-milestone-text'),
         prestigeProgress: document.getElementById('prestige-progress'),
@@ -2076,7 +2058,6 @@
         statRebirths: document.getElementById('stat-rebirths'),
         lbYourCoins: document.getElementById('lb-your-coins'),
         lbYourRebirths: document.getElementById('lb-your-rebirths'),
-        arenaRebirthBtn: document.getElementById('arena-rebirth-btn'),
         helpModal: document.getElementById('help-modal'),
         offlineModal: document.getElementById('offline-modal'),
         rebirthModal: document.getElementById('rebirth-modal'),
@@ -2356,12 +2337,9 @@
 
         const claimable = getClaimableGems();
         els.prestigeReadyBadge.classList.toggle('hidden', claimable <= 0);
+        els.btnOpenRebirth.classList.toggle('ready', claimable > 0);
         els.prestigeClaimable.textContent = `+${claimable} Gem${claimable === 1 ? '' : 's'}`;
         els.btnRebirth.disabled = claimable <= 0;
-        els.arenaRebirthBtn.classList.toggle('ready', claimable > 0);
-        els.arenaRebirthBtn.textContent = claimable > 0
-          ? `Rebirth Ready (+${claimable} Gem${claimable === 1 ? '' : 's'})`
-          : `Rebirth: ${formatNum(state.runCredits)} / ${formatNum(PRESTIGE_MILESTONE)}`;
 
         const nextThreshold = Math.pow(claimable + 1, 2) * PRESTIGE_MILESTONE;
         const prevThreshold = claimable === 0 ? 0 : Math.pow(claimable, 2) * PRESTIGE_MILESTONE;
@@ -2428,20 +2406,19 @@
           }
         });
 
-        function switchTab(activeName) {
-          els.tabShop.classList.toggle('active', activeName === 'shop');
-          els.tabPrestige.classList.toggle('active', activeName === 'prestige');
-          els.tabLeaderboard.classList.toggle('active', activeName === 'leaderboard');
-          els.panelShop.style.display = activeName === 'shop' ? 'flex' : 'none';
-          els.panelPrestige.style.display = activeName === 'prestige' ? 'flex' : 'none';
-          els.panelLeaderboard.style.display = activeName === 'leaderboard' ? 'flex' : 'none';
-        }
-
-        els.tabShop.addEventListener('click', () => switchTab('shop'));
-        els.tabPrestige.addEventListener('click', () => switchTab('prestige'));
-        els.tabLeaderboard.addEventListener('click', () => {
-          switchTab('leaderboard');
+        els.btnOpenRanks.addEventListener('click', () => {
+          els.ranksPageModal.classList.add('open');
           Leaderboard.sync(false);
+        });
+        document.getElementById('btn-close-ranks-page').addEventListener('click', () => {
+          els.ranksPageModal.classList.remove('open');
+        });
+
+        els.btnOpenRebirth.addEventListener('click', () => {
+          els.rebirthPageModal.classList.add('open');
+        });
+        document.getElementById('btn-close-rebirth-page').addEventListener('click', () => {
+          els.rebirthPageModal.classList.remove('open');
         });
 
         document.querySelectorAll('[data-tap-buy]').forEach((btn) => {
@@ -2517,36 +2494,9 @@
           }
         });
 
-        // Leaderboard Supabase controls
-        document.getElementById('btn-lb-config').addEventListener('click', () => {
-          const box = document.getElementById('lb-setup-box');
-          const cfg = Leaderboard.getConfig();
-          document.getElementById('lb-sb-url').value = cfg.url || '';
-          document.getElementById('lb-sb-key').value = cfg.anonKey || '';
-          box.classList.toggle('hidden');
-        });
-
-        document.getElementById('btn-lb-save-cfg').addEventListener('click', () => {
-          const url = document.getElementById('lb-sb-url').value.trim();
-          const anonKey = document.getElementById('lb-sb-key').value.trim();
-          const playerName = applyPlayerName(lbPlayerNameInput.value, false);
-          Leaderboard.saveConfig({ url, anonKey, playerName });
-          if (Leaderboard.isConnected()) {
-            Leaderboard.sync(true);
-          } else {
-            showToast('Enter both Supabase URL and Anon Key');
-          }
-        });
-
+        // Save Leaderboard Player Name
         document.getElementById('btn-lb-sync').addEventListener('click', () => {
-          applyPlayerName(lbPlayerNameInput.value, false);
-          if (Leaderboard.isConnected()) {
-            Leaderboard.sync(true);
-          } else {
-            document.getElementById('lb-setup-box').classList.remove('hidden');
-            Leaderboard.render();
-            showToast('Name saved! Add your Supabase URL & Key below to sync');
-          }
+          applyPlayerName(lbPlayerNameInput.value, true);
         });
 
         // Guide Modal
@@ -2572,12 +2522,11 @@
           return true;
         }
 
-        // Rebirth Flow (both left-side arena button & Rebirth tab button)
-        els.arenaRebirthBtn.addEventListener('click', () => {
-          if (!openRebirthModal()) switchTab('prestige');
+        // Rebirth Flow
+        els.btnRebirth.addEventListener('click', () => {
+          els.rebirthPageModal.classList.remove('open');
+          openRebirthModal();
         });
-
-        els.btnRebirth.addEventListener('click', openRebirthModal);
 
         document.getElementById('btn-cancel-rebirth').addEventListener('click', () => els.rebirthModal.classList.remove('open'));
         document.getElementById('btn-confirm-rebirth').addEventListener('click', () => {
