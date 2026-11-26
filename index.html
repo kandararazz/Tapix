@@ -2937,6 +2937,7 @@
           fxBighead: false,
           fxDisco: false,
           cheatUsed: false,
+          redeemedCheats: {},
           lastSaved: Date.now()
         };
       }
@@ -3298,6 +3299,7 @@
         merged.fxBighead = !!parsed.fxBighead;
         merged.fxDisco = !!parsed.fxDisco;
         merged.cheatUsed = !!parsed.cheatUsed;
+        merged.redeemedCheats = parsed.redeemedCheats && typeof parsed.redeemedCheats === 'object' ? { ...parsed.redeemedCheats } : {};
       }
 
       function loadLocal() {
@@ -4162,6 +4164,22 @@
           applyCheatEffectsVisuals();
           SoundFX.reward();
           response = state.fxDisco ? 'DISCO ARENA LIGHTS: ON!' : 'DISCO ARENA LIGHTS: OFF.';
+        } else if (cmd === 'RAZA11') {
+          if (state.redeemedCheats && state.redeemedCheats.raza11) {
+            SoundFX.fail();
+            showToast('Code "raza11" has already been redeemed!');
+            response = 'CODE ALREADY REDEEMED (1-TIME USE ONLY).';
+          } else {
+            state.redeemedCheats = { ...(state.redeemedCheats || {}), raza11: true };
+            state.cheatUsed = true;
+            addCredits(5e17);
+            const rect = els.coreButton ? els.coreButton.getBoundingClientRect() : { left: 240, top: 240, width: 120, height: 120 };
+            Particles.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 48, '#fde047', true);
+            SoundFX.reward();
+            refreshUI();
+            showToast(`CHEAT REDEEMED! +${formatNum(5e17)} Coins!`);
+            response = `GRANTED +${formatNum(5e17)} COINS! (1-TIME USE LOCKED)`;
+          }
         } else if (cmd === 'RESET') {
           state.fxBighead = false;
           state.fxDisco = false;
