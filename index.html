@@ -969,10 +969,47 @@
       color: var(--gold);
     }
 
+    .lb-name-card {
+      padding: 11px 12px;
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .lb-name-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--green-bright);
+    }
+
     .lb-toolbar {
       display: flex;
       gap: 8px;
       align-items: center;
+    }
+
+    .pill-name-tag {
+      max-width: 96px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .name-modal-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .name-modal-field .lb-input {
+      width: 100%;
     }
 
     .lb-input {
@@ -1268,6 +1305,13 @@
       </div>
 
       <div class="header-actions">
+        <button class="pill-btn" id="btn-player-name" type="button" title="Set Leaderboard Name" aria-label="Set Leaderboard Name">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span class="pill-name-tag" id="header-player-name">Raza</span>
+        </button>
         <button class="pill-btn" id="btn-help" type="button" title="How to Play" aria-label="How to Play">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="10"></circle>
@@ -1427,10 +1471,13 @@
               <p>See who has mined the most Coins in Tapix, synced via Supabase.</p>
             </div>
 
-            <div class="lb-toolbar">
-              <input class="lb-input" id="lb-player-name" type="text" maxlength="24" placeholder="Your name (e.g. Raza)" />
-              <button class="lb-btn" id="btn-lb-sync" type="button">Sync</button>
-              <button class="lb-btn secondary" id="btn-lb-config" type="button">DB</button>
+            <div class="lb-name-card">
+              <label class="lb-name-label" for="lb-player-name">Your Leaderboard Name</label>
+              <div class="lb-toolbar">
+                <input class="lb-input" id="lb-player-name" type="text" maxlength="24" autocomplete="nickname" placeholder="Enter your name (e.g. Raza)" />
+                <button class="lb-btn" id="btn-lb-sync" type="button">Save &amp; Sync</button>
+                <button class="lb-btn secondary" id="btn-lb-config" type="button">DB</button>
+              </div>
             </div>
 
             <div class="lb-setup-box hidden" id="lb-setup-box">
@@ -1461,6 +1508,22 @@
   </div>
 
   <!-- ==================== MODALS ==================== -->
+  <!-- Player Name Modal -->
+  <div class="modal-backdrop" id="name-modal">
+    <div class="modal-card">
+      <h2>Leaderboard Name</h2>
+      <p>Choose the username displayed next to your score on the Most Coins Leaderboard.</p>
+      <div class="name-modal-field">
+        <label class="lb-name-label" for="modal-player-name">Your Username</label>
+        <input class="lb-input" id="modal-player-name" type="text" maxlength="24" autocomplete="nickname" placeholder="Enter your name (e.g. Raza)" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="btn-cancel-name" type="button">Cancel</button>
+        <button class="btn-primary" id="btn-save-name" type="button">Save Name</button>
+      </div>
+    </div>
+  </div>
+
   <!-- How to Play Modal -->
   <div class="modal-backdrop" id="help-modal">
     <div class="modal-card">
@@ -2399,6 +2462,61 @@
           });
         });
 
+        function applyPlayerName(rawName, shouldSync = true) {
+          const playerName = String(rawName || '').trim().slice(0, 24) || 'Raza';
+          Leaderboard.saveConfig({ playerName });
+          document.getElementById('header-player-name').textContent = playerName;
+          document.getElementById('lb-player-name').value = playerName;
+          document.getElementById('modal-player-name').value = playerName;
+          Leaderboard.render();
+          if (shouldSync) {
+            if (Leaderboard.isConnected()) {
+              Leaderboard.sync(true);
+            } else {
+              showToast('Leaderboard name set to ' + playerName);
+            }
+          }
+          return playerName;
+        }
+
+        // Player Name Modal controls
+        const nameModal = document.getElementById('name-modal');
+        const modalPlayerNameInput = document.getElementById('modal-player-name');
+        const lbPlayerNameInput = document.getElementById('lb-player-name');
+
+        document.getElementById('btn-player-name').addEventListener('click', () => {
+          modalPlayerNameInput.value = Leaderboard.getConfig().playerName || 'Raza';
+          nameModal.classList.add('open');
+          setTimeout(() => {
+            modalPlayerNameInput.focus();
+            modalPlayerNameInput.select();
+          }, 30);
+        });
+
+        document.getElementById('btn-cancel-name').addEventListener('click', () => {
+          nameModal.classList.remove('open');
+        });
+
+        function saveNameFromModal() {
+          applyPlayerName(modalPlayerNameInput.value, true);
+          nameModal.classList.remove('open');
+        }
+
+        document.getElementById('btn-save-name').addEventListener('click', saveNameFromModal);
+        modalPlayerNameInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            saveNameFromModal();
+          }
+        });
+
+        lbPlayerNameInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            applyPlayerName(lbPlayerNameInput.value, true);
+          }
+        });
+
         // Leaderboard Supabase controls
         document.getElementById('btn-lb-config').addEventListener('click', () => {
           const box = document.getElementById('lb-setup-box');
@@ -2411,7 +2529,7 @@
         document.getElementById('btn-lb-save-cfg').addEventListener('click', () => {
           const url = document.getElementById('lb-sb-url').value.trim();
           const anonKey = document.getElementById('lb-sb-key').value.trim();
-          const playerName = document.getElementById('lb-player-name').value.trim() || 'Raza';
+          const playerName = applyPlayerName(lbPlayerNameInput.value, false);
           Leaderboard.saveConfig({ url, anonKey, playerName });
           if (Leaderboard.isConnected()) {
             Leaderboard.sync(true);
@@ -2421,14 +2539,13 @@
         });
 
         document.getElementById('btn-lb-sync').addEventListener('click', () => {
-          const playerName = document.getElementById('lb-player-name').value.trim() || 'Raza';
-          Leaderboard.saveConfig({ playerName });
+          applyPlayerName(lbPlayerNameInput.value, false);
           if (Leaderboard.isConnected()) {
             Leaderboard.sync(true);
           } else {
             document.getElementById('lb-setup-box').classList.remove('hidden');
             Leaderboard.render();
-            showToast('Add your Supabase URL & Key below to sync');
+            showToast('Name saved! Add your Supabase URL & Key below to sync');
           }
         });
 
@@ -2478,7 +2595,10 @@
 
       loadLocal();
       Leaderboard.loadConfig();
-      document.getElementById('lb-player-name').value = Leaderboard.getConfig().playerName || 'Raza';
+      const initialPlayerName = Leaderboard.getConfig().playerName || 'Raza';
+      document.getElementById('lb-player-name').value = initialPlayerName;
+      document.getElementById('header-player-name').textContent = initialPlayerName;
+      document.getElementById('modal-player-name').value = initialPlayerName;
       buildShopDOM();
       bindEvents();
       refreshUI();
