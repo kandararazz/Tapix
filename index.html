@@ -1874,7 +1874,7 @@
     }
 
     /* ==========================================================================
-       6B. DAY/NIGHT, SNAKE ARCADE, VICTORY CREDITS, TERMINAL & SHAKE
+       6B. SNAKE ARCADE, VICTORY CREDITS, TERMINAL & SHAKE
        ========================================================================== */
     .brand-title-row {
       display: inline-flex;
@@ -1896,62 +1896,6 @@
     @keyframes crownBob {
       0%, 100% { transform: translateY(0) rotate(-4deg); }
       50% { transform: translateY(-2px) rotate(4deg); }
-    }
-
-    .day-night-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 11px;
-      border-radius: 999px;
-      background: rgba(251, 191, 36, 0.18);
-      border: 1px solid rgba(253, 224, 71, 0.55);
-      color: #fef08a;
-      font-size: 0.72rem;
-      font-weight: 800;
-      backdrop-filter: blur(8px);
-      transition: background 0.6s ease, border-color 0.6s ease, color 0.6s ease;
-    }
-
-    .day-night-pill.is-night {
-      background: rgba(49, 46, 129, 0.78);
-      border-color: rgba(165, 180, 252, 0.7);
-      color: #e0e7ff;
-    }
-
-    .click-arena {
-      transition: filter 0.6s ease, box-shadow 0.6s ease;
-    }
-
-    .click-arena.is-day {
-      box-shadow: inset 0 0 70px rgba(253, 224, 71, 0.16);
-    }
-
-    .click-arena.is-night {
-      background:
-        radial-gradient(circle at 50% 24%, rgba(99, 102, 241, 0.34) 0%, rgba(15, 23, 42, 0.88) 76%),
-        repeating-conic-gradient(
-          from 0deg at 50% 54%,
-          #0f172a 0deg 15deg,
-          #1e1b4b 15deg 30deg
-        );
-      box-shadow: inset 0 0 90px rgba(129, 140, 248, 0.32);
-    }
-
-    .moonlight-target {
-      position: absolute;
-      width: 58px;
-      height: 58px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 32% 32%, #f8fafc, #93c5fd 52%, #4338ca);
-      border: 2px solid #e0e7ff;
-      color: #1e1b4b;
-      display: grid;
-      place-items: center;
-      box-shadow: 0 0 28px rgba(147, 197, 253, 0.95);
-      z-index: 26;
-      animation: goldenPulse 0.75s ease-in-out infinite alternate;
-      font-size: 1.4rem;
     }
 
     .click-arena.fx-disco {
@@ -2327,7 +2271,6 @@
 
         <div class="arena-top-strip">
           <div class="arena-top-left">
-            <div class="day-night-pill" id="day-night-pill">☀ Day</div>
             <button class="mystery-arena-btn ready" id="btn-mystery-chest" type="button">
               <span id="mystery-chest-label">Free Chest Ready!</span>
             </button>
@@ -2700,9 +2643,9 @@
         <h3>Final Treasury</h3>
         <p id="credits-stats-text">Lifetime Coins Earned</p>
         <h3>Starring</h3>
-        <p>Golden Stars • Moonlight Stars • Endless Tapix Clicks</p>
+        <p>Golden Stars • Auto-Miners • Endless Tapix Clicks</p>
         <h3>Special Thanks</h3>
-        <p>The Moonlight Stars, Golden Stars, and You — for clicking to infinity!</p>
+        <p>The Golden Stars and You — for clicking to infinity!</p>
       </div>
     </div>
     <button class="btn-primary" id="btn-close-credits" type="button" style="z-index:2; min-width:220px;">Keep Playing Forever 👑</button>
@@ -2750,8 +2693,6 @@
       const GLITCH_DURATION_MS = 10_000;
       const AUTO_BUYER_COST = 50_000;
       const JUMPSCARE_INTERVAL_MS = 300_000;
-      const DAY_NIGHT_PHASE_MS = 120_000;
-      const MOONLIGHT_DURATION_MS = 7_000;
       const UNIVERSE_COST = 1e21;
       const MEGA_CRIT_MULT = 50;
 
@@ -2931,7 +2872,6 @@
           glitchUntil: 0,
           nextGlitchAt: Date.now() + 120_000,
           screenShakeHitstop: true,
-          dayNightOrigin: Date.now(),
           snakeHighScore: 0,
           beatGame: false,
           fxBighead: false,
@@ -2950,9 +2890,6 @@
       let activeGoldenEl = null;
       let goldenTimeoutId = null;
       let nextGoldenSpawnId = null;
-      let activeMoonlightEl = null;
-      let moonlightTimeoutId = null;
-      let nextMoonlightAt = Date.now() + 8_000;
       let lastCorePointerTapAt = 0;
 
       /* ========================================================================
@@ -3116,15 +3053,6 @@
         return 1.0;
       };
 
-      function getDayNightInfo(now = Date.now()) {
-        const origin = state.dayNightOrigin || now;
-        const cycleLen = DAY_NIGHT_PHASE_MS * 2;
-        const elapsed = ((now - origin) % cycleLen + cycleLen) % cycleLen;
-        const isNight = elapsed >= DAY_NIGHT_PHASE_MS;
-        const remainingSec = Math.max(0, Math.ceil((isNight ? cycleLen - elapsed : DAY_NIGHT_PHASE_MS - elapsed) / 1000));
-        return { isNight, remainingSec };
-      }
-
       const getCostDiscount = () => Math.max(0.7, 1 - getSkillLv('idle_discount') * 0.06);
       const getPrestigeMultiplier = () => 1 + state.rebirths * 0.5 + state.prestigeGems * GEM_BONUS_PER_GEM;
       const getOverclockMultiplier = () => (Date.now() < state.overclockUntil ? (state.frenzyMult || 2) : 1);
@@ -3136,21 +3064,15 @@
         getAchievementMultiplier();
 
       function getBaseCps() {
-        const now = Date.now();
         const skillMult = 1 + getSkillLv('idle_cps') * 0.25;
-        const { isNight } = getDayNightInfo(now);
-        const nightCpsMult = isNight ? 2.0 : 1.0;
         const minerCps = BUILDINGS.reduce((sum, b) => sum + (state.buildings[b.id] || 0) * (b.cps || 0), 0) * getMinerOverclockMultiplier();
         const tapCps = TAP_UPGRADES.reduce((sum, t) => sum + (state.tapUpgrades[t.id] || 0) * (t.cps || 0), 0);
-        return (minerCps + tapCps) * skillMult * nightCpsMult;
+        return (minerCps + tapCps) * skillMult;
       }
 
       const getEffectiveCps = () => getBaseCps() * getGlobalMultiplier();
 
       function getClickPower() {
-        const now = Date.now();
-        const { isNight } = getDayNightInfo(now);
-        const dayClickMult = isNight ? 1.0 : 1.25;
         let baseTap = 1;
         for (const t of TAP_UPGRADES) {
           baseTap += (state.tapUpgrades[t.id] || 0) * (t.bonus || 0);
@@ -3158,7 +3080,7 @@
         for (const b of BUILDINGS) {
           baseTap += (state.buildings[b.id] || 0) * (b.bonus || 0);
         }
-        return baseTap * getGlobalMultiplier() * dayClickMult;
+        return baseTap * getGlobalMultiplier();
       }
 
       const getScaledCost = (baseCost, rate, owned) =>
@@ -3293,7 +3215,6 @@
         merged.unlockedSkins = Array.isArray(parsed.unlockedSkins) ? parsed.unlockedSkins : ['tapix'];
         merged.unlockedThemes = Array.isArray(parsed.unlockedThemes) ? parsed.unlockedThemes : ['emerald'];
         merged.screenShakeHitstop = parsed.screenShakeHitstop !== false;
-        merged.dayNightOrigin = Number(parsed.dayNightOrigin) || Date.now();
         merged.snakeHighScore = Number(parsed.snakeHighScore) || 0;
         merged.beatGame = !!parsed.beatGame;
         merged.fxBighead = !!parsed.fxBighead;
@@ -3363,7 +3284,6 @@
         btnBuyCrit: document.getElementById('btn-buy-crit'),
         arcadePageModal: document.getElementById('arcade-page-modal'),
         brandVictoryCrown: document.getElementById('brand-victory-crown'),
-        dayNightPill: document.getElementById('day-night-pill'),
         btnBuyUniverse: document.getElementById('btn-buy-universe'),
         universeCard: document.getElementById('universe-upgrade-card'),
         universeBtnLabel: document.getElementById('universe-btn-label'),
@@ -3679,51 +3599,6 @@
           clearGoldenTarget();
           scheduleNextGoldenEvent();
         }, GOLDEN_DURATION_MS);
-      }
-
-      function clearMoonlightCoin() {
-        if (moonlightTimeoutId) { clearTimeout(moonlightTimeoutId); moonlightTimeoutId = null; }
-        if (activeMoonlightEl) { activeMoonlightEl.remove(); activeMoonlightEl = null; }
-      }
-
-      function spawnMoonlightCoin() {
-        clearMoonlightCoin();
-        nextMoonlightAt = Date.now() + 14_000 + Math.random() * 10_000;
-        const target = document.createElement('button');
-        target.type = 'button';
-        target.className = 'moonlight-target';
-        target.setAttribute('aria-label', 'Moonlight Coin');
-        target.textContent = '🌙';
-        target.style.left = `${16 + Math.random() * 68}%`;
-        target.style.top = `${20 + Math.random() * 58}%`;
-
-        let collected = false;
-        const collectMoon = (e) => {
-          if (collected) return;
-          collected = true;
-          e.stopPropagation();
-          clearMoonlightCoin();
-          state.goldenCaught += 1;
-          const reward = Math.floor(Math.max(1000 * getPrestigeMultiplier(), getEffectiveCps() * 35 + getClickPower() * 55));
-          addCredits(reward);
-          const gotGem = Math.random() < 0.45;
-          if (gotGem) state.prestigeGems += 1;
-          SoundFX.reward();
-          const rect = target.getBoundingClientRect();
-          const cx = e.clientX || rect.left + rect.width / 2;
-          const cy = e.clientY || rect.top + rect.height / 2;
-          Particles.burst(cx, cy, 28, '#93c5fd', true);
-          spawnFloatingText(cx, cy, gotGem ? `MOON +${formatNum(reward)} +1 GEM` : `MOON +${formatNum(reward)}`, true);
-          showToast(gotGem ? `Moonlight Coin: +${formatNum(reward)} Coins & +1 Gem!` : `Moonlight Coin: +${formatNum(reward)} Coins!`);
-          saveLocal();
-          refreshUI();
-        };
-
-        target.addEventListener('pointerdown', collectMoon);
-        target.addEventListener('click', collectMoon);
-        els.clickArena.appendChild(target);
-        activeMoonlightEl = target;
-        moonlightTimeoutId = setTimeout(clearMoonlightCoin, MOONLIGHT_DURATION_MS);
       }
 
       /* ========================================================================
@@ -4075,7 +3950,7 @@
       }
 
       /* ========================================================================
-         7E. DAY/NIGHT, SNAKE ARCADE, UNIVERSE ENDING, TERMINAL & SHAKE
+         7E. SNAKE ARCADE, UNIVERSE ENDING, TERMINAL & SHAKE
          ======================================================================== */
       function triggerShakeAndHitstop() {
         const shell = document.querySelector('.app-shell');
@@ -4383,14 +4258,6 @@
         const overclockRemaining = Math.max(0, (state.overclockUntil - now) / 1000);
         const glitchLeft = Math.max(0, ((state.glitchUntil || 0) - now) / 1000);
         const ev = getEvolution();
-        const dn = getDayNightInfo(now);
-
-        els.clickArena.classList.toggle('is-day', !dn.isNight);
-        els.clickArena.classList.toggle('is-night', dn.isNight);
-        if (els.dayNightPill) {
-          els.dayNightPill.classList.toggle('is-night', dn.isNight);
-          setText(els.dayNightPill, dn.isNight ? '🌙 Night' : '☀ Day');
-        }
         applyCheatEffectsVisuals();
 
         els.clickArena.classList.toggle('glitch-mode', glitchLeft > 0);
@@ -4540,7 +4407,6 @@
       function autoFarmTick() {
         if (!state.autoFarm) return;
         if (activeGoldenEl) activeGoldenEl.click();
-        if (activeMoonlightEl) activeMoonlightEl.click();
         if (document.hidden) {
           addCredits(getClickPower());
           state.totalClicks += 1;
@@ -4574,12 +4440,6 @@
 
         if (ts >= nextJumpscareAt && !document.hidden) {
           triggerJumpscare();
-        }
-
-        // Day / Night rare Moonlight Coin spawn
-        const dn = getDayNightInfo(ts);
-        if (dn.isNight && ts >= nextMoonlightAt && !activeMoonlightEl && !document.hidden) {
-          spawnMoonlightCoin();
         }
 
         SnakeGame.tick(ts);
