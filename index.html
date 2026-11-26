@@ -437,6 +437,56 @@
       font-weight: 600;
     }
 
+    .arena-controls {
+      margin-top: 16px;
+      z-index: 6;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .auto-farm-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(5, 36, 15, 0.88);
+      border: 1.5px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 800;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+      transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .auto-farm-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--border-accent);
+      color: #ffffff;
+    }
+
+    .auto-farm-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #64748b;
+      transition: background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .auto-farm-btn.active {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border-color: #bbf7d0;
+      color: #03210d;
+      box-shadow: 0 0 22px rgba(74, 222, 128, 0.5);
+    }
+
+    .auto-farm-btn.active .auto-farm-dot {
+      background: #fef08a;
+      box-shadow: 0 0 10px #fef08a;
+    }
+
     .pill-btn.ranks-pill-btn {
       border-color: rgba(74, 222, 128, 0.4);
       color: #dcfce7;
@@ -1352,6 +1402,13 @@
           </button>
         </div>
 
+        <div class="arena-controls">
+          <button class="auto-farm-btn" id="btn-auto-farm" type="button" aria-pressed="false">
+            <span class="auto-farm-dot" aria-hidden="true"></span>
+            <span id="auto-farm-label">Auto Farm: OFF</span>
+          </button>
+        </div>
+
         <div class="arena-footer">
           <p class="arena-hint">Tap the face (or press Space) to earn Coins • Catch Golden Stars for bonus surges</p>
         </div>
@@ -1667,6 +1724,7 @@
           rebirths: 0,
           buildings,
           tapUpgrades,
+          autoFarm: false,
           overclockUntil: 0,
           lastSaved: Date.now()
         };
@@ -2079,6 +2137,8 @@
         statRebirths: document.getElementById('stat-rebirths'),
         lbYourCoins: document.getElementById('lb-your-coins'),
         lbYourRebirths: document.getElementById('lb-your-rebirths'),
+        btnAutoFarm: document.getElementById('btn-auto-farm'),
+        autoFarmLabel: document.getElementById('auto-farm-label'),
         helpModal: document.getElementById('help-modal'),
         offlineModal: document.getElementById('offline-modal'),
         rebirthModal: document.getElementById('rebirth-modal'),
@@ -2383,7 +2443,26 @@
         els.statRebirths.textContent = formatNum(state.rebirths);
         els.lbYourCoins.textContent = formatNum(state.totalCredits);
         els.lbYourRebirths.textContent = formatNum(state.rebirths);
+        els.btnAutoFarm.classList.toggle('active', !!state.autoFarm);
+        els.btnAutoFarm.setAttribute('aria-pressed', state.autoFarm ? 'true' : 'false');
+        els.autoFarmLabel.textContent = state.autoFarm ? 'Auto Farm: ON (5 taps/s + Stars)' : 'Auto Farm: OFF';
         if (!Leaderboard.isConnected()) Leaderboard.render();
+      }
+
+      function autoFarmTick() {
+        if (!state.autoFarm) return;
+        if (activeGoldenEl) {
+          activeGoldenEl.click();
+        }
+        if (document.hidden) {
+          addCredits(getClickPower());
+          state.totalClicks += 1;
+          return;
+        }
+        const rect = els.coreButton.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          handleCoreTap(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        }
       }
 
       let uiRefreshAcc = 0;
@@ -2443,6 +2522,13 @@
         });
         document.getElementById('btn-close-rebirth-page').addEventListener('click', () => {
           els.rebirthPageModal.classList.remove('open');
+        });
+
+        els.btnAutoFarm.addEventListener('click', () => {
+          state.autoFarm = !state.autoFarm;
+          saveLocal();
+          refreshUI();
+          showToast(state.autoFarm ? 'Auto Farm ON: auto-tapping & catching Golden Stars!' : 'Auto Farm OFF');
         });
 
         document.querySelectorAll('[data-tap-buy]').forEach((btn) => {
@@ -2579,6 +2665,7 @@
       scheduleNextGoldenEvent();
       if (Leaderboard.isConnected()) Leaderboard.sync(false);
       setInterval(saveLocal, 5000);
+      setInterval(autoFarmTick, 200);
       setInterval(() => { if (Leaderboard.isConnected()) Leaderboard.sync(false); }, 15000);
       requestAnimationFrame(gameLoop);
     })();
