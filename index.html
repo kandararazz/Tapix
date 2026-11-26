@@ -729,14 +729,6 @@
       display: block;
     }
 
-    .arena-footer {
-      margin-top: 20px;
-      z-index: 6;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
     .arena-controls {
       margin-top: 16px;
       z-index: 6;
@@ -2308,6 +2300,13 @@
           <span class="btn-label">Rebirth</span>
           <span class="tab-badge prestige-ready hidden" id="prestige-ready-badge">READY</span>
         </button>
+        <button class="pill-btn cheat-codes-btn" id="btn-secret-terminal" type="button" title="Enter Cheat Codes (~)" aria-label="Cheat Codes">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="4 17 10 11 4 5"></polyline>
+            <line x1="12" y1="19" x2="20" y2="19"></line>
+          </svg>
+          <span class="btn-label">Cheat Codes</span>
+        </button>
         <button class="pill-btn" id="btn-help" type="button" title="How to Play" aria-label="How to Play">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="10"></circle>
@@ -2375,16 +2374,6 @@
         </div>
 
         <div class="coin-pile-viz" id="coin-pile-viz" aria-hidden="true"></div>
-
-        <div class="arena-footer">
-          <button type="button" class="pill-btn cheat-codes-btn" id="btn-secret-terminal" title="Enter Cheat Codes (~)" aria-label="Cheat Codes">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="4 17 10 11 4 5"></polyline>
-              <line x1="12" y1="19" x2="20" y2="19"></line>
-            </svg>
-            <span>Cheat Codes</span>
-          </button>
-        </div>
       </section>
 
       <!-- RIGHT: UPGRADE SHOP -->
