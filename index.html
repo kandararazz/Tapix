@@ -437,6 +437,38 @@
       font-weight: 600;
     }
 
+    .arena-rebirth-btn {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      z-index: 20;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 15px;
+      border-radius: 999px;
+      background: rgba(5, 36, 15, 0.88);
+      border: 1.5px solid rgba(251, 191, 36, 0.42);
+      color: #fef08a;
+      font-size: 0.8rem;
+      font-weight: 800;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+      transition: transform 0.12s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    }
+
+    .arena-rebirth-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+
+    .arena-rebirth-btn.ready {
+      background: linear-gradient(135deg, #22c55e, #facc15);
+      border-color: #fef08a;
+      color: #03200c;
+      box-shadow: 0 0 24px rgba(250, 204, 21, 0.55);
+    }
+
     /* Floating '+X' text numbers */
     .floating-num {
       position: fixed;
@@ -1166,6 +1198,10 @@
 
       .main-grid { grid-template-columns: 1fr; overflow: visible; }
       .click-arena { min-height: 330px; padding: 18px 14px; }
+      .arena-rebirth-btn {
+        position: static;
+        margin-top: 12px;
+      }
       .core-wrapper { width: 190px; height: 190px; }
       .core-button { width: 164px; height: 164px; }
 
@@ -1277,21 +1313,25 @@
         <div class="arena-footer">
           <p class="arena-hint">Tap the face (or press Space) to earn Coins • Catch Golden Stars for bonus surges</p>
         </div>
+
+        <button class="arena-rebirth-btn" id="arena-rebirth-btn" type="button">
+          <span>Rebirth: 0 / 100K</span>
+        </button>
       </section>
 
-      <!-- RIGHT: UPGRADE SHOP, REBIRTH & LEADERBOARD -->
+      <!-- RIGHT: UPGRADE SHOP, RANKS & REBIRTH -->
       <aside class="shop-sidebar">
         <div class="shop-tabs">
           <button class="tab-btn active" id="tab-shop" type="button">
             <span>Upgrades</span>
             <span class="tab-badge hidden" id="shop-buyable-badge">0</span>
           </button>
+          <button class="tab-btn leaderboard-tab" id="tab-leaderboard" type="button">
+            <span>Ranks</span>
+          </button>
           <button class="tab-btn prestige-tab" id="tab-prestige" type="button">
             <span>Rebirth</span>
             <span class="tab-badge prestige-ready hidden" id="prestige-ready-badge">READY</span>
-          </button>
-          <button class="tab-btn leaderboard-tab" id="tab-leaderboard" type="button">
-            <span>Ranks</span>
           </button>
         </div>
 
@@ -1973,6 +2013,7 @@
         statRebirths: document.getElementById('stat-rebirths'),
         lbYourCoins: document.getElementById('lb-your-coins'),
         lbYourRebirths: document.getElementById('lb-your-rebirths'),
+        arenaRebirthBtn: document.getElementById('arena-rebirth-btn'),
         helpModal: document.getElementById('help-modal'),
         offlineModal: document.getElementById('offline-modal'),
         rebirthModal: document.getElementById('rebirth-modal'),
@@ -2254,6 +2295,10 @@
         els.prestigeReadyBadge.classList.toggle('hidden', claimable <= 0);
         els.prestigeClaimable.textContent = `+${claimable} Gem${claimable === 1 ? '' : 's'}`;
         els.btnRebirth.disabled = claimable <= 0;
+        els.arenaRebirthBtn.classList.toggle('ready', claimable > 0);
+        els.arenaRebirthBtn.textContent = claimable > 0
+          ? `Rebirth Ready (+${claimable} Gem${claimable === 1 ? '' : 's'})`
+          : `Rebirth: ${formatNum(state.runCredits)} / ${formatNum(PRESTIGE_MILESTONE)}`;
 
         const nextThreshold = Math.pow(claimable + 1, 2) * PRESTIGE_MILESTONE;
         const prevThreshold = claimable === 0 ? 0 : Math.pow(claimable, 2) * PRESTIGE_MILESTONE;
@@ -2398,17 +2443,24 @@
           });
         });
 
-        // Rebirth Flow
-        els.btnRebirth.addEventListener('click', () => {
+        function openRebirthModal() {
           const claimable = getClaimableGems();
-          if (claimable <= 0) return;
+          if (claimable <= 0) return false;
           const nextMult = 1 + (state.rebirths + 1) * 0.5 + (state.prestigeGems + claimable) * GEM_BONUS_PER_GEM;
           els.rebirthConfirmText.innerHTML =
             `You will reset your Coins, Auto-Miners, and Tap Upgrades to gain <strong>+50% Click Power</strong>, ` +
             `<strong>+50% Faster Coins/Sec</strong>, and <strong>+${claimable} Prestige Gem${claimable > 1 ? 's' : ''}</strong> ` +
             `(new boost: <strong>x${nextMult.toFixed(2)}</strong>).`;
           els.rebirthModal.classList.add('open');
+          return true;
+        }
+
+        // Rebirth Flow (both left-side arena button & Rebirth tab button)
+        els.arenaRebirthBtn.addEventListener('click', () => {
+          if (!openRebirthModal()) switchTab('prestige');
         });
+
+        els.btnRebirth.addEventListener('click', openRebirthModal);
 
         document.getElementById('btn-cancel-rebirth').addEventListener('click', () => els.rebirthModal.classList.remove('open'));
         document.getElementById('btn-confirm-rebirth').addEventListener('click', () => {
