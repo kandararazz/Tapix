@@ -268,10 +268,8 @@
           0 0 60px rgba(134, 239, 172, 0.9),
           0 14px 36px rgba(0, 0, 0, 0.65);
       }
-      .ability-btn:hover:not(:disabled),
       .auto-farm-btn:hover,
-      .mystery-arena-btn:hover,
-      .auto-buyer-btn:hover {
+      .mystery-arena-btn:hover {
         border-color: var(--gold);
         filter: brightness(1.08);
       }
@@ -398,8 +396,7 @@
       flex-shrink: 0;
     }
 
-    .arena-side-dock .auto-farm-btn,
-    .arena-side-dock .ability-btn {
+    .arena-side-dock .auto-farm-btn {
       width: 100%;
       justify-content: space-between;
       min-height: 40px;
@@ -536,73 +533,6 @@
       background: rgba(3, 20, 9, 0.68);
       border: 1px solid rgba(134, 239, 172, 0.28);
       backdrop-filter: blur(8px);
-    }
-
-    .abilities-bar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-      z-index: 12;
-    }
-
-    .ability-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-height: 40px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(13, 56, 26, 0.96), rgba(6, 31, 14, 0.96));
-      border: 1.5px solid rgba(74, 222, 128, 0.45);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 4px 14px rgba(0, 0, 0, 0.38);
-      color: #f0fdf4;
-      font-size: 0.78rem;
-      font-weight: 800;
-      transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .ability-btn:active:not(:disabled) {
-      transform: scale(0.96);
-    }
-
-    .ability-btn.active {
-      background: linear-gradient(180deg, #22d3ee, #22c55e);
-      color: #03210d;
-      border-color: #a5f3fc;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 0 18px rgba(34, 211, 238, 0.55);
-    }
-
-    .ability-btn:disabled:not(.active) {
-      opacity: 0.58;
-      cursor: not-allowed;
-    }
-
-    .coin-rain-layer {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 42;
-    }
-
-    .rain-coin {
-      position: absolute;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #fef08a, #f59e0b 70%, #b45309);
-      border: 2px solid #fef9c3;
-      box-shadow: 0 0 14px rgba(251, 191, 36, 0.75);
-      display: grid;
-      place-items: center;
-      font-size: 0.85rem;
-      font-weight: 900;
-      color: #451a03;
-      pointer-events: auto;
-      cursor: pointer;
-      transform: translate(-50%, -50%);
     }
 
     .jumpscare-overlay {
@@ -1152,46 +1082,6 @@
 
     .streak-day.claimed { border-color: var(--green-bright); background: var(--green-soft); opacity: 0.72; }
     .streak-day.today { border-color: var(--gold); background: rgba(251, 191, 36, 0.16); box-shadow: 0 0 12px rgba(251, 191, 36, 0.3); }
-
-    .shop-smart-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 9px 14px;
-      border-bottom: 1px solid var(--border-subtle);
-      background: rgba(4, 22, 10, 0.72);
-      flex-shrink: 0;
-    }
-
-    .auto-buyer-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 40px;
-      padding: 8px 14px;
-      border-radius: var(--radius-md);
-      background: linear-gradient(180deg, rgba(16, 62, 30, 0.96), rgba(7, 33, 15, 0.96));
-      border: 1.5px solid rgba(134, 239, 172, 0.38);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 4px 12px rgba(0, 0, 0, 0.35);
-      color: #dcfce7;
-      font-size: 0.8rem;
-      font-weight: 800;
-      transition: transform 0.12s ease, border-color 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-    }
-
-    .auto-buyer-btn:active {
-      transform: scale(0.98);
-    }
-
-    .auto-buyer-btn.active,
-    .auto-buyer-btn[aria-pressed="true"] {
-      background: linear-gradient(180deg, #4ade80, #16a34a);
-      border-color: #bbf7d0;
-      color: #03210d;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 0 18px rgba(74, 222, 128, 0.45);
-    }
 
     .subtab-btn {
       min-height: 38px;
@@ -2182,8 +2072,7 @@
         justify-content: center;
         width: 100%;
       }
-      .arena-side-dock .auto-farm-btn,
-      .arena-side-dock .ability-btn {
+      .arena-side-dock .auto-farm-btn {
         width: auto;
       }
     }
@@ -2267,7 +2156,6 @@
       <!-- LEFT: CLICK ARENA -->
       <section class="click-arena" id="click-arena">
         <canvas id="particle-canvas"></canvas>
-        <div class="coin-rain-layer" id="coin-rain-layer"></div>
 
         <div class="arena-top-strip">
           <div class="arena-top-left">
@@ -2309,10 +2197,6 @@
               <span class="auto-farm-dot" aria-hidden="true"></span>
               <span id="offline-farm-label">Offline Farm: ON</span>
             </button>
-            <button class="ability-btn ready" id="btn-ability-rain" type="button">
-              <span class="ability-name">Coin Rain</span>
-              <span class="ability-state" id="ability-rain-state">Ready</span>
-            </button>
           </div>
         </div>
 
@@ -2324,12 +2208,6 @@
         <div class="shop-header">
           <span class="shop-header-title">Upgrades Shop</span>
           <span class="tab-badge hidden" id="shop-buyable-badge">0</span>
-        </div>
-
-        <div class="shop-smart-bar">
-          <button class="auto-buyer-btn" id="btn-auto-buyer" type="button" aria-pressed="false" style="width:100%;">
-            <span id="auto-buyer-label">Auto-Buyer: Unlock 50K</span>
-          </button>
         </div>
 
         <div class="shop-scroll" id="panel-shop">
@@ -2688,10 +2566,7 @@
       const CHEST_COOLDOWN_MS = 180_000;
       const MINER_OC_ACTIVE_MS = 20_000;
       const MINER_OC_REST_MS = 10_000;
-      const RAIN_DURATION_MS = 10_000;
-      const RAIN_CD_MS = 90_000;
       const GLITCH_DURATION_MS = 10_000;
-      const AUTO_BUYER_COST = 50_000;
       const JUMPSCARE_INTERVAL_MS = 300_000;
       const UNIVERSE_COST = 1e21;
       const MEGA_CRIT_MULT = 50;
@@ -2855,8 +2730,6 @@
           shards: 0,
           autoFarm: false,
           offlineFarm: true,
-          autoBuyerUnlocked: false,
-          autoBuyerOn: false,
           challengeId: null,
           trophies: {},
           contract: null,
@@ -2867,8 +2740,6 @@
           minerOverclockUntil: 0,
           minerRestUntil: 0,
           nextChestAt: 0,
-          nextRainAt: 0,
-          rainActiveUntil: 0,
           glitchUntil: 0,
           nextGlitchAt: Date.now() + 120_000,
           screenShakeHitstop: true,
@@ -3266,16 +3137,11 @@
         autoFarmLabel: document.getElementById('auto-farm-label'),
         btnOfflineFarm: document.getElementById('btn-offline-farm'),
         offlineFarmLabel: document.getElementById('offline-farm-label'),
-        btnAutoBuyer: document.getElementById('btn-auto-buyer'),
-        autoBuyerLabel: document.getElementById('auto-buyer-label'),
         btnMysteryChest: document.getElementById('btn-mystery-chest'),
         mysteryChestLabel: document.getElementById('mystery-chest-label'),
         coinPileViz: document.getElementById('coin-pile-viz'),
         coreSkinOverlay: document.getElementById('core-skin-overlay'),
-        coinRainLayer: document.getElementById('coin-rain-layer'),
         jumpscareOverlay: document.getElementById('jumpscare-overlay'),
-        btnAbilityRain: document.getElementById('btn-ability-rain'),
-        abilityRainState: document.getElementById('ability-rain-state'),
         btnMinerOverclock: document.getElementById('btn-miner-overclock'),
         critUpgradeCard: document.getElementById('crit-upgrade-card'),
         critOwned: document.getElementById('crit-owned'),
@@ -3783,11 +3649,8 @@
       }
 
       /* ========================================================================
-         7C. ABILITIES, QUESTS, CHALLENGES, STREAK, GLITCH & BACKUP
+         7C. JUMPSCARE, GLITCH & BACKUP
          ======================================================================== */
-      const rainCoins = [];
-      let rainSpawnAcc = 0;
-
       let nextJumpscareAt = Date.now() + JUMPSCARE_INTERVAL_MS;
       let jumpscareTimeoutId = null;
 
@@ -3802,73 +3665,6 @@
         }, 1450);
       }
 
-      function activateCoinRain() {
-        const now = Date.now();
-        if (now < (state.nextRainAt || 0)) return;
-        state.rainActiveUntil = now + RAIN_DURATION_MS;
-        state.nextRainAt = now + RAIN_CD_MS;
-        SoundFX.reward();
-        showToast('COIN RAIN! Swipe or hover coins as they fall for 10s!');
-        refreshUI();
-      }
-
-      function collectRainCoin(rc, idx) {
-        const reward = Math.max(25, Math.floor(getClickPower() * 3 + getEffectiveCps() * 1.25));
-        addCredits(reward);
-        const rect = rc.el.getBoundingClientRect();
-        spawnFloatingText(rect.left + 16, rect.top + 16, `+${formatNum(reward)}`, false);
-        SoundFX.clink(75, false);
-        rc.el.remove();
-        rainCoins.splice(idx, 1);
-      }
-
-      function spawnRainCoin() {
-        if (!els.coinRainLayer) return;
-        const arenaRect = els.clickArena.getBoundingClientRect();
-        if (arenaRect.width < 40) return;
-        const el = document.createElement('button');
-        el.type = 'button';
-        el.className = 'rain-coin';
-        el.textContent = '$';
-        const x = 24 + Math.random() * (arenaRect.width - 48);
-        const y = -20;
-        el.style.left = `${x}px`;
-        el.style.top = `${y}px`;
-        const rc = { el, x, y, vy: 110 + Math.random() * 120, vx: (Math.random() - 0.5) * 45 };
-        const collect = (e) => {
-          e.stopPropagation();
-          const idx = rainCoins.indexOf(rc);
-          if (idx >= 0) collectRainCoin(rc, idx);
-        };
-        el.addEventListener('pointerenter', collect);
-        el.addEventListener('pointerdown', collect);
-        els.coinRainLayer.appendChild(el);
-        rainCoins.push(rc);
-      }
-
-      function updateCoinRain(dt) {
-        const now = Date.now();
-        if (now < (state.rainActiveUntil || 0)) {
-          rainSpawnAcc += dt;
-          if (rainSpawnAcc >= 0.22) {
-            rainSpawnAcc = 0;
-            spawnRainCoin();
-          }
-        }
-        const arenaRect = els.clickArena.getBoundingClientRect();
-        for (let i = rainCoins.length - 1; i >= 0; i--) {
-          const rc = rainCoins[i];
-          rc.x += rc.vx * dt;
-          rc.y += rc.vy * dt;
-          rc.el.style.left = `${rc.x}px`;
-          rc.el.style.top = `${rc.y}px`;
-          if (rc.y > arenaRect.height + 40) {
-            rc.el.remove();
-            rainCoins.splice(i, 1);
-          }
-        }
-      }
-
       function triggerGlitch() {
         const now = Date.now();
         state.glitchUntil = now + GLITCH_DURATION_MS;
@@ -3876,37 +3672,6 @@
         SoundFX.reward();
         showToast('GL!TCH SURGE (10s): Every tap pays 2x–12x random Jackpots!');
         refreshUI();
-      }
-
-      let lastAutoBuyerAt = 0;
-      function runAutoBuyerTick() {
-        if (!state.autoBuyerUnlocked || !state.autoBuyerOn) return;
-        const now = Date.now();
-        if (now - lastAutoBuyerAt < 650) return;
-        lastAutoBuyerAt = now;
-
-        let bestType = null;
-        let bestId = null;
-        let bestCost = Infinity;
-
-        for (const t of TAP_UPGRADES) {
-          const c = getTapBulkQuote(t, '1').cost;
-          if (c <= state.credits && c < bestCost) {
-            bestCost = c;
-            bestType = 'tap';
-            bestId = t.id;
-          }
-        }
-        for (const b of BUILDINGS) {
-          const c = getBuildingBulkQuote(b, '1').cost;
-          if (c <= state.credits && c < bestCost) {
-            bestCost = c;
-            bestType = 'bld';
-            bestId = b.id;
-          }
-        }
-        if (bestType === 'tap') buyTapUpgrade(bestId, true);
-        else if (bestType === 'bld') buyBuilding(bestId, true);
       }
 
       function exportSaveCode() {
@@ -4055,6 +3820,15 @@
             showToast(`CHEAT REDEEMED! +${formatNum(5e17)} Coins!`);
             response = `GRANTED +${formatNum(5e17)} COINS! (1-TIME USE LOCKED)`;
           }
+        } else if (cmd === '1234') {
+          state.cheatUsed = true;
+          addCredits(1e24);
+          const rect = els.coreButton ? els.coreButton.getBoundingClientRect() : { left: 240, top: 240, width: 120, height: 120 };
+          Particles.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 48, '#fde047', true);
+          SoundFX.reward();
+          refreshUI();
+          showToast('CHEAT ACTIVATED! +1,000 Sx Coins!');
+          response = 'GRANTED +1,000 Sx COINS!';
         } else if (cmd === 'RESET') {
           state.fxBighead = false;
           state.fxDisco = false;
@@ -4272,14 +4046,6 @@
         els.btnMysteryChest.classList.toggle('ready', chestCd === 0);
         setText(els.mysteryChestLabel, chestCd === 0 ? 'Free Chest Ready!' : `Chest: ${formatDuration(chestCd / 1000)}`);
 
-        // Coin Rain side dock ability
-        const rainActiveLeft = Math.max(0, ((state.rainActiveUntil || 0) - now) / 1000);
-        const rainCdLeft = Math.max(0, ((state.nextRainAt || 0) - now) / 1000);
-        els.btnAbilityRain.classList.toggle('active', rainActiveLeft > 0);
-        els.btnAbilityRain.classList.toggle('ready', rainActiveLeft === 0 && rainCdLeft === 0);
-        setText(els.abilityRainState, rainActiveLeft > 0 ? `${rainActiveLeft.toFixed(0)}s` : (rainCdLeft === 0 ? 'Ready' : formatDuration(rainCdLeft)));
-        setDisabled(els.btnAbilityRain, rainCdLeft > 0);
-
         // Miner 300% Overclock button
         const ocActiveLeft = Math.max(0, ((state.minerOverclockUntil || 0) - now) / 1000);
         const ocRestLeft = Math.max(0, ((state.minerRestUntil || 0) - now) / 1000);
@@ -4362,7 +4128,7 @@
         setText(els.statCrowns, formatNum(state.crowns || 0));
         setText(els.statRebirths, formatNum(state.rebirths));
 
-        // Toggles (Auto Farm, Offline Farm, Auto-Buyer Bot)
+        // Toggles (Auto Farm, Offline Farm)
         els.btnAutoFarm.classList.toggle('active', !!state.autoFarm);
         els.btnAutoFarm.setAttribute('aria-pressed', state.autoFarm ? 'true' : 'false');
         setText(els.autoFarmLabel, state.autoFarm ? 'Auto Farm: ON (5/s)' : 'Auto Farm: OFF');
@@ -4372,16 +4138,6 @@
         els.btnOfflineFarm.classList.toggle('on', offlineOn);
         els.btnOfflineFarm.setAttribute('aria-pressed', offlineOn ? 'true' : 'false');
         setText(els.offlineFarmLabel, offlineOn ? 'Offline Farm: ON' : 'Offline Farm: OFF');
-
-        els.btnAutoBuyer.classList.toggle('active', !!(state.autoBuyerUnlocked && state.autoBuyerOn));
-        els.btnAutoBuyer.setAttribute('aria-pressed', state.autoBuyerOn ? 'true' : 'false');
-        if (!state.autoBuyerUnlocked) {
-          setText(els.autoBuyerLabel, `Auto-Buyer: Unlock ${formatNum(AUTO_BUYER_COST)}`);
-          setDisabled(els.btnAutoBuyer, state.credits < AUTO_BUYER_COST);
-        } else {
-          setText(els.autoBuyerLabel, state.autoBuyerOn ? 'Auto-Buyer: ON' : 'Auto-Buyer: OFF');
-          setDisabled(els.btnAutoBuyer, false);
-        }
 
         // Buy the Universe card
         if (els.btnBuyUniverse) {
@@ -4446,8 +4202,6 @@
 
         const cps = getEffectiveCps();
         if (cps > 0 && dt > 0) addCredits(cps * dt);
-        updateCoinRain(dt);
-        runAutoBuyerTick();
         Particles.updateAndDraw();
         uiRefreshAcc += dt;
         if (uiRefreshAcc >= 0.08) {
@@ -4523,26 +4277,6 @@
           showToast(state.offlineFarm ? 'Offline Farm ON: earns coins while tab is closed!' : 'Offline Farm OFF');
         });
 
-        els.btnAutoBuyer.addEventListener('click', () => {
-          if (!state.autoBuyerUnlocked) {
-            if (state.credits < AUTO_BUYER_COST) {
-              showToast(`Need ${formatNum(AUTO_BUYER_COST)} Coins to unlock Auto-Buyer Bot!`);
-              return;
-            }
-            state.credits -= AUTO_BUYER_COST;
-            state.autoBuyerUnlocked = true;
-            state.autoBuyerOn = true;
-            SoundFX.reward();
-            showToast('Auto-Buyer Bot Unlocked & Activated!');
-          } else {
-            state.autoBuyerOn = !state.autoBuyerOn;
-            showToast(state.autoBuyerOn ? 'Auto-Buyer Bot ON' : 'Auto-Buyer Bot OFF');
-          }
-          saveLocal();
-          refreshUI();
-        });
-
-        els.btnAbilityRain.addEventListener('click', activateCoinRain);
         if (els.jumpscareOverlay) {
           els.jumpscareOverlay.addEventListener('click', () => {
             els.jumpscareOverlay.classList.remove('active');
