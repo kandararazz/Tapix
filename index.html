@@ -603,6 +603,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
       gap: 8px;
       margin-bottom: 10px;
     }
@@ -626,8 +627,8 @@
 
     .buy-mode-btn {
       min-height: 28px;
-      padding: 3px 10px;
-      font-size: 0.72rem;
+      padding: 3px 8px;
+      font-size: 0.71rem;
       font-weight: 700;
       border-radius: 6px;
       color: var(--text-dim);
@@ -1370,8 +1371,10 @@
               <span class="section-title">Coins Per Tap Upgrades</span>
               <div class="buy-mode-group" role="group" aria-label="Tap purchase quantity">
                 <button class="buy-mode-btn active" data-tap-buy="1" type="button">x1</button>
+                <button class="buy-mode-btn" data-tap-buy="5" type="button">x5</button>
                 <button class="buy-mode-btn" data-tap-buy="10" type="button">x10</button>
                 <button class="buy-mode-btn" data-tap-buy="50" type="button">x50</button>
+                <button class="buy-mode-btn" data-tap-buy="100" type="button">x100</button>
                 <button class="buy-mode-btn" data-tap-buy="max" type="button">MAX</button>
               </div>
             </div>
@@ -1384,8 +1387,10 @@
               <span class="section-title">Auto-Miners (Coins/Sec)</span>
               <div class="buy-mode-group" role="group" aria-label="Miner purchase quantity">
                 <button class="buy-mode-btn active" data-buy="1" type="button">x1</button>
+                <button class="buy-mode-btn" data-buy="5" type="button">x5</button>
                 <button class="buy-mode-btn" data-buy="10" type="button">x10</button>
                 <button class="buy-mode-btn" data-buy="50" type="button">x50</button>
+                <button class="buy-mode-btn" data-buy="100" type="button">x100</button>
                 <button class="buy-mode-btn" data-buy="max" type="button">MAX</button>
               </div>
             </div>
@@ -1606,14 +1611,20 @@
         { id: 'tap_turbo', name: 'Turbo Tap', icon: ICONS.flame, bonus: 35, baseCost: 300, desc: '+35 Coins per tap' },
         { id: 'tap_super', name: 'Super Tap', icon: ICONS.cursor, bonus: 85, baseCost: 700, desc: '+85 Coins per tap' },
         { id: 'tap_hyper', name: 'Hyper Tap', icon: ICONS.gem, bonus: 180, baseCost: 1_500, desc: '+180 Coins per tap' },
+        { id: 'tap_nitro', name: 'Nitro Tap', icon: ICONS.bolt, bonus: 400, baseCost: 3_200, desc: '+400 Coins per tap' },
         { id: 'tap_mega', name: 'Mega Tap', icon: ICONS.drill, bonus: 800, baseCost: 6_500, desc: '+800 Coins per tap' },
+        { id: 'tap_sonic', name: 'Sonic Tap', icon: ICONS.drone, bonus: 2_000, baseCost: 18_000, desc: '+2,000 Coins per tap' },
         { id: 'tap_ultra', name: 'Ultra Tap', icon: ICONS.orbit, bonus: 4_500, baseCost: 50_000, desc: '+4,500 Coins per tap' },
         { id: 'tap_plasma', name: 'Plasma Tap', icon: ICONS.flame, bonus: 14_000, baseCost: 180_000, desc: '+14K Coins per tap' },
         { id: 'tap_giga', name: 'Giga Tap', icon: ICONS.cpu, bonus: 35_000, baseCost: 450_000, desc: '+35K Coins per tap' },
+        { id: 'tap_quantum', name: 'Quantum Tap', icon: ICONS.gem, bonus: 90_000, baseCost: 1_200_000, desc: '+90K Coins per tap' },
         { id: 'tap_omega', name: 'Omega Tap', icon: ICONS.factory, bonus: 180_000, baseCost: 3_500_000, desc: '+180K Coins per tap' },
+        { id: 'tap_apex', name: 'Apex Tap', icon: ICONS.bolt, bonus: 420_000, baseCost: 7_500_000, desc: '+420K Coins per tap' },
         { id: 'tap_godlike', name: 'Godlike Tap', icon: ICONS.crown, bonus: 950_000, baseCost: 15_000_000, desc: '+950K Coins per tap' },
         { id: 'tap_cosmic', name: 'Cosmic Tap', icon: ICONS.orbit, bonus: 4_500_000, baseCost: 75_000_000, desc: '+4.5M Coins per tap' },
-        { id: 'tap_infinity', name: 'Infinity Tap', icon: ICONS.crown, bonus: 25_000_000, baseCost: 500_000_000, desc: '+25M Coins per tap' }
+        { id: 'tap_infinity', name: 'Infinity Tap', icon: ICONS.crown, bonus: 25_000_000, baseCost: 500_000_000, desc: '+25M Coins per tap' },
+        { id: 'tap_celestial', name: 'Celestial Tap', icon: ICONS.flame, bonus: 110_000_000, baseCost: 2_500_000_000, desc: '+110M Coins per tap' },
+        { id: 'tap_eternal', name: 'Eternal Tap', icon: ICONS.crown, bonus: 650_000_000, baseCost: 15_000_000_000, desc: '+650M Coins per tap' }
       ];
 
       const BUILDINGS = [
@@ -1621,14 +1632,20 @@
         { id: 'drone', name: 'Gold Drone', icon: ICONS.drone, baseCost: 300, cps: 4, desc: '+4 Coins/s each' },
         { id: 'coinbot', name: 'Coin Bot', icon: ICONS.bot, baseCost: 650, cps: 10, desc: '+10 Coins/s each' },
         { id: 'worker', name: 'Vault Worker', icon: ICONS.bot, baseCost: 1_400, cps: 22, desc: '+22 Coins/s each' },
+        { id: 'magnet', name: 'Coin Magnet', icon: ICONS.bolt, baseCost: 2_800, cps: 45, desc: '+45 Coins/s each' },
         { id: 'drill', name: 'Laser Drill', icon: ICONS.drill, baseCost: 5_500, cps: 75, desc: '+75 Coins/s each' },
+        { id: 'rig', name: 'Turbo Rig', icon: ICONS.drill, baseCost: 12_000, cps: 175, desc: '+175 Coins/s each' },
         { id: 'factory', name: 'Mint Factory', icon: ICONS.factory, baseCost: 28_000, cps: 380, desc: '+380 Coins/s each' },
+        { id: 'reactor_core', name: 'Core Harvester', icon: ICONS.cpu, baseCost: 70_000, cps: 900, desc: '+900 Coins/s each' },
         { id: 'orbital', name: 'Orbital Mint', icon: ICONS.orbit, baseCost: 160_000, cps: 1_900, desc: '+1.9K Coins/s each' },
         { id: 'aibot', name: 'Quantum Vault', icon: ICONS.cpu, baseCost: 950_000, cps: 10_000, desc: '+10K Coins/s each' },
         { id: 'reactor', name: 'Emerald Reactor', icon: ICONS.bolt, baseCost: 4_200_000, cps: 52_000, desc: '+52K Coins/s each' },
+        { id: 'hypervault', name: 'Mega Treasury', icon: ICONS.gem, baseCost: 8_500_000, cps: 120_000, desc: '+120K Coins/s each' },
         { id: 'singularity', name: 'Hyper Singularity', icon: ICONS.crown, baseCost: 15_000_000, cps: 240_000, desc: '+240K Coins/s each' },
         { id: 'solarforge', name: 'Solar Forge', icon: ICONS.flame, baseCost: 80_000_000, cps: 1_200_000, desc: '+1.2M Coins/s each' },
-        { id: 'galacticbank', name: 'Galactic Bank', icon: ICONS.gem, baseCost: 450_000_000, cps: 6_500_000, desc: '+6.5M Coins/s each' }
+        { id: 'galacticbank', name: 'Galactic Bank', icon: ICONS.gem, baseCost: 450_000_000, cps: 6_500_000, desc: '+6.5M Coins/s each' },
+        { id: 'starcore', name: 'Starlight Engine', icon: ICONS.orbit, baseCost: 2_200_000_000, cps: 32_000_000, desc: '+32M Coins/s each' },
+        { id: 'multiverse', name: 'Multiverse Mint', icon: ICONS.crown, baseCost: 12_000_000_000, cps: 180_000_000, desc: '+180M Coins/s each' }
       ];
 
       /* ========================================================================
@@ -1750,9 +1767,8 @@
       const getScaledCost = (baseCost, rate, owned) => Math.floor(baseCost * Math.pow(rate, owned));
 
       function getGeometricBulkQuote(baseCost, rate, owned, mode) {
-        if (mode === '1') return { qty: 1, cost: getScaledCost(baseCost, rate, owned) };
-        if (mode === '10' || mode === '50') {
-          const targetQty = Number(mode);
+        if (mode !== 'max') {
+          const targetQty = Math.max(1, Number(mode) || 1);
           let cost = 0;
           for (let i = 0; i < targetQty; i++) cost += getScaledCost(baseCost, rate, owned + i);
           return { qty: targetQty, cost };
