@@ -3804,31 +3804,26 @@
           applyCheatEffectsVisuals();
           SoundFX.reward();
           response = state.fxDisco ? 'DISCO ARENA LIGHTS: ON!' : 'DISCO ARENA LIGHTS: OFF.';
-        } else if (cmd === 'RAZA11') {
-          if (state.redeemedCheats && state.redeemedCheats.raza11) {
+        } else if (cmd === 'RAZA11' || cmd === '1234') {
+          const codeKey = cmd.toLowerCase();
+          const codeConfig = cmd === 'RAZA11'
+            ? { amount: 5e17, label: formatNum(5e17) }
+            : { amount: 1e24, label: '1,000 Sx' };
+          if (state.redeemedCheats && state.redeemedCheats[codeKey]) {
             SoundFX.fail();
-            showToast('Code "raza11" has already been redeemed!');
+            showToast(`Code "${codeKey}" has already been redeemed!`);
             response = 'CODE ALREADY REDEEMED (1-TIME USE ONLY).';
           } else {
-            state.redeemedCheats = { ...(state.redeemedCheats || {}), raza11: true };
+            state.redeemedCheats = { ...(state.redeemedCheats || {}), [codeKey]: true };
             state.cheatUsed = true;
-            addCredits(5e17);
+            addCredits(codeConfig.amount);
             const rect = els.coreButton ? els.coreButton.getBoundingClientRect() : { left: 240, top: 240, width: 120, height: 120 };
             Particles.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 48, '#fde047', true);
             SoundFX.reward();
             refreshUI();
-            showToast(`CHEAT REDEEMED! +${formatNum(5e17)} Coins!`);
-            response = `GRANTED +${formatNum(5e17)} COINS! (1-TIME USE LOCKED)`;
+            showToast(`CHEAT REDEEMED! +${codeConfig.label} Coins!`);
+            response = `GRANTED +${codeConfig.label} COINS! (1-TIME USE LOCKED)`;
           }
-        } else if (cmd === '1234') {
-          state.cheatUsed = true;
-          addCredits(1e24);
-          const rect = els.coreButton ? els.coreButton.getBoundingClientRect() : { left: 240, top: 240, width: 120, height: 120 };
-          Particles.burst(rect.left + rect.width / 2, rect.top + rect.height / 2, 48, '#fde047', true);
-          SoundFX.reward();
-          refreshUI();
-          showToast('CHEAT ACTIVATED! +1,000 Sx Coins!');
-          response = 'GRANTED +1,000 Sx COINS!';
         } else if (cmd === 'RESET') {
           state.fxBighead = false;
           state.fxDisco = false;
