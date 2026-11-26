@@ -797,15 +797,58 @@
     }
 
     .pill-btn.rebirth-pill-btn {
-      border-color: rgba(251, 191, 36, 0.42);
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #3b0764 0%, #6d28d9 52%, #9333ea 100%);
+      border: 1.5px solid rgba(251, 191, 36, 0.72);
       color: #fef08a;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        0 4px 14px rgba(109, 40, 217, 0.42),
+        0 0 12px rgba(251, 191, 36, 0.16);
+      letter-spacing: 0.02em;
+    }
+
+    .pill-btn.rebirth-pill-btn:hover {
+      background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 55%, #a855f7 100%);
+      border-color: #fde047;
+      color: #ffffff;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 6px 18px rgba(139, 92, 246, 0.55),
+        0 0 16px rgba(251, 191, 36, 0.35);
     }
 
     .pill-btn.rebirth-pill-btn.ready {
-      background: linear-gradient(135deg, #22c55e, #facc15);
-      border-color: #fef08a;
-      color: #03200c;
-      box-shadow: 0 0 18px rgba(250, 204, 21, 0.45);
+      background: linear-gradient(135deg, #f59e0b 0%, #fde047 50%, #f97316 100%);
+      border-color: #fef9c3;
+      color: #2e1065;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.65),
+        0 0 24px rgba(250, 204, 21, 0.7),
+        0 4px 14px rgba(234, 88, 12, 0.45);
+      animation: rebirthReadyGlow 1.6s ease-in-out infinite alternate;
+    }
+
+    .pill-btn.rebirth-pill-btn.ready::after,
+    .prestige-btn:not(:disabled)::after {
+      content: "";
+      position: absolute;
+      inset: -20% -60%;
+      background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.42) 50%, transparent 62%);
+      transform: translateX(-100%);
+      animation: rebirthSheen 2.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes rebirthReadyGlow {
+      from { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 0 18px rgba(250, 204, 21, 0.6); }
+      to { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 0 30px rgba(253, 224, 71, 0.95); }
+    }
+
+    @keyframes rebirthSheen {
+      0%, 55% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
     }
 
     /* Floating '+X' text numbers */
@@ -929,9 +972,10 @@
     }
 
     .tab-badge.prestige-ready {
-      background: var(--gold-soft);
-      color: #fde68a;
-      border-color: rgba(251, 191, 36, 0.6);
+      background: #2e1065;
+      color: #fde047;
+      border-color: rgba(254, 240, 138, 0.85);
+      box-shadow: 0 0 8px rgba(46, 16, 101, 0.45);
     }
 
     .tab-badge.hidden {
@@ -1469,24 +1513,45 @@
     }
 
     .prestige-btn {
+      position: relative;
+      overflow: hidden;
       width: 100%;
-      min-height: 46px;
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-      background: linear-gradient(180deg, #4ade80, #eab308);
-      border: 1px solid rgba(254, 240, 138, 0.65);
-      color: #03210d;
-      font-weight: 800;
-      font-size: 0.92rem;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 4px 24px rgba(34, 197, 94, 0.38);
-      transition: transform 0.12s ease, opacity 0.15s ease, filter 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 50px;
+      padding: 13px 18px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #f59e0b 0%, #fde047 48%, #a855f7 100%);
+      border: 1.5px solid #fef08a;
+      color: #1e1b4b;
+      font-weight: 900;
+      font-size: 0.96rem;
+      letter-spacing: 0.02em;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.65),
+        0 4px 0 #7e22ce,
+        0 10px 26px rgba(168, 85, 247, 0.45);
+      transition: transform 0.12s ease, opacity 0.15s ease, filter 0.15s ease, box-shadow 0.12s ease;
     }
 
     .prestige-btn:active:not(:disabled) {
-      transform: scale(0.97);
+      transform: translateY(2px);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.55),
+        0 2px 0 #7e22ce,
+        0 4px 14px rgba(168, 85, 247, 0.38);
     }
 
-    .prestige-btn:disabled { opacity: 0.42; cursor: not-allowed; box-shadow: none; }
+    .prestige-btn:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+      background: linear-gradient(180deg, rgba(76, 29, 149, 0.72), rgba(46, 16, 101, 0.8));
+      border-color: rgba(251, 191, 36, 0.35);
+      color: #fde68a;
+      box-shadow: none;
+    }
 
     /* Leaderboard Coming Soon Panel */
     .leaderboard-hero {
@@ -2237,8 +2302,8 @@
         </button>
         <button class="pill-btn rebirth-pill-btn" id="btn-open-rebirth" type="button" title="Quantum Rebirth" aria-label="Rebirth">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
-            <path d="M21 3v5h-5"></path>
+            <path d="M12 3l2.2 4.8 5.3.7-3.9 3.6 1 5.2L12 14.8 7.4 17.3l1-5.2-3.9-3.6 5.3-.7L12 3z"></path>
+            <path d="M5 20h14"></path>
           </svg>
           <span class="btn-label">Rebirth</span>
           <span class="tab-badge prestige-ready hidden" id="prestige-ready-badge">READY</span>
@@ -2433,7 +2498,11 @@
         </div>
 
         <button class="prestige-btn" id="btn-rebirth" type="button" disabled>
-          Rebirth &amp; Claim Boost
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3l2.2 4.8 5.3.7-3.9 3.6 1 5.2L12 14.8 7.4 17.3l1-5.2-3.9-3.6 5.3-.7L12 3z"></path>
+            <path d="M5 20h14"></path>
+          </svg>
+          <span>Rebirth &amp; Claim Boost</span>
         </button>
 
         <div class="stats-box">
