@@ -690,23 +690,31 @@
     .jumpscare-overlay {
       position: fixed;
       inset: 0;
+      width: 100vw;
+      height: 100dvh;
       z-index: 9999;
       background: #000000;
       display: none;
-      place-items: center;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
       cursor: pointer;
       overflow: hidden;
     }
 
     .jumpscare-overlay.active {
-      display: grid;
+      display: flex;
       animation: scareFlash 0.14s steps(2) infinite;
     }
 
     .jumpscare-img {
+      display: block;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      max-width: 100vw;
+      max-height: 100dvh;
+      object-fit: contain;
+      object-position: center center;
       animation: scareZoomShake 0.12s infinite alternate;
     }
 
@@ -716,9 +724,9 @@
     }
 
     @keyframes scareZoomShake {
-      0% { transform: scale(1.06) translate(-6px, 4px) rotate(-1.5deg); }
-      50% { transform: scale(1.16) translate(6px, -6px) rotate(1.5deg); }
-      100% { transform: scale(1.12) translate(-4px, -3px) rotate(0deg); }
+      0% { transform: scale(0.95) translate(-4px, 3px) rotate(-1deg); }
+      50% { transform: scale(1.01) translate(4px, -4px) rotate(1deg); }
+      100% { transform: scale(0.98) translate(-3px, -2px) rotate(0deg); }
     }
 
     .arena-credits-row {
@@ -2285,6 +2293,23 @@
       color: #fca5a5;
       background: rgba(127, 29, 29, 0.32);
     }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .pill-btn.admin-pill-btn {
+      border-color: rgba(251, 191, 36, 0.72);
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(234, 179, 8, 0.14));
+      color: #fde047;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+    }
+
+    .pill-btn.admin-pill-btn:hover {
+      border-color: #fde047;
+      color: #ffffff;
+      box-shadow: 0 0 18px rgba(251, 191, 36, 0.38);
+    }
   </style>
 </head>
 <body>
@@ -2335,6 +2360,12 @@
             <line x1="12" y1="19" x2="20" y2="19"></line>
           </svg>
           <span class="btn-label">Cheat Codes</span>
+        </button>
+        <button class="pill-btn admin-pill-btn hidden" id="btn-open-admin" type="button" title="Admin Control Panel" aria-label="Admin">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"></path>
+          </svg>
+          <span class="btn-label">Admin</span>
         </button>
       </div>
     </header>
@@ -2720,15 +2751,13 @@
       </div>
       <div class="admin-status-bar">
         <span>Coins: <strong id="admin-status-coins">0</strong></span>
-        <span>Infinite Money: <strong id="admin-status-inf">OFF</strong></span>
         <span>Gems: <strong id="admin-status-gems">0</strong></span>
         <span>Crowns: <strong id="admin-status-crowns">0</strong></span>
         <span>Rebirths: <strong id="admin-status-rebirths">0</strong></span>
       </div>
       <div class="admin-section">
-        <h3>Economy &amp; Infinite Money</h3>
+        <h3>Economy &amp; Currencies</h3>
         <div class="admin-grid">
-          <button class="btn-primary admin-btn" id="btn-admin-toggle-inf" type="button">Give Infinite Money (∞)</button>
           <button class="btn-secondary admin-btn" id="btn-admin-add-1m" type="button">+1M Coins</button>
           <button class="btn-secondary admin-btn" id="btn-admin-add-1b" type="button">+1B Coins</button>
           <button class="btn-secondary admin-btn" id="btn-admin-add-qa" type="button">+1 Qa Coins</button>
@@ -2779,6 +2808,7 @@
           <button class="btn-secondary admin-btn" id="btn-admin-snake-score" type="button">+25 Snake High Score</button>
           <button class="btn-secondary admin-btn" id="btn-admin-beat" type="button">Beat Game / Universe</button>
           <button class="btn-secondary admin-btn" id="btn-admin-open-vault" type="button">Open Vault</button>
+          <button class="btn-secondary admin-btn danger" id="btn-admin-lock" type="button">Hide Admin Button</button>
           <button class="btn-secondary admin-btn danger" id="btn-admin-reset-save" type="button">Wipe Save Data</button>
         </div>
       </div>
@@ -3009,8 +3039,7 @@
           fxBighead: false,
           fxDisco: false,
           isAdmin: false,
-          infiniteMoney: false,
-          adminResetV2: true,
+          adminResetV3: true,
           cheatUsed: false,
           redeemedCheats: {},
           lastSaved: Date.now()
@@ -3222,11 +3251,10 @@
         Math.floor(baseCost * getCostDiscount() * Math.pow(rate, owned));
 
       function canAfford(cost) {
-        return Number.isFinite(cost) && cost >= 0 && (!!state.infiniteMoney || state.credits >= cost);
+        return Number.isFinite(cost) && cost >= 0 && state.credits >= cost;
       }
 
       function spendCredits(cost) {
-        if (state.infiniteMoney) return;
         if (Number.isFinite(cost) && cost > 0) {
           state.credits = Math.max(0, state.credits - cost);
         }
@@ -3250,7 +3278,7 @@
         let cost = 0;
         while (qty < 200) {
           const nextCost = getScaledCost(baseCost, rate, owned + qty);
-          if (!Number.isFinite(nextCost) || (!state.infiniteMoney && cost + nextCost > state.credits)) break;
+          if (!Number.isFinite(nextCost) || cost + nextCost > state.credits) break;
           cost += nextCost;
           qty++;
         }
@@ -3263,9 +3291,9 @@
 
       function getClaimableGems() {
         const threshold = getRebirthThreshold();
-        if (state.runCredits < threshold && !state.infiniteMoney) return 0;
-        const ratio = state.runCredits >= threshold ? (state.runCredits / threshold) : 100;
-        const base = Math.max(state.infiniteMoney ? 10 : 1, Math.floor(Math.sqrt(ratio)) + Math.floor(state.rebirths * 0.5));
+        if (state.runCredits < threshold) return 0;
+        const ratio = state.runCredits / threshold;
+        const base = Math.max(1, Math.floor(Math.sqrt(ratio)) + Math.floor(state.rebirths * 0.5));
         const gemMult = 1 + getSkillLv('idle_gems') * 0.2;
         return Math.max(1, Math.floor(base * gemMult));
       }
@@ -3424,9 +3452,10 @@
         merged.beatGame = !!parsed.beatGame;
         merged.fxBighead = !!parsed.fxBighead;
         merged.fxDisco = !!parsed.fxDisco;
-        merged.isAdmin = false;
-        merged.infiniteMoney = parsed.adminResetV2 ? !!parsed.infiniteMoney : false;
-        merged.adminResetV2 = true;
+        merged.isAdmin = parsed.adminResetV3 ? !!parsed.isAdmin : false;
+        merged.adminResetV3 = true;
+        delete merged.infiniteMoney;
+        delete merged.adminResetV2;
         merged.cheatUsed = !!parsed.cheatUsed;
         merged.redeemedCheats = parsed.redeemedCheats && typeof parsed.redeemedCheats === 'object' ? { ...parsed.redeemedCheats } : {};
       }
@@ -3501,10 +3530,9 @@
         offlineModal: document.getElementById('offline-modal'),
         rebirthModal: document.getElementById('rebirth-modal'),
         rebirthConfirmText: document.getElementById('rebirth-confirm-text'),
+        btnOpenAdmin: document.getElementById('btn-open-admin'),
         adminPanelModal: document.getElementById('admin-panel-modal'),
-        btnAdminToggleInf: document.getElementById('btn-admin-toggle-inf'),
         adminStatusCoins: document.getElementById('admin-status-coins'),
-        adminStatusInf: document.getElementById('admin-status-inf'),
         adminStatusGems: document.getElementById('admin-status-gems'),
         adminStatusCrowns: document.getElementById('admin-status-crowns'),
         adminStatusRebirths: document.getElementById('admin-status-rebirths')
@@ -3988,7 +4016,7 @@
 
       let lastCoinPileLevel = -1;
       function updateCoinPileVisualizer() {
-        const level = state.infiniteMoney ? 12 : (state.credits < 1 ? 0 : Math.min(12, Math.floor(Math.log10(state.credits + 1)) + 1));
+        const level = state.credits < 1 ? 0 : Math.min(12, Math.floor(Math.log10(state.credits + 1)) + 1);
         if (level === lastCoinPileLevel) return;
         lastCoinPileLevel = level;
         const container = els.coinPileViz;
@@ -4012,15 +4040,21 @@
       let nextJumpscareAt = Date.now() + JUMPSCARE_INTERVAL_MS;
       let jumpscareTimeoutId = null;
 
+      function dismissJumpscare() {
+        if (jumpscareTimeoutId) {
+          clearTimeout(jumpscareTimeoutId);
+          jumpscareTimeoutId = null;
+        }
+        if (els.jumpscareOverlay) els.jumpscareOverlay.classList.remove('active');
+      }
+
       function triggerJumpscare() {
         if (!els.jumpscareOverlay) return;
         nextJumpscareAt = Date.now() + JUMPSCARE_INTERVAL_MS;
         els.jumpscareOverlay.classList.add('active');
         SoundFX.jumpscare();
         if (jumpscareTimeoutId) clearTimeout(jumpscareTimeoutId);
-        jumpscareTimeoutId = setTimeout(() => {
-          els.jumpscareOverlay.classList.remove('active');
-        }, 1450);
+        jumpscareTimeoutId = setTimeout(dismissJumpscare, 2000);
       }
 
       function triggerGlitch() {
@@ -4172,11 +4206,18 @@
           refreshUI();
           if (els.terminalOverlay) els.terminalOverlay.classList.remove('open');
           if (els.adminPanelModal) els.adminPanelModal.classList.add('open');
-          showToast('ADMIN PANEL OPENED!');
-          response = 'ADMIN PANEL OPENED!';
+          showToast('ADMIN BUTTON UNLOCKED!');
+          response = 'ADMIN BUTTON UNLOCKED & PANEL OPENED!';
         } else if (cmd === 'ADMIN') {
-          SoundFX.fail();
-          response = 'USE SECRET CODE 456 TO OPEN ADMIN PANEL.';
+          if (state.isAdmin) {
+            SoundFX.reward();
+            if (els.terminalOverlay) els.terminalOverlay.classList.remove('open');
+            if (els.adminPanelModal) els.adminPanelModal.classList.add('open');
+            response = 'ADMIN PANEL OPENED!';
+          } else {
+            SoundFX.fail();
+            response = 'USE SECRET CODE 456 TO UNLOCK ADMIN.';
+          }
         } else if (cmd === 'RAZA11' || cmd === '1234' || cmd === '1111') {
           const codeKey = cmd.toLowerCase();
           const COIN_CHEAT_CODES = {
@@ -4427,16 +4468,15 @@
 
         els.clickArena.classList.toggle('glitch-mode', glitchLeft > 0);
 
-        const rawCreditsStr = state.infiniteMoney ? '∞' : formatNum(state.credits);
+        const rawCreditsStr = formatNum(state.credits);
         const displayCreditsStr = glitchLeft > 0 ? `${rawCreditsStr} // 0x${((now >> 5) & 255).toString(16).toUpperCase()}` : rawCreditsStr;
         setText(els.arenaCredits, displayCreditsStr);
         setText(els.adminStatusCoins, rawCreditsStr);
-        setText(els.adminStatusInf, state.infiniteMoney ? 'ON (∞)' : 'OFF');
         setText(els.adminStatusGems, formatNum(state.prestigeGems));
         setText(els.adminStatusCrowns, formatNum(state.crowns || 0));
         setText(els.adminStatusRebirths, formatNum(state.rebirths || 0));
-        if (els.btnAdminToggleInf) {
-          setText(els.btnAdminToggleInf, state.infiniteMoney ? 'Infinite Money: ON (Disable)' : 'Give Infinite Money (∞)');
+        if (els.btnOpenAdmin) {
+          els.btnOpenAdmin.classList.toggle('hidden', !state.isAdmin);
         }
         if (els.coreButton.dataset.tier !== ev.id) els.coreButton.dataset.tier = ev.id;
 
@@ -4509,7 +4549,7 @@
         setText(els.prestigeClaimable, `+${claimable} Gem${claimable === 1 ? '' : 's'} & +1 Crown`);
         setDisabled(els.btnRebirth, claimable <= 0);
 
-        const pct = state.infiniteMoney ? 100 : Math.min(100, Math.max(0, (state.runCredits / rebirthThreshold) * 100));
+        const pct = Math.min(100, Math.max(0, (state.runCredits / rebirthThreshold) * 100));
         els.prestigeProgress.style.width = `${pct.toFixed(1)}%`;
         setText(
           els.prestigeMilestoneText,
@@ -4639,7 +4679,7 @@
           const inText = tag === 'INPUT' || tag === 'TEXTAREA';
           if (e.key === 'Escape') {
             if (els.jumpscareOverlay && els.jumpscareOverlay.classList.contains('active')) {
-              els.jumpscareOverlay.classList.remove('active');
+              dismissJumpscare();
               return;
             }
             if (els.creditsOverlay && els.creditsOverlay.classList.contains('open')) {
@@ -4696,9 +4736,7 @@
         });
 
         if (els.jumpscareOverlay) {
-          els.jumpscareOverlay.addEventListener('click', () => {
-            els.jumpscareOverlay.classList.remove('active');
-          });
+          els.jumpscareOverlay.addEventListener('click', dismissJumpscare);
         }
 
         // Critical Click, Miner Overclock, Mystery Chest, Secret Egg
@@ -4890,7 +4928,13 @@
           });
         });
 
-        // Admin Control Panel Modal (Only opened via terminal code 456)
+        // Admin Control Panel Modal (Unlocked via terminal code 456 -> Admin button)
+        if (els.btnOpenAdmin && els.adminPanelModal) {
+          els.btnOpenAdmin.addEventListener('click', () => {
+            if (!state.isAdmin) return;
+            els.adminPanelModal.classList.add('open');
+          });
+        }
         const closeAdminBtn = document.getElementById('btn-close-admin');
         if (closeAdminBtn && els.adminPanelModal) {
           closeAdminBtn.addEventListener('click', () => els.adminPanelModal.classList.remove('open'));
@@ -4906,11 +4950,6 @@
           showToast(`Admin: ${label} (${secs}s) Activated!`);
         };
         const adminActions = {
-          'btn-admin-toggle-inf': () => {
-            state.infiniteMoney = !state.infiniteMoney;
-            lastCoinPileLevel = -1;
-            showToast(state.infiniteMoney ? 'Infinite Money: ON (∞ Coins)' : 'Infinite Money: OFF');
-          },
           'btn-admin-add-1m': grantCoins(1e6, '1M'),
           'btn-admin-add-1b': grantCoins(1e9, '1B'),
           'btn-admin-add-qa': grantCoins(1e15, '1 Qa'),
@@ -4920,11 +4959,10 @@
           'btn-admin-add-gems1k': () => { state.prestigeGems += 1000; showToast('Admin: +1,000 Prestige Gems!'); },
           'btn-admin-add-crowns': () => { state.crowns = (state.crowns || 0) + 10; showToast('Admin: +10 Crowns!'); },
           'btn-admin-zero-coins': () => {
-            state.infiniteMoney = false;
             state.credits = 0;
             state.runCredits = 0;
             lastCoinPileLevel = -1;
-            showToast('Admin: Coins reset to 0 & Infinite Money OFF.');
+            showToast('Admin: Coins reset to 0.');
           },
           'btn-admin-tap-plus10': () => {
             TAP_UPGRADES.forEach((t) => { state.tapUpgrades[t.id] = (state.tapUpgrades[t.id] || 0) + 10; });
@@ -5041,6 +5079,11 @@
             renderVaultLists();
             if (els.vaultPageModal) els.vaultPageModal.classList.add('open');
           },
+          'btn-admin-lock': () => {
+            state.isAdmin = false;
+            if (els.adminPanelModal) els.adminPanelModal.classList.remove('open');
+            showToast('Admin button hidden! Enter 456 to unlock again.');
+          },
           'btn-admin-reset-save': () => {
             resetGameFromScratch('Save data wiped!');
           }
@@ -5052,7 +5095,7 @@
             handler();
             if (btnId === 'btn-admin-reset-save') return;
             checkAchievements();
-            if (!['btn-admin-jumpscare', 'btn-admin-glitch'].includes(btnId)) {
+            if (!['btn-admin-jumpscare', 'btn-admin-glitch', 'btn-admin-lock'].includes(btnId)) {
               SoundFX.reward();
             }
             saveLocal();
